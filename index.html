@@ -3,117 +3,174 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Sedam TAG 2026 - Gestão Estratégica</title>
+<title>Sedam TAG 2026 - Auditoria e Gestão</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body { background: radial-gradient(circle at top, #1e293b, #0f172a); color: #f8fafc; font-family: 'Inter', sans-serif; }
+body { background: radial-gradient(circle at top, #1e293b, #0f172a); color: #f8fafc; font-family: 'Inter', sans-serif; min-height: 100-vh; }
 .card-glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
 .card-glass:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.4); }
-.status-vencido { border-left: 8px solid #ef4444; }
-.status-alerta { border-left: 8px solid #f59e0b; }
-.status-em-dia { border-left: 8px solid #10b981; }
+.status-vencido { border-left: 8px solid #ef4444 !important; background: rgba(239, 68, 68, 0.05); }
+.status-alerta { border-left: 8px solid #f59e0b !important; background: rgba(245, 158, 11, 0.05); }
+.status-em-dia { border-left: 8px solid #10b981 !important; background: rgba(16, 185, 129, 0.05); }
+input::placeholder { color: #64748b; }
 </style>
 </head>
 <body class="p-4 md:p-8">
-<!-- LOGIN -->
+<!-- SEÇÃO DE LOGIN -->
 <div id="login-screen" class="min-h-screen flex items-center justify-center">
 <div class="card-glass p-10 rounded-3xl w-full max-w-md shadow-2xl">
-<h1 class="text-3xl font-black text-center mb-8 text-blue-400">TAG SEDAM 2026</h1>
-<input type="email" id="email" placeholder="Email" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-blue-500">
-<input type="password" id="password" placeholder="Senha" class="w-full p-4 mb-8 bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-blue-500">
-<button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold shadow-lg transition-all">Entrar no Sistema</button>
-<p id="login-msg" class="text-center mt-4 text-xs text-slate-500"></p>
+<h1 class="text-3xl font-black text-center mb-2 text-blue-400">TAG SEDAM</h1>
+<p class="text-center text-slate-400 text-sm mb-8">Gestão Estratégica 2026</p>
+<div class="space-y-4">
+<input type="email" id="email" placeholder="E-mail funcional" class="w-full p-4 bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-blue-500 text-white">
+<input type="password" id="password" placeholder="Senha de acesso" class="w-full p-4 bg-slate-800 rounded-xl border-none focus:ring-2 focus:ring-blue-500 text-white">
+<button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold shadow-lg transition-all transform active:scale-95">Entrar no Sistema</button>
+</div>
+<p id="login-msg" class="text-center mt-6 text-xs text-red-400 font-medium"></p>
 </div>
 </div>
-<!-- DASHBOARD -->
+<!-- SEÇÃO DO DASHBOARD -->
 <div id="dashboard" class="hidden max-w-7xl mx-auto">
-<header class="flex flex-col md:row justify-between items-center mb-12 gap-4">
+<header class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
 <div>
-<h2 class="text-4xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">Monitoramento de Metas</h2>
-<p id="user-info" class="text-slate-400 font-medium"></p>
+<h2 class="text-4xl font-black bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">Painel de Auditoria</h2>
+<p id="user-info" class="text-slate-400 font-medium mt-1 italic"></p>
 </div>
-<button onclick="logout()" class="bg-red-500/10 text-red-400 px-6 py-2 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all">Sair</button>
+<button onclick="logout()" class="bg-red-500/10 text-red-400 px-6 py-2 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all">Sair do Sistema</button>
 </header>
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- GRÁFICO -->
 <div class="lg:col-span-2 card-glass p-8 rounded-3xl shadow-xl">
-<h3 class="text-xl font-bold mb-6">Evolução Acumulada (%)</h3>
-<div class="h-[300px] w-full"><canvas id="mainChart"></canvas></div>
+<h3 class="text-xl font-bold mb-6 flex items-center gap-2"><span class="w-2 h-6 bg-blue-500 rounded-full"></span>Evolução Acumulada (%)</h3>
+<div class="h-[350px] w-full"><canvas id="mainChart"></canvas></div>
 </div>
+<!-- FORMULÁRIO (VISÍVEL APENAS PARA NÍVEL 3 E 4) -->
 <div id="form-area" class="card-glass p-8 rounded-3xl shadow-xl hidden">
-<h3 class="text-xl font-bold mb-6 text-emerald-400">Lançar Evolução</h3>
-<select id="delib_id" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none text-sm"></select>
-<input type="month" id="mes_ref" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none">
-<input type="number" id="percentual" placeholder="Percentual do Mês (%)" class="w-full p-4 mb-6 bg-slate-800 rounded-xl border-none">
-<button onclick="salvarLancamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-bold shadow-lg">Registrar</button>
+<h3 class="text-xl font-bold mb-6 text-emerald-400">Lançar Atualização</h3>
+<label class="block text-xs text-slate-500 mb-1 ml-1">Selecione a Meta</label>
+<select id="delib_id" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none text-sm text-white"></select>
+<label class="block text-xs text-slate-500 mb-1 ml-1">Mês de Referência</label>
+<input type="month" id="mes_ref" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none text-white">
+<label class="block text-xs text-slate-500 mb-1 ml-1">Percentual Concluído (%)</label>
+<input type="number" id="percentual" placeholder="Ex: 85" class="w-full p-4 mb-6 bg-slate-800 rounded-xl border-none text-white">
+<button onclick="salvarLancamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-bold shadow-lg transition-all">Registrar Evolução</button>
 </div>
 </div>
+<!-- LISTA DE CARDS -->
 <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12"></div>
 </div>
 <script>
+
 // CONFIGURAÇÕES SUPABASE
         const SUPABASE_URL = 'https://zvtzbiqfwhggysiuiuxh.supabase.co/rest/v1/';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2dHpiaXFmd2hnZ3lzaXVpdXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODYyMjcsImV4cCI6MjA5MzE2MjIyN30.tCnFZv2B6Kmd9KsyZM8CHClZqsq7Nyu-8nxyYVs_ZMQ';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 let myProfile = null;
 let myChart = null;
 async function login() {
 const email = document.getElementById('email').value;
 const password = document.getElementById('password').value;
-const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-if(error) document.getElementById('login-msg').innerText = error.message;
-else initApp(data.user.id);
+const loginMsg = document.getElementById('login-msg');
+loginMsg.innerText = "Autenticando...";
+const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+if(error) { loginMsg.innerText = "Falha no acesso: " + error.message; }
+else { initApp(data.user.id); }
 }
 async function initApp(uid) {
-const { data: profile } = await supabase.from('perfis').select('*').eq('id', uid).single();
+const { data: profile, error } = await supabaseClient.from('perfis').select('*').eq('id', uid).single();
+if(error || !profile) { alert("Perfil não localizado no banco de dados."); return; }
 myProfile = profile;
 document.getElementById('login-screen').classList.add('hidden');
 document.getElementById('dashboard').classList.remove('hidden');
-document.getElementById('user-info').innerText = `${profile.nome_completo} • ${profile.nivel_acesso}`;
+document.getElementById('user-info').innerText = `${profile.nome_completo} | ${profile.nivel_acesso} (Nível ${profile.hierarquia})`;
 if(profile.hierarquia >= 3) document.getElementById('form-area').classList.remove('hidden');
 carregarDashboard();
 }
 async function carregarDashboard() {
-const { data: delibs } = await supabase.from('deliberacoes').select('*, perfis(nome_completo)');
+const { data: delibs } = await supabaseClient.from('deliberacoes').select('*, perfis(nome_completo)');
 renderCards(delibs);
 if(myProfile.hierarquia >= 3) renderSelect(delibs);
-const { data: evolucao } = await supabase.from('evolucao_mensal').select('*').order('mes_referencia');
+const { data: evolucao } = await supabaseClient.from('evolucao_mensal').select('*').order('mes_referencia');
 renderChart(evolucao);
 }
 function renderCards(itens) {
 const container = document.getElementById('cards-container');
 const hoje = new Date();
+if(!itens) return;
 container.innerHTML = itens.map(i => {
 const prazo = new Date(i.prazo);
-const dias = Math.ceil((prazo - hoje) / (86400000));
-let cor = 'status-em-dia';
-if(dias < 0) cor = 'status-vencido';
-else if(dias <= 30) cor = 'status-alerta';
-return `<div class="card-glass p-6 rounded-2xl ${cor}">
-<div class="flex justify-between mb-2"><span class="font-black text-blue-400">${i.identificador}</span><span class="text-[10px] text-slate-500">${i.prazo}</span></div>
-<p class="text-xs text-slate-300 mb-4 h-12 overflow-hidden">${i.descricao}</p>
-<div class="flex justify-between text-[10px] mb-1"><span>${i.perfis?.nome_completo || 'Sem Resp.'}</span><span class="font-bold">${i.total_cumprimento}%</span></div>
-<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden"><div class="bg-blue-500 h-full" style="width:${i.total_cumprimento}%"></div></div>
+const diff = Math.ceil((prazo - hoje) / (86400000));
+let corStatus = 'status-em-dia';
+if(diff < 0) corStatus = 'status-vencido';
+else if(diff <= 30) corStatus = 'status-alerta';
+return `<div class="card-glass p-6 rounded-2xl ${corStatus}">
+<div class="flex justify-between items-start mb-3">
+<span class="font-black text-blue-400 text-lg">${i.identificador}</span>
+<span class="text-[10px] bg-slate-800 px-2 py-1 rounded-lg text-slate-400">${new Date(i.prazo).toLocaleDateString('pt-BR')}</span>
+</div>
+<p class="text-xs text-slate-300 mb-6 h-12 overflow-hidden leading-relaxed">${i.descricao}</p>
+<div class="flex justify-between items-center text-[10px] mb-2">
+<span class="text-slate-500">Resp: ${i.perfis?.nome_completo || 'Auditoria'}</span>
+<span class="font-bold text-blue-400">${i.total_cumprimento}%</span>
+</div>
+<div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+<div class="bg-blue-500 h-full transition-all duration-1000" style="width:${i.total_cumprimento}%"></div>
+</div>
 </div>`;
 }).join('');
 }
 function renderChart(dados) {
 const ctx = document.getElementById('mainChart').getContext('2d');
 if(myChart) myChart.destroy();
-myChart = new Chart(ctx, { type: 'line', data: { labels: dados.map(d => d.mes_referencia), datasets: [{ label: 'Evolução %', data: dados.map(d => d.percentual_lancado), borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } } });
+if(!dados || dados.length === 0) return;
+myChart = new Chart(ctx, {
+type: 'line',
+data: {
+labels: dados.map(d => d.mes_referencia),
+datasets: [{
+label: 'Evolução TAG (%)',
+data: dados.map(d => d.percentual_lancado),
+borderColor: '#3b82f6',
+backgroundColor: 'rgba(59, 130, 246, 0.1)',
+borderWidth: 3,
+tension: 0.4,
+fill: true,
+pointRadius: 4,
+pointBackgroundColor: '#3b82f6'
+}]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false,
+scales: { 
+y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.05)' } },
+x: { grid: { display: false } }
+},
+plugins: { legend: { display: false } }
+}
+});
 }
 function renderSelect(itens) {
 const sel = document.getElementById('delib_id');
-sel.innerHTML = itens.map(i => `<option value="${i.id}">${i.identificador}</option>`).join('');
+if(!sel) return;
+sel.innerHTML = itens.map(i => `<option value="${i.id}">${i.identificador} - ${i.descricao.substring(0,30)}...</option>`).join('');
 }
 async function salvarLancamento() {
-const payload = { deliberacao_id: document.getElementById('delib_id').value, mes_referencia: document.getElementById('mes_ref').value + "-01", percentual_lancado: document.getElementById('percentual').value };
-const { error } = await supabase.from('evolucao_mensal').insert(payload);
-if(error) alert(error.message); else carregarDashboard();
+const idDelib = document.getElementById('delib_id').value;
+const perc = document.getElementById('percentual').value;
+const dataRef = document.getElementById('mes_ref').value + "-01";
+if(!idDelib || !perc || !dataRef) { alert("Preencha todos os campos!"); return; }
+const { error } = await supabaseClient.from('evolucao_mensal').insert({
+deliberacao_id: idDelib,
+mes_referencia: dataRef,
+percentual_lancado: perc
+});
+if(error) alert("Erro ao salvar: " + error.message);
+else { alert("Lançamento realizado com sucesso!"); carregarDashboard(); }
 }
-async function logout() { await supabase.auth.signOut(); location.reload(); }
+async function logout() { await supabaseClient.auth.signOut(); location.reload(); }
 </script>
 </body>
 </html>
