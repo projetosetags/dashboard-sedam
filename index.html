@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="icon" href="data:,">
-<title>Sedam TAG 2026 - Dashboard Auditoria</title>
+<title>Sedam TAG 2026 - Auditoria e Gestão</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,11 +21,11 @@ body { background: radial-gradient(circle at top, #1e293b, #0f172a); color: #f8f
 <div id="login-screen" class="min-h-screen flex items-center justify-center">
 <div class="card-glass p-10 rounded-3xl w-full max-w-md shadow-2xl">
 <h1 class="text-3xl font-black text-center mb-2 text-blue-400">TAG SEDAM</h1>
-<p class="text-center text-slate-400 text-sm mb-8">Login Auditoria</p>
+<p class="text-center text-slate-400 text-sm mb-8">Gestão Estratégica 2026</p>
 <div class="space-y-4">
-<input type="email" id="email" placeholder="Email (manoel@sedam.com)" class="w-full p-4 bg-slate-800 rounded-xl border-none text-white focus:ring-2 focus:ring-blue-500">
-<input type="password" id="password" placeholder="Senha" class="w-full p-4 bg-slate-800 rounded-xl border-none text-white focus:ring-2 focus:ring-blue-500">
-<button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold shadow-lg transition-all">Acessar Painel</button>
+<input type="text" id="userInput" placeholder="Usuário (ex: manoel)" class="w-full p-4 bg-slate-800 rounded-xl border-none text-white focus:ring-2 focus:ring-blue-500">
+<input type="password" id="passInput" placeholder="Senha" class="w-full p-4 bg-slate-800 rounded-xl border-none text-white focus:ring-2 focus:ring-blue-500">
+<button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold shadow-lg transition-all">Entrar no Sistema</button>
 </div>
 <p id="login-msg" class="text-center mt-6 text-xs text-red-400 font-medium"></p>
 </div>
@@ -48,7 +48,7 @@ body { background: radial-gradient(circle at top, #1e293b, #0f172a); color: #f8f
 <select id="delib_id" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none text-sm text-white"></select>
 <input type="month" id="mes_ref" class="w-full p-4 mb-4 bg-slate-800 rounded-xl border-none text-white">
 <input type="number" id="percentual" placeholder="%" class="w-full p-4 mb-6 bg-slate-800 rounded-xl border-none text-white">
-<button onclick="salvarLancamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-bold w-full">Salvar</button>
+<button onclick="salvarLancamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-bold">Salvar</button>
 </div>
 </div>
 <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12"></div>
@@ -59,15 +59,16 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let myProfile = null;
 async function login() {
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
+let email = document.getElementById('userInput').value.trim().toLowerCase();
+const password = document.getElementById('passInput').value;
+if(!email.includes('@')) email += '@sedam.com';
 const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-if(error) document.getElementById('login-msg').innerText = error.message;
+if(error) document.getElementById('login-msg').innerText = "Erro: " + error.message;
 else initApp(data.user.id);
 }
 async function initApp(uid) {
 const { data: profile } = await supabaseClient.from('perfis').select('*').eq('id', uid).single();
-if(!profile) { document.getElementById('login-msg').innerText = "Perfil não sincronizado. Rode o SQL de Sincronização."; return; }
+if(!profile) { document.getElementById('login-msg').innerText = "Perfil não sincronizado no Banco de Dados."; return; }
 myProfile = profile;
 document.getElementById('login-screen').classList.add('hidden');
 document.getElementById('dashboard').classList.remove('hidden');
@@ -76,11 +77,10 @@ if(profile.hierarquia >= 3) document.getElementById('form-area').classList.remov
 carregarDashboard();
 }
 async function carregarDashboard() {
-const { data: delibs, error } = await supabaseClient.from('deliberacoes').select('*, perfis(nome_completo)');
-if(error) { console.error(error); return; }
+const { data: delibs } = await supabaseClient.from('deliberacoes').select('*, perfis(nome_completo)');
 const container = document.getElementById('cards-container');
+if(!delibs || delibs.length === 0) { container.innerHTML = "<p class='col-span-full text-center py-20 text-slate-500'>Nenhuma deliberação encontrada.</p>"; return; }
 const hoje = new Date();
-if(!delibs || delibs.length === 0) { container.innerHTML = "<p class='col-span-full text-center py-20 text-slate-500'>Nenhuma meta vinculada ao seu perfil.</p>"; return; }
 container.innerHTML = delibs.map(i => {
 const prazo = new Date(i.prazo);
 const diff = Math.ceil((prazo - hoje) / 86400000);
@@ -90,7 +90,7 @@ return `<div class="card-glass p-6 rounded-2xl ${cor}">
 <div class="flex justify-between mb-3"><span class="font-bold text-blue-400">${i.identificador}</span><span class="text-[10px] text-slate-500">${new Date(i.prazo).toLocaleDateString()}</span></div>
 <p class="text-xs text-slate-300 mb-4 h-12 overflow-hidden">${i.descricao}</p>
 <div class="flex justify-between text-[10px] mb-2"><span>Resp: ${i.perfis?.nome_completo || 'Auditoria'}</span><span class="font-bold text-blue-400">${i.total_cumprimento}%</span></div>
-<div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden"><div class="bg-blue-500 h-full" style="width:${i.total_cumprimento}%"></div></div>
+<div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden"><div class="bg-blue-500 h-full" style="style:width:${i.total_cumprimento}%"></div></div>
 </div>`;
 }).join('');
 }
