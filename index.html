@@ -13,59 +13,90 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <style>
 body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; }
-/* Estilo de Botão/Card Colorido Conforme Execução */
-.card-micro { padding: 0.2rem; min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); }
-.bg-status-red { background-color: #7f1d1d !important; border-color: #ef4444; } /* 0-30% */
-.bg-status-yellow { background-color: #78350f !important; border-color: #f59e0b; } /* 31-99% */
-.bg-status-fulfilled { background-color: #064e3b !important; border-color: #10b981; } /* 100% */
-.percent-big { font-size: 1.5rem; font-weight: 900; line-height: 1; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.tab-btn { padding: 0.75rem 1rem; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #64748b; border-bottom: 2px solid transparent; transition: 0.3s; }
+/* Estilo Semafórico dos Cards */
+.card-micro { padding: 0.15rem; min-height: 42px; display: flex; align-items: center; justify-content: center; transition: 0.2s; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+.bg-status-red { background-color: #991b1b !important; } /* 0-30% */
+.bg-status-yellow { background-color: #854d0e !important; } /* 31-99% */
+.bg-status-green { background-color: #065f46 !important; } /* 100% */
+.percent-big { font-size: 1.1rem; font-weight: 900; color: white; }
+.tab-btn { padding: 0.6rem 1rem; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #64748b; border-bottom: 2px solid transparent; transition: 0.3s; }
 .tab-active { color: #3b82f6; border-bottom-color: #3b82f6; background: rgba(59,130,246,0.05); }
 .input-table { background: transparent; border: none; color: #3b82f6; font-weight: 800; width: 45px; text-align: center; font-size: 11px; }
-.row-100 { background: rgba(16, 185, 129, 0.15) !important; font-weight: 700; }
+.row-100 { background: rgba(16, 185, 129, 0.1) !important; color: #10b981; font-weight: 700; }
+.legend-box { background: rgba(30,41,59,0.6); border: 1px solid rgba(59,130,246,0.2); padding: 1rem; border-radius: 10px; margin-top: 1rem; font-size: 0.7rem; color: #cbd5e1; white-space: pre-wrap; }
+.btn-pdf { background: #ef4444; color: white; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; transition: 0.3s; }
 </style>
 </head>
 <body class="p-2 md:p-4">
 <div id="login-screen" class="min-h-screen flex items-center justify-center">
 <div class="bg-slate-900 p-8 rounded-3xl border border-white/5 shadow-2xl w-full max-w-xs text-center">
-<h1 class="text-xl font-black text-blue-400 mb-6 uppercase tracking-widest">TAG TCE/RO</h1>
-<input type="text" id="u" placeholder="Usuário" class="w-full p-3 mb-3 bg-slate-800 rounded-lg text-white text-sm"><input type="password" id="p" placeholder="Senha" class="w-full p-3 mb-4 bg-slate-800 rounded-lg text-white text-sm"><button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold text-sm">ENTRAR</button>
+<h1 class="text-xl font-black text-blue-400 mb-6 uppercase tracking-tighter">TAG TCE/RO v11</h1>
+<input type="text" id="u" placeholder="Usuário" class="w-full p-3 mb-3 bg-slate-800 rounded-lg text-white text-sm">
+<input type="password" id="p" placeholder="Senha" class="w-full p-3 mb-4 bg-slate-800 rounded-lg text-white text-sm">
+<button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold text-sm">ENTRAR</button>
 </div>
 </div>
+
 <div id="dashboard" class="hidden">
 <header class="flex justify-between items-center mb-4 px-2">
-<div><h2 class="text-lg font-black text-blue-400 leading-none">PAINEL DE AUDITORIA TAG</h2><p id="user-info" class="text-[9px] text-slate-500 uppercase mt-1 italic"></p></div>
-<div class="flex items-center gap-4"><div id="pdf-container"></div><div class="text-right border-l border-white/10 pl-4"><span class="block text-[7px] text-slate-500 font-bold uppercase">Média Geral TAG</span><span id="total-geral" class="text-2xl font-black text-emerald-400">0%</span></div><button onclick="logout()" class="text-[9px] bg-white/5 text-slate-400 px-3 py-1 rounded">SAIR</button></div>
+<div><h2 class="text-lg font-black text-blue-400 leading-none">PAINEL ESTRATÉGICO TAG</h2><p id="user-info" class="text-[9px] text-slate-500 uppercase mt-1 italic"></p></div>
+<div class="flex items-center gap-4">
+<div id="pdf-container"></div>
+<div class="text-right border-l border-white/10 pl-4"><span class="block text-[7px] text-slate-500 font-bold uppercase">Média Geral TAG</span><span id="total-geral" class="text-2xl font-black text-emerald-400">0%</span></div>
+<button onclick="logout()" class="text-[9px] bg-white/5 text-slate-400 px-3 py-1 rounded">SAIR</button>
+</div>
 </header>
-<nav class="flex gap-1 mb-4 border-b border-white/5"><button onclick="switchTab('resumo')" id="tab-resumo" class="tab-btn tab-active">Resumo</button><button onclick="switchTab('mensal')" id="tab-mensal" class="tab-btn">Monitoramento</button><button onclick="switchTab('analise')" id="tab-analise" class="tab-btn">Gráficos</button><button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Cumpridos</button></nav>
-<div id="view-resumo" class="tab-view"><div id="cards-container" class="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-16 2xl:grid-cols-24 gap-1"></div></div>
-<div id="view-mensal" class="tab-view hidden"><div class="bg-slate-900/40 rounded-xl border border-white/5 overflow-x-auto"><table class="w-full text-left border-collapse min-w-[1300px]"><thead><tr class="text-[8px] text-slate-500 uppercase border-b border-white/10"><th class="p-3">Sub-Item</th><th class="p-3 w-1/5">Ação Detalhada</th><th>Início</th><th>Responsável</th><th>Setor/Coord</th><th>Março</th><th>Abril</th><th class="text-blue-400">Maio</th><th class="p-3 text-right">Acumulado</th></tr></thead><tbody id="table-body" class="text-[10px]"></tbody></table></div></div>
+
+<nav class="flex gap-1 mb-4 border-b border-white/5">
+<button onclick="switchTab('resumo')" id="tab-resumo" class="tab-btn tab-active">Resumo</button>
+<button onclick="switchTab('mensal')" id="tab-mensal" class="tab-btn">Monitoramento</button>
+<button onclick="switchTab('analise')" id="tab-analise" class="tab-btn">Gráficos</button>
+<button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Concluídos</button>
+</nav>
+
+<!-- MONITORAMENTO MENSAL DETALHADO -->
+<div id="view-mensal" class="tab-view hidden">
+<div class="bg-slate-900/40 rounded-xl border border-white/5 overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[1400px]">
+<thead><tr class="text-[8px] text-slate-500 uppercase border-b border-white/10">
+<th class="p-3">Sub-Item</th><th class="p-3 w-1/4">Ação Detalhada</th><th>Responsável</th><th>Coordenadoria</th><th>Início</th><th>Março</th><th>Abril</th><th class="text-blue-400">Maio</th><th class="p-3 text-right">Total</th>
+</tr></thead>
+<tbody id="table-body" class="text-[10px]"></tbody>
+</table>
+</div>
+</div>
+
 <div id="view-concluidos" class="tab-view hidden">
-<div id="concluidos-container" class="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-16 gap-1 mb-8"></div>
-<div class="bg-slate-900/40 p-6 rounded-xl border border-emerald-500/20"><h3 class="text-emerald-400 font-bold text-xs mb-4 uppercase">Descrição das Ações Concluídas</h3><div id="concluidos-list" class="space-y-2 text-[10px] text-slate-400"></div></div>
+<div id="concluidos-container" class="grid grid-cols-6 sm:grid-cols-10 lg:grid-cols-18 gap-1 mb-8"></div>
+<div class="bg-slate-900/40 p-6 rounded-xl border border-emerald-500/20"><h3 class="text-emerald-400 font-bold text-xs mb-4 uppercase">Descrição das Ações Cumpridas (100%)</h3><div id="concluidos-list" class="space-y-1 text-[10px] text-slate-400"></div></div>
 </div>
-<div id="view-analise" class="tab-view hidden"><div class="bg-slate-900/40 p-6 rounded-2xl border border-white/5"><div class="flex flex-col sm:flex-row gap-3 mb-6"><div class="flex flex-col gap-1"><label class="text-[8px] text-slate-500 font-bold uppercase">1. Item do TAG</label><select id="sel-item" onchange="updateSubSelect()" class="bg-slate-800 text-[10px] rounded p-2 text-white border-none w-72"></select></div><div class="flex flex-col gap-1"><label class="text-[8px] text-slate-500 font-bold uppercase">2. Sub-Item / Ação</label><select id="sel-sub" onchange="renderChart()" class="bg-slate-800 text-[10px] rounded p-2 text-white border-none w-72"></select></div></div><div class="h-[300px]"><canvas id="barChart"></canvas></div><div id="chart-legend" class="legend-box hidden"></div></div></div>
+
+<div id="view-analise" class="tab-view hidden">
+<div class="bg-slate-900/40 p-6 rounded-2xl border border-white/5">
+<div class="flex flex-col sm:flex-row gap-3 mb-6">
+<div class="flex flex-col gap-1"><label class="text-[8px] text-slate-500 font-bold uppercase">1. Item do TAG</label><select id="sel-item" onchange="updateSubSelect()" class="bg-slate-800 text-[10px] rounded p-2 text-white border-none w-72"></select></div>
+<div class="flex flex-col gap-1"><label class="text-[8px] text-slate-500 font-bold uppercase">2. Sub-Item / Ação</label><select id="sel-sub" onchange="renderChart()" class="bg-slate-800 text-[10px] rounded p-2 text-white border-none w-72"></select></div>
 </div>
+<div class="h-[300px]"><canvas id="barChart"></canvas></div>
+<div id="chart-legend" class="legend-box hidden"></div>
+</div>
+</div>
+
+<div id="view-resumo" class="tab-view"><div id="cards-container" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 2xl:grid-cols-28 gap-1"></div></div>
+</div>
+
 <script>
 const S_URL = 'https://zvtzbiqfwhggysiuiuxh.supabase.co';
 const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2dHpiaXFmd2hnZ3lzaXVpdXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODYyMjcsImV4cCI6MjA5MzE2MjIyN30.tCnFZv2B6Kmd9KsyZM8CHClZqsq7Nyu-8nxyYVs_ZMQ';
 const client = supabase.createClient(S_URL, S_KEY);
 let userP = null; let allData = []; let myChart = null;
-const descItens = { "total": "TOTAL GERAL DO TAG - Consolidação total da performance SEDAM.", "1.1": "Elabore plano de ação considerando LOA e PE-RO.", "1.2": "Concluir Plano Estratégico Sedam (5 anos).", "1.3": "Identificar processos e rotinas e instituir manuais.", "1.4": "Institucionalizar licenciamento via sensoriamento remoto.", "1.5": "Desenvolver Geoportal SEDAM.", "1.7": "Plano de Ação Unidades de Conservação." };
+
+const descItens = { "total": "TOTAL GERAL DO TAG SEDAM", "1.1": "Elabore plano de ação considerando LOA e PE-RO.", "1.2": "Concluir Plano Estratégico Sedam (5 anos).", "1.3": "Identificar processos e rotinas e instituir manuais.", "1.4": "Institucionalizar licenciamento via sensoriamento remoto.", "1.5": "Desenvolver Geoportal SEDAM.", "1.7": "Plano de Ação Unidades de Conservação." };
 const rangeItens = { "1.1": ["1.1", "1.2", "1.3", "1.4"], "1.2": ["2.1", "3.1", "3.2", "3.3", "4.1", "4.2"], "1.3": ["5.1", "5.2", "5.3", "5.4", "5.5", "5.6", "5.7"], "1.4": ["6.1", "6.2", "6.3", "6.4", "7.1", "7.2", "8.1"], "1.5": ["9.1", "9.2", "9.3", "9.4", "10.1", "10.2", "10.3", "10.4", "10.5", "10.6", "10.7"] };
 
-async function login() {
-let e = document.getElementById('u').value.trim().toLowerCase(); if(!e.includes('@')) e += '@sedam.com';
-const { data, error } = await client.auth.signInWithPassword({ email: e, password: document.getElementById('p').value });
-if(!error) init(data.user.id);
-}
-async function init(uid) {
-const { data: p } = await client.from('perfis').select('*').eq('id', uid).single(); userP = p;
-document.getElementById('login-screen').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden');
-document.getElementById('user-info').innerText = `${p.nome_completo} | ${p.nivel_acesso}`;
-if(p.hierarquia <= 2) document.getElementById('pdf-container').innerHTML = `<button onclick="gerarRelatorioPDF()" class="btn-pdf">Exportar PDF A4</button>`;
-const lastTab = localStorage.getItem('activeTab') || 'resumo'; switchTab(lastTab); carregarDados();
-}
+async function login() { let e = document.getElementById('u').value.trim().toLowerCase(); if(!e.includes('@')) e += '@sedam.com'; const { data, error } = await client.auth.signInWithPassword({ email: e, password: document.getElementById('p').value }); if(!error) init(data.user.id); }
+async function init(uid) { const { data: p } = await client.from('perfis').select('*').eq('id', uid).single(); userP = p; document.getElementById('login-screen').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); document.getElementById('user-info').innerText = `${p.nome_completo} | ${p.nivel_acesso}`; if(p.hierarquia <= 2) document.getElementById('pdf-container').innerHTML = `<button onclick="gerarRelatorioPDF()" class="btn-pdf">Emitir PDF A4</button>`; const lastTab = localStorage.getItem('activeTab') || 'resumo'; switchTab(lastTab); carregarDados(); client.channel('any').on('postgres_changes', { event: '*', schema: 'public', table: 'deliberacoes' }, () => carregarDados()).subscribe(); }
+
 async function carregarDados() {
 const { data } = await client.from('deliberacoes').select('*, evolucao_mensal(*)');
 if(data) {
@@ -74,76 +105,70 @@ document.getElementById('total-geral').innerText = Math.round(allData.reduce((ac
 renderResumo(); renderTable(); renderConcluidos(); renderSelects(); renderChart();
 }
 }
+
 function renderResumo() {
 document.getElementById('cards-container').innerHTML = allData.map(i => {
-let colorClass = i.total_cumprimento <= 30 ? 'bg-status-red' : (i.total_cumprimento >= 100 ? 'bg-status-fulfilled' : 'bg-status-yellow');
-return `<div class="card-micro ${colorClass}"><span class="text-[7px] font-bold text-white/50 uppercase">${i.identificador}</span><span class="percent-big">${i.total_cumprimento}%</span></div>`;
+let color = i.total_cumprimento <= 30 ? 'bg-status-red' : (i.total_cumprimento >= 100 ? 'bg-status-green' : 'bg-status-yellow');
+return `<div class="card-micro ${color}"><span class="percent-big">${i.total_cumprimento}%</span></div>`;
 }).join('');
 }
+
 function renderTable() {
 document.getElementById('table-body').innerHTML = allData.map(i => {
 const is100 = i.total_cumprimento >= 100;
 const abr = i.evolucao_mensal?.find(e => e.mes_referencia === '2026-04-01')?.percentual_lancado || 0;
 const mai = i.evolucao_mensal?.find(e => e.mes_referencia === '2026-05-01')?.percentual_lancado || 0;
-return `<tr class="border-b border-white/5 hover:bg-white/5 ${is100 ? 'row-100' : ''}"><td class="p-3 font-black text-blue-400">${i.identificador}</td><td class="p-3 leading-tight">${i.descricao || '---'}</td><td>${i.data_inicio || '---'}</td><td>${i.responsavel_manual || '---'}</td><td>${i.coordenadoria || '---'}</td><td class="opacity-50">0%</td><td class="font-bold text-blue-300">${abr}%</td><td class="bg-blue-500/10 text-center font-black">${mai}%</td><td class="p-3 text-right font-black text-emerald-400 text-sm">${i.total_cumprimento}%</td></tr>`;
+const canEdit = (userP.hierarquia === 1 || i.responsavel_id === userP.id);
+return `<tr class="border-b border-white/5 hover:bg-white/5 ${is100?'row-100':''}"><td class="p-3 font-black text-blue-400">${i.identificador}</td><td class="p-3 leading-tight">${i.descricao||'---'}</td><td>${i.responsavel_manual||'---'}</td><td>${i.coordenadoria||'---'}</td><td>${i.data_inicio||'---'}</td><td class="opacity-50">0%</td><td class="font-bold text-blue-300">${abr}%</td><td><input type="number" class="input-table" value="${mai}" ${!canEdit?'disabled':''} onchange="salvar(this.value, '${i.id}', '2026-05-01')"></td><td class="p-3 text-right font-black text-emerald-400 text-sm">${i.total_cumprimento}%</td></tr>`;
 }).join('');
 }
+
 function renderConcluidos() {
 const c = allData.filter(i => i.total_cumprimento >= 100);
-document.getElementById('concluidos-container').innerHTML = c.map(i => `<div class="card-micro bg-status-fulfilled"><span class="text-[7px] font-bold text-white/50">${i.identificador}</span><span class="percent-big">100%</span></div>`).join('');
-document.getElementById('concluidos-list').innerHTML = c.map(i => `<div class="flex gap-2 border-b border-white/5 pb-1"><span class="font-bold text-emerald-400">${i.identificador}</span><span>${i.descricao}</span></div>`).join('');
+document.getElementById('concluidos-container').innerHTML = c.map(i => `<div class="card-micro bg-status-green"><span class="percent-big">100%</span><span class="text-[7px] text-white/50 ml-1">${i.identificador}</span></div>`).join('');
+document.getElementById('concluidos-list').innerHTML = c.map(i => `<div class="flex gap-2"><span class="font-bold text-emerald-400">${i.identificador}:</span> ${i.descricao}</div>`).join('');
 }
+
 function renderChart() {
 const ctx = document.getElementById('barChart').getContext('2d'); if(myChart) myChart.destroy();
 const sI = document.getElementById('sel-item').value; const sS = document.getElementById('sel-sub').value;
 const leg = document.getElementById('chart-legend'); leg.classList.remove('hidden');
 let dataset = [0,0,0];
 if(sI === 'total' || sS === 'item') {
-const filterRange = sI === 'total' ? allData.map(d=>d.identificador) : rangeItens[sI];
-const items = allData.filter(d => filterRange.includes(d.identificador));
-leg.innerText = sI === 'total' ? descItens.total : descItens[sI];
-// Lógica de Média com Carry-over (Carrega o 100% do mês anterior se o atual for menor ou nulo)
-const calcAvg = (mes) => {
-  let soma = 0;
-  items.forEach(it => {
-    let val = it.evolucao_mensal?.find(e=>e.mes_referencia===mes)?.percentual_lancado || 0;
-    if(mes === '2026-05-01' && val === 0) val = it.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado || 0;
-    soma += parseFloat(val);
-  });
-  return Math.round(soma / items.length);
-};
-dataset = [0, calcAvg('2026-04-01'), calcAvg('2026-05-01')];
+  const filter = sI === 'total' ? allData.map(d=>d.identificador) : rangeItens[sI];
+  const items = allData.filter(d => filter.includes(d.identificador));
+  const calc = (m) => { 
+    let sum = 0; items.forEach(it => { 
+      let v = it.evolucao_mensal?.find(e=>e.mes_referencia===m)?.percentual_lancado || 0;
+      if(m === '2026-05-01' && v === 0) v = it.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado || 0; // Carry-Forward Logic
+      sum += parseFloat(v);
+    }); return Math.round(sum / items.length);
+  };
+  dataset = [0, calc('2026-04-01'), calc('2026-05-01')];
+  leg.innerText = descItens[sI] || "Consolidação Global";
 } else {
-const item = allData.find(i => i.id === sS); leg.innerText = item.descricao;
-dataset = [0, item.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado||0, item.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado||0];
+  const item = allData.find(i => i.id === sS); leg.innerText = item.descricao;
+  dataset = [0, item.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado||0, item.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado||0];
 }
-myChart = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: ['MAR','ABR','MAI'], datasets: [{ data: dataset, backgroundColor: dataset.map(v=>v>=100?'#10b981':'#3b82f6'), borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (v) => v >= 100 ? 'OK-CUMPRIDO' : v + '%' }, legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
+myChart = new Chart(ctx, { type: 'bar', plugins: [ChartDataLabels], data: { labels: ['MAR','ABRIL','MAIO'], datasets: [{ data: dataset, backgroundColor: dataset.map(v=>v>=100?'#10b981':'#3b82f6'), borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { datalabels: { color: '#fff', font: { weight: 'bold', size: 14 }, formatter: (v) => v >= 100 ? 'OK-CUMPRIDO' : v + '%' }, legend: { display: false } }, scales: { y: { beginAtZero: true, max: 100 } } } });
 }
-function updateSubSelect() {
-const sI = document.getElementById('sel-item').value; const sS = document.getElementById('sel-sub');
-if(sI === 'total') { sS.innerHTML = `<option value="nao">-- Nível Global --</option>`; sS.disabled = true; }
-else { sS.disabled = false; const subs = allData.filter(d => rangeItens[sI]?.includes(d.identificador));
-sS.innerHTML = `<option value="item">MÉDIA DO ITEM ${sI}</option>` + subs.map(d => `<option value="${d.id}">${d.identificador}</option>`).join(''); }
-renderChart();
-}
-function renderSelects() {
-const sI = document.getElementById('sel-item'); if(sI.options.length === 0) {
-let h = `<option value="total">TOTAL GERAL TAG SEDAM</option>`; Object.keys(descItens).filter(k=>k!=='total').forEach(k=> h += `<option value="${k}">ITEM ${k}</option>`);
-sI.innerHTML = h; updateSubSelect();
-}
-}
+
 function gerarRelatorioPDF() {
 const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4');
 const h = "Metodologia de Acompanhamento do TAG da Sedam no Estado de Rondônia";
-const f = "Maria Gleidivana Alves de Albuquerque – Auditora de Controle Externo / Assessora IV\nManoel Fernandes Neto – Auditor de Controle Externo – TCE/RO";
+const f = "Maria Gleidivana Alves de Albuquerque – Auditora de Controle Externo / Assessora IV (coordenadora da reunião)\nManoel Fernandes Neto – Auditor de Controle Externo – TCE/RO";
 doc.setFontSize(8); doc.setTextColor(100); doc.text(h, 105, 10, { align: 'center' });
-const rows = allData.map(i => [i.identificador, i.responsavel_manual || '---', i.coordenadoria || '---', i.total_cumprimento + "%"]);
-doc.autoTable({ head: [['Item', 'Responsável', 'Coord.', 'Progresso']], body: rows, startY: 25, styles: { fontSize: 7 } });
-const p = doc.internal.getNumberOfPages(); for(let i=1; i<=p; i++) { doc.setPage(i); doc.setFontSize(7); doc.text(f, 105, 285, { align: 'center' }); }
-doc.save(`TAG2026_Relatorio.pdf`);
+const rows = allData.map(i => [i.identificador, i.descricao.substring(0,70)+'...', i.responsavel_manual||'---', i.total_cumprimento+"%"]);
+doc.autoTable({ head: [['Item', 'Ação', 'Responsável', 'Progresso']], body: rows, startY: 20, styles: { fontSize: 6 } });
+const pCount = doc.internal.getNumberOfPages(); for(let i=1; i<=pCount; i++) { doc.setPage(i); doc.setFontSize(7); doc.text(f, 105, 285, { align: 'center' }); }
+doc.save(`TAG2026_Relatorio_TCE.pdf`);
 }
+
+async function salvar(v, id, m) { const { error } = await client.from('evolucao_mensal').upsert({ deliberacao_id: id, mes_referencia: m, percentual_lancado: v }, { onConflict: 'deliberacao_id,mes_referencia' }); if(!error) { await client.from('deliberacoes').update({ total_cumprimento: v }).eq('id', id); carregarDados(); } }
 function switchTab(t) { localStorage.setItem('activeTab', t); document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden')); document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active')); document.getElementById('view-'+t).classList.remove('hidden'); document.getElementById('tab-'+t).classList.add('tab-active'); }
 function logout() { client.auth.signOut(); localStorage.clear(); location.reload(); }
+function updateSubSelect() { const sI = document.getElementById('sel-item').value; const sS = document.getElementById('sel-sub'); if(sI==='total'){sS.innerHTML='<option>-- Global Selecionado --</option>'; sS.disabled=true;} else {sS.disabled=false; const subs=allData.filter(d=>rangeItens[sI]?.includes(d.identificador)); sS.innerHTML=`<option value="item">MÉDIA DO ITEM ${sI}</option>`+subs.map(d=>`<option value="${d.id}">${d.identificador}</option>`).join('');} renderChart(); }
+function renderSelects() { const sI = document.getElementById('sel-item'); if(sI.options.length===0){let h='<option value="total">TOTAL GERAL TAG</option>'; Object.keys(descItens).filter(k=>k!=='total').forEach(k=>h+=`<option value="${k}">ITEM ${k}</option>`); sI.innerHTML=h; updateSubSelect();}}
 client.auth.getSession().then(({data}) => { if(data.session) init(data.session.user.id); });
 </script>
 </body>
