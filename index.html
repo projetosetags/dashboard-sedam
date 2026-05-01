@@ -54,6 +54,11 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 <button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Cumpridos</button>
 </nav>
 
+<div class="flex gap-2 mb-3">
+<button onclick="modoResumo='item';renderResumo()" class="text-xs bg-blue-600 px-2 py-1 rounded">ITEM</button>
+<button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-slate-700 px-2 py-1 rounded">SUBITEM</button>
+</div>
+  
 <!-- ABA 1: RESUMO (CARDS SEMAFÓRICOS) -->
 <div id="view-resumo" class="tab-view"><div id="cards-container" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 2xl:grid-cols-28 gap-1"></div></div>
 
@@ -109,6 +114,27 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 </div>
 
 <script>
+const descItens = {
+"1": "Planejamento Estratégico e Governança",
+"2": "Análise e Revisão do Planejamento Estratégico",
+"3": "Atualização e Consolidação do Plano Estratégico",
+"4": "Governança e Monitoramento Estratégico",
+"5": "Mapeamento e Melhoria de Processos",
+"6": "Desenvolvimento e Estruturação de Sistemas",
+"7": "Adequação Normativa e Legal",
+"8": "Capacitação Técnica e Sensoriamento",
+"9": "Desenvolvimento de Sistemas e Integração",
+"10": "Integração e Expansão Tecnológica",
+"12": "Transparência e Portal Público",
+"15": "Revisão de Plano de Ação",
+"24": "Cadastro de Unidades de Conservação",
+"25": "Programas Ambientais e REDD+",
+"30": "Articulação Institucional",
+"31": "Organização e Gestão Operacional",
+"33": "Monitoramento e Coleta de Dados",
+"45": "Ações Integradas e Cooperação"
+}
+let modoResumo = 'subitem'
 const MESES = [
 {n:1,label:'JAN'},
 {n:2,label:'FEV'},
@@ -201,14 +227,59 @@ renderHeaderMeses()
 }
 
 function renderResumo(){
+
+let mapa = {}
+
+allData.forEach(i=>{
+
+let item = i.identificador?.split('.')[0] || '0'
+
+if(!mapa[item]) mapa[item]=[]
+mapa[item].push(i)
+
+})
+
+// 🔥 CARDS
 document.getElementById('cards-container').innerHTML=
-allData.map(i=>{
-let v=i.total_cumprimento||0
+Object.keys(mapa).map(item=>{
+
+let lista = mapa[item]
+
+// média do item
+let media = Math.round(
+lista.reduce((acc,c)=>acc+(c.total_cumprimento||0),0)/lista.length
+)
+
+// cor
 let cor =
-i.status_cor==='red' ? 'bg-status-red' :
-i.status_cor==='green' ? 'bg-status-green' :
+media<=30 ? 'bg-status-red' :
+media>=100 ? 'bg-status-green' :
 'bg-status-yellow'
-return `<div class="card-micro ${cor}"><span class="percent-big">${v}%</span></div>`
+
+// 🔥 DESCRIÇÃO
+let descItem = descItens[item] || `Item ${item}`
+
+return `
+<div class="card-micro ${cor}">
+<div class="flex flex-col items-center">
+
+<span class="percent-big">${media}%</span>
+
+<span class="text-[7px] text-white/60 mt-1">
+ITEM ${item}
+</span>
+
+<span class="text-[7px] text-white/40 text-center px-1">
+${modoResumo==='item'
+? descItem
+: lista.map(s=>`• ${s.identificador}`).slice(0,3).join('<br>')
+}
+</span>
+
+</div>
+</div>
+`
+
 }).join('')
 }
 
