@@ -146,7 +146,11 @@ let {data}=await query
 
 if(!data){allData=[];return}
 
-allData=data.sort((a,b)=>a.identificador.localeCompare(b.identificador,undefined,{numeric:true}))
+allData=(data||[])
+.filter(d=>d && d.identificador)
+.sort((a,b)=>
+String(a.identificador||'').localeCompare(String(b.identificador||''),undefined,{numeric:true})
+)
 
 let media=allData.length
 ?Math.round(allData.reduce((acc,c)=>acc+(c.total_cumprimento||0),0)/allData.length)
