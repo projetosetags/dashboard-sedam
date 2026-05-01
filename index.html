@@ -57,6 +57,18 @@ const S_URL = 'https://zvtzbiqfwhggysiuiuxh.supabase.co';
 const S_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2dHpiaXFmd2hnZ3lzaXVpdXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1ODYyMjcsImV4cCI6MjA5MzE2MjIyN30.tCnFZv2B6Kmd9KsyZM8CHClZqsq7Nyu-8nxyYVs_ZMQ';
 const client = supabase.createClient(S_URL, S_KEY, { global: { headers: { 'apikey': S_KEY } } });
 let userProfile = null;
+
+function ordenarIdentificadores(a, b) {
+const partesA = a.identificador.split('.').map(p => isNaN(p) ? p : parseInt(p));
+const partesB = b.identificador.split('.').map(p => isNaN(p) ? p : parseInt(p));
+for (let i = 0; i < Math.max(partesA.length, partesB.length); i++) {
+if (partesA[i] === undefined) return -1;
+if (partesB[i] === undefined) return 1;
+if (partesA[i] !== partesB[i]) return partesA[i] > partesB[i] ? 1 : -1;
+}
+return 0;
+}
+  
 async function login() {
 let e = document.getElementById('userInput').value.trim().toLowerCase();
 const p = document.getElementById('passInput').value;
@@ -75,28 +87,27 @@ if(profile.hierarquia >= 3) document.getElementById('form-area').classList.remov
 carregarDados();
 }
 async function carregarDados() {
-const { data: delibs } = await client.from('deliberacoes').select('*, perfis:responsavel_id(nome_completo, username)').order('identificador');
+const { data: delibs, error } = await client.from('deliberacoes').select('*, perfis:responsavel_id(username)');
+if(error) { console.error(error); return; }
 if(delibs) {
-const soma = delibs.reduce((acc, curr) => acc + (curr.total_cumprimento || 0), 0);
-document.getElementById('total-geral').innerText = Math.round(soma / delibs.length) + "%";
-renderCards(delibs);
-renderSelect(delibs);
+// Aplica a ordenação técnica customizada antes de renderizar
+const delibsOrdenadas = delibs.sort(ordenarIdentificadores);
+const soma = delibsOrdenadas.reduce((acc, curr) => acc + (curr.total_cumprimento || 0), 0);
+document.getElementById('total-geral').innerText = Math.round(soma / delibsOrdenadas.length) + "%";
+renderCards(delibsOrdenadas);
+renderSelect(delibsOrdenadas);
 const { data: evol } = await client.from('evolucao_mensal').select('mes_referencia, percentual_lancado').order('mes_referencia');
 renderChart(evol);
 }
 }
+
 // FUNÇÃO RENDERIZAÇÃO DE MICRO-CARDS (AUDITORIA)
 function renderCards(itens) {
 const container = document.getElementById('cards-container');
 const hoje = new Date();
-if (!itens || itens.length === 0) {
-container.innerHTML = "<p class='col-span-full text-center py-20 text-slate-500'>Aguardando processamento SQL...</p>";
-return;
-}
 container.innerHTML = itens.map(i => {
 const prazo = new Date(i.prazo);
 const diff = Math.ceil((prazo - hoje) / 86400000);
-// Lógica Semafórica: Menos de 100% é considerado em andamento ou atrasado
 let cor = i.total_cumprimento < 100 ? (diff < 0 ? 'status-vencido' : 'status-alerta') : 'status-em-dia';
 const editBtn = userProfile.hierarquia === 1 ? `<button onclick="corrigir('${i.id}', '${i.identificador}', ${i.total_cumprimento})" class="btn-correct">AJUSTAR</button>` : '';
 return `
