@@ -80,7 +80,7 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 <div id="chart-legend" class="legend-box hidden"></div>
 </div>
 </div>
-
+<div id="ranking" class="mt-6 text-xs"></div>
 <!-- ABA 4: 100% CUMPRIDOS (LISTA DESCRITIVA) -->
 <div id="view-concluidos" class="tab-view hidden">
 <div id="concluidos-container" class="grid grid-cols-6 sm:grid-cols-12 lg:grid-cols-18 gap-1 mb-8"></div>
@@ -159,13 +159,17 @@ renderTable()
 renderConcluidos()
 renderSelects()
 renderChart()
+renderRanking()
 }
 
 function renderResumo(){
 document.getElementById('cards-container').innerHTML=
 allData.map(i=>{
 let v=i.total_cumprimento||0
-let cor=v<=30?'bg-status-red':(v>=100?'bg-status-green':'bg-status-yellow')
+let cor =
+i.status_cor==='red' ? 'bg-status-red' :
+i.status_cor==='green' ? 'bg-status-green' :
+'bg-status-yellow'
 return `<div class="card-micro ${cor}"><span class="percent-big">${v}%</span></div>`
 }).join('')
 }
@@ -179,12 +183,23 @@ let mai=i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_
 
 let canEdit=(userP.nivel_acesso==1||i.responsavel_id==userP.id)
 
-return `<tr class="border-b border-white/5">
+// 🔥 PATCH 3 → DATA INTELIGENTE
+let dataFormatada = i.data_inicio
+? new Date(i.data_inicio).toLocaleDateString('pt-BR')
+: (i.prazo_texto || '-')
+
+// 🔥 PATCH 2 → COR POR STATUS
+let bg =
+i.status_cor==='red' ? 'bg-red-900/20' :
+i.status_cor==='yellow' ? 'bg-yellow-900/20' :
+i.status_cor==='green' ? 'bg-emerald-900/20' : ''
+
+return `<tr class="border-b border-white/5 ${bg}">
 <td class="p-3 font-black text-blue-400">${i.identificador}</td>
 <td class="p-3">${i.descricao||'-'}</td>
 <td>${i.responsavel||'-'}</td>
 <td>${i.coordenadoria||'-'}</td>
-<td>${i.data_inicio||'-'}</td>
+<td>${dataFormatada}</td>
 <td class="opacity-50">0%</td>
 <td>${abr}%</td>
 <td><input type="number" class="input-table" value="${mai}" ${!canEdit?'disabled':''} onchange="salvar(this.value,'${i.id}','2026-05-01')"></td>
@@ -192,7 +207,7 @@ return `<tr class="border-b border-white/5">
 </tr>`
 }).join('')
 }
-
+  
 function renderConcluidos(){
 let c=allData.filter(i=>(i.total_cumprimento||0)>=100)
 
@@ -204,22 +219,54 @@ c.map(i=>`<div><b>${i.identificador}</b> ${i.descricao}</div>`).join('')
 }
 
 function renderChart(){
+
 let ctx=document.getElementById('barChart').getContext('2d')
 if(myChart)myChart.destroy()
 
-let data=[0,50,70]
+let mar=0,abr=0,mai=0,count=allData.length||1
+
+allData.forEach(i=>{
+let m=i.evolucao_mensal||[]
+
+mar+=parseFloat(m.find(e=>e.mes_referencia==='2026-03-01')?.percentual_lancado||0)
+abr+=parseFloat(m.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado||0)
+mai+=parseFloat(m.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado||0)
+})
+
+mar=Math.round(mar/count)
+abr=Math.round(abr/count)
+mai=Math.round(mai/count)
 
 myChart=new Chart(ctx,{
 type:'bar',
-data:{labels:['MAR','ABR','MAI'],datasets:[{data}]},
-options:{responsive:true,maintainAspectRatio:false}
+data:{
+labels:['MAR','ABR','MAI'],
+datasets:[{
+data:[mar,abr,mai],
+backgroundColor:[
+mar>=100?'#10b981':mar<=30?'#ef4444':'#f59e0b',
+abr>=100?'#10b981':abr<=30?'#ef4444':'#f59e0b',
+mai>=100?'#10b981':mai<=30?'#ef4444':'#f59e0b'
+]
+}]
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+plugins:{
+legend:{display:false}
+},
+scales:{
+y:{beginAtZero:true,max:100}
+}
+}
 })
 }
 
 async function salvar(v,id,m){
 
-if(userP.nivel_acesso<3){
-alert("Sem permissão")
+if(userP.nivel_acesso!=3){
+alert("Somente responsável pode editar")
 return
 }
 
@@ -239,8 +286,25 @@ carregarDados()
 function gerarRelatorioPDF(){
 const {jsPDF}=window.jspdf
 let doc=new jsPDF()
-doc.text("Relatório TAG SEDAM",10,10)
-doc.save("relatorio.pdf")
+
+doc.setFontSize(12)
+doc.text("RELATÓRIO TAG SEDAM 2026",10,10)
+
+let rows=allData.map(i=>[
+i.identificador,
+i.descricao?.substring(0,40),
+i.responsavel,
+(i.total_cumprimento||0)+'%'
+])
+
+doc.autoTable({
+head:[['Item','Descrição','Responsável','%']],
+body:rows,
+startY:20,
+styles:{fontSize:6}
+})
+
+doc.save("relatorio_tag.pdf")
 }
 
 function switchTab(t){
@@ -249,6 +313,30 @@ document.querySelectorAll('.tab-view').forEach(v=>v.classList.add('hidden'))
 document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('tab-active'))
 document.getElementById('view-'+t).classList.remove('hidden')
 document.getElementById('tab-'+t).classList.add('tab-active')
+}
+
+function renderRanking(){
+
+let map={}
+
+allData.forEach(i=>{
+let r=i.responsavel||'---'
+if(!map[r]) map[r]=[]
+map[r].push(i.total_cumprimento||0)
+})
+
+let arr=Object.keys(map).map(k=>{
+let avg=Math.round(map[k].reduce((a,b)=>a+b,0)/map[k].length)
+return {nome:k,media:avg}
+}).sort((a,b)=>b.media-a.media)
+
+document.getElementById('ranking').innerHTML=
+arr.map((r,i)=>`
+<div class="flex justify-between border-b border-white/5 py-1">
+<span>${i+1}º ${r.nome}</span>
+<span class="font-bold">${r.media}%</span>
+</div>
+`).join('')
 }
 
 function logout(){
