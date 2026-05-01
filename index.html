@@ -79,6 +79,7 @@ async function login(){
 
 let usuario=document.getElementById('email').value
 usuario=usuario.trim().toLowerCase()
+
 const senha=document.getElementById('password').value.trim()
 const loginMsg=document.getElementById('login-msg')
 
@@ -92,32 +93,33 @@ loginMsg.innerText="Validando..."
 const {data,error}=await supabaseClient
 .from("perfis")
 .select("*")
-.ilike("username",usuario)
+.eq("username",usuario)
 .limit(1)
+
+if(error){
+console.error(error)
+loginMsg.innerText="Erro conexão banco"
+return
+}
 
 const user = data && data.length ? data[0] : null
 
-if(error || !user){
+if(!user){
 loginMsg.innerText="Usuário não encontrado"
 return
 }
 
-if(error || !data){
-loginMsg.innerText="Usuário não encontrado"
-return
-}
-
-// 🔥 senha simples (igual username por enquanto)
+// 🔥 senha simples
 if(senha !== "123456"){
 loginMsg.innerText="Senha inválida"
 return
 }
 
-// 🔥 salva sessão local
-localStorage.setItem("uid",data.id)
+// 🔥 salva sessão correta
+localStorage.setItem("uid",user.id)
 
-// entra no sistema
-initApp(data.id)
+// 🔥 entra correto
+initApp(user.id)
 
 }
 
