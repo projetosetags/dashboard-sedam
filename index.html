@@ -12,9 +12,11 @@
 body { background: radial-gradient(circle at top, #1e293b, #0f172a); color: #f8fafc; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; }
 .card-glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
 .card-glass:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.4); }
-.status-vencido { border-left: 6px solid #ef4444 !important; background: rgba(239, 68, 68, 0.05); }
-.status-alerta { border-left: 6px solid #f59e0b !important; background: rgba(245, 158, 11, 0.05); }
-.status-em-dia { border-left: 6px solid #10b981 !important; background: rgba(16, 185, 129, 0.05); }
+/* Layout Compacto para Auditoria */
+.status-vencido { border-left: 4px solid #ef4444 !important; background: rgba(239, 68, 68, 0.03); }
+.status-alerta { border-left: 4px solid #f59e0b !important; background: rgba(245, 158, 11, 0.03); }
+.status-em-dia { border-left: 4px solid #10b981 !important; background: rgba(16, 185, 129, 0.03); }
+.card-compact { padding: 1rem !important; min-height: 140px; }
 input::placeholder { color: #64748b; }
 </style>
 </head>
@@ -52,7 +54,7 @@ input::placeholder { color: #64748b; }
 <button onclick="salvarLancamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-bold">Salvar</button>
 </div>
 </div>
-<div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12"></div>
+<div id="cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mt-12"></div>
 </div>
 <script>
 const S_URL = 'https://zvtzbiqfwhggysiuiuxh.supabase.co';
@@ -84,21 +86,37 @@ const { data: evolucao } = await client.from('evolucao_mensal').select('*').orde
 renderChart(evolucao);
 }
 function renderCards(itens) {
-const container = document.getElementById('cards-container');
-if(!itens || itens.length === 0) { container.innerHTML = "<p class='col-span-full text-center py-20 text-slate-500'>Aguardando carga de dados SQL...</p>"; return; }
-const hoje = new Date();
-container.innerHTML = itens.map(i => {
-const prazo = new Date(i.prazo);
-const diff = Math.ceil((prazo - hoje) / 86400000);
-let cor = 'status-em-dia';
-if(diff < 0) cor = 'status-vencido'; else if(diff <= 30) cor = 'status-alerta';
-return `<div class="card-glass p-6 rounded-2xl ${cor}">
-<div class="flex justify-between mb-3"><span class="font-bold text-blue-400">${i.identificador}</span><span class="text-[10px] text-slate-500">${prazo.toLocaleDateString()}</span></div>
-<p class="text-xs text-slate-300 mb-4 h-12 overflow-hidden leading-snug">${i.descricao}</p>
-<div class="flex justify-between text-[10px] mb-2"><span>Resp: ${i.perfis?.nome_completo || 'Audit.'}</span><span class="font-bold text-blue-400">${i.total_cumprimento || 0}%</span></div>
-<div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden"><div class="bg-blue-500 h-full" style="width:${i.total_cumprimento || 0}%"></div></div>
-</div>`;
-}).join('');
+    const container = document.getElementById('cards-container');
+    const hoje = new Date();
+    if (!itens || itens.length === 0) {
+        container.innerHTML = "<p class='col-span-full text-center py-20 text-slate-500'>Aguardando carga...</p>";
+        return;
+    }
+    container.innerHTML = itens.map(i => {
+        const prazo = new Date(i.prazo);
+        const diff = Math.ceil((prazo - hoje) / 86400000);
+        let cor = 'status-em-dia';
+        if (diff < 0) cor = 'status-vencido'; else if (diff <= 30) cor = 'status-alerta';
+        return `
+        <div class="card-glass card-compact rounded-xl ${cor} flex flex-col justify-between shadow-sm">
+            <div>
+                <div class="flex justify-between items-start mb-1">
+                    <span class="font-black text-blue-400 text-sm">${i.identificador}</span>
+                    <span class="text-[9px] font-bold ${diff < 0 ? 'text-red-400' : 'text-slate-500'}">${prazo.toLocaleDateString('pt-BR')}</span>
+                </div>
+                <p class="text-[10px] text-slate-300 leading-tight line-clamp-3 mb-2" title="${i.descricao}">${i.descricao}</p>
+            </div>
+            <div class="border-t border-white/5 pt-2">
+                <div class="flex justify-between text-[9px] mb-1">
+                    <span class="text-slate-500 truncate mr-1">Resp: ${i.perfis?.nome_completo?.split(' ')[0] || 'Audit.'}</span>
+                    <span class="font-bold text-blue-400">${i.total_cumprimento || 0}%</span>
+                </div>
+                <div class="w-full bg-slate-900 h-1 rounded-full overflow-hidden">
+                    <div class="bg-blue-500 h-full transition-all duration-1000" style="width:${i.total_cumprimento || 0}%"></div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
 }
 function renderChart(dados) {
 const ctx = document.getElementById('mainChart').getContext('2d');
