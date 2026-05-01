@@ -81,6 +81,12 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 </div>
 </div>
 <div id="ranking" class="mt-6 text-xs"></div>
+
+<div class="flex gap-2 mb-4">
+<button onclick="modoGrupo='item';renderConcluidos()" class="text-xs bg-blue-600 px-2 py-1 rounded">AGRUPAR POR ITEM</button>
+<button onclick="modoGrupo='subitem';renderConcluidos()" class="text-xs bg-slate-700 px-2 py-1 rounded">AGRUPAR POR SUBITEM</button>
+</div>
+
 <!-- ABA 4: 100% CUMPRIDOS (LISTA DESCRITIVA) -->
 <div id="view-concluidos" class="tab-view hidden">
 <div id="concluidos-container" class="grid grid-cols-6 sm:grid-cols-12 lg:grid-cols-18 gap-1 mb-8"></div>
@@ -92,6 +98,7 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 </div>
 
 <script>
+let modoGrupo = 'subitem'
 document.addEventListener("DOMContentLoaded",()=>{
 let uid=localStorage.getItem("uid")
 if(uid) init(uid)
@@ -213,13 +220,50 @@ return `<tr class="border-b border-white/5 ${bg}">
 }
   
 function renderConcluidos(){
-let c=allData.filter(i=>(i.total_cumprimento||0)>=100)
 
+let lista = allData.filter(i=>(i.total_cumprimento||0)>=100)
+
+// 🔥 AGRUPAMENTO
+let mapa = {}
+
+lista.forEach(i=>{
+
+let chave = modoGrupo === 'item'
+? i.identificador.split('.')[0]   // 1,2,3
+: i.identificador                // 1.1,1.2
+
+if(!mapa[chave]) mapa[chave]=[]
+mapa[chave].push(i)
+
+})
+
+// 🔥 CARDS
 document.getElementById('concluidos-container').innerHTML=
-c.map(i=>`<div class="card-micro bg-status-green"><span class="percent-big">100%</span></div>`).join('')
+Object.keys(mapa).map(k=>`
+<div class="card-micro bg-status-green">
+<span class="percent-big">${mapa[k].length}</span>
+<span class="text-[7px] text-white/50 ml-1">${modoGrupo==='item'?'ITEM':'SUB'} ${k}</span>
+</div>
+`).join('')
 
+// 🔥 LISTA DETALHADA
 document.getElementById('concluidos-list').innerHTML=
-c.map(i=>`<div><b>${i.identificador}</b> ${i.descricao}</div>`).join('')
+Object.keys(mapa).map(k=>`
+
+<div class="mb-3">
+<div class="text-emerald-400 font-bold mb-1">
+${modoGrupo==='item'?'ITEM':'SUBITEM'} ${k} (${mapa[k].length})
+</div>
+
+${mapa[k].map(i=>`
+<div class="ml-2 text-[10px]">
+• <b>${i.identificador}</b> - ${i.descricao}
+</div>
+`).join('')}
+
+</div>
+
+`).join('')
 }
 
 function renderChart(){
