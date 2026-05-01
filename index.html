@@ -61,9 +61,20 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 <div id="view-mensal" class="tab-view hidden">
 <div class="bg-slate-900/40 rounded-xl border border-white/5 overflow-x-auto">
 <table class="w-full text-left border-collapse min-w-[1400px]">
-<thead><tr class="text-[8px] text-slate-500 uppercase border-b border-white/10">
-<th class="p-3">Sub-Item</th><th class="p-3 w-1/4">Descrição da Ação</th><th>Responsável</th><th>Coordenadoria</th><th>Início</th><th>Março</th><th>Abril</th><th class="text-blue-400">Maio</th><th class="p-3 text-right">Total</th>
-</tr></thead>
+<thead>
+<tr class="text-[8px] text-slate-500 uppercase border-b border-white/10">
+<th class="p-3">Sub-Item</th>
+<th class="p-3 w-1/4">Descrição da Ação</th>
+<th>Responsável</th>
+<th>Coordenadoria</th>
+<th>Início</th>
+
+<span id="cols-meses"></span>
+
+<th class="p-3 text-right">Total</th>
+</tr>
+</thead>
+
 <tbody id="table-body" class="text-[10px]"></tbody>
 </table>
 </div>
@@ -98,6 +109,21 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 </div>
 
 <script>
+const MESES = [
+{n:1,label:'JAN'},
+{n:2,label:'FEV'},
+{n:3,label:'MAR'},
+{n:4,label:'ABR'},
+{n:5,label:'MAI'},
+{n:6,label:'JUN'},
+{n:7,label:'JUL'},
+{n:8,label:'AGO'},
+{n:9,label:'SET'},
+{n:10,label:'OUT'},
+{n:11,label:'NOV'},
+{n:12,label:'DEZ'}
+]
+
 let modoGrupo = 'subitem'
 document.addEventListener("DOMContentLoaded",()=>{
 let uid=localStorage.getItem("uid")
@@ -171,6 +197,7 @@ renderConcluidos()
 renderSelects()
 renderChart()
 renderRanking()
+renderHeaderMeses()
 }
 
 function renderResumo(){
@@ -186,35 +213,65 @@ return `<div class="card-micro ${cor}"><span class="percent-big">${v}%</span></d
 }
 
 function renderTable(){
+
+let mesAtual = new Date().getMonth()+1
+
 document.getElementById('table-body').innerHTML=
 allData.map(i=>{
 
-let abr=i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado||0
-let mai=i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado||0
-
-let canEdit=(userP.nivel_acesso==1||i.responsavel_id==userP.id)
-
-// 🔥 PATCH 3 → DATA INTELIGENTE
 let dataFormatada = i.data_inicio
 ? new Date(i.data_inicio).toLocaleDateString('pt-BR')
 : (i.prazo_texto || '-')
 
-// 🔥 PATCH 2 → COR POR STATUS
+// 🔒 PERMISSÃO
+let podeEditar =
+(userP.nivel_acesso==1 || userP.nivel_acesso==2) ||
+(userP.nivel_acesso==3 && i.responsavel_id==userP.id)
+
+// 🔥 COLUNAS DINÂMICAS
+let colMeses = MESES
+.filter(m=>m.n<=mesAtual)
+.map(m=>{
+
+let ref = `2026-${String(m.n).padStart(2,'0')}-01`
+
+let valor = i.evolucao_mensal?.find(e=>e.mes_referencia===ref)?.percentual_lancado||0
+
+// passado → travado
+if(m.n < mesAtual){
+return `<td class="opacity-40">${valor}%</td>`
+}
+
+// mês atual → editável
+return `<td>
+<input type="number"
+class="input-table"
+value="${valor||''}"
+${!podeEditar?'disabled':''}
+onchange="salvar(this.value,'${i.id}','${ref}')">
+</td>`
+}).join('')
+
+// 🔥 STATUS COR
 let bg =
 i.status_cor==='red' ? 'bg-red-900/20' :
 i.status_cor==='yellow' ? 'bg-yellow-900/20' :
 i.status_cor==='green' ? 'bg-emerald-900/20' : ''
 
 return `<tr class="border-b border-white/5 ${bg}">
+
 <td class="p-3 font-black text-blue-400">${i.identificador}</td>
 <td class="p-3">${i.descricao||'-'}</td>
 <td>${i.responsavel||'-'}</td>
 <td>${i.coordenadoria||'-'}</td>
 <td>${dataFormatada}</td>
-<td class="opacity-50">0%</td>
-<td>${abr}%</td>
-<td><input type="number" class="input-table" value="${mai}" ${!canEdit?'disabled':''} onchange="salvar(this.value,'${i.id}','2026-05-01')"></td>
-<td class="p-3 text-right font-black text-emerald-400">${i.total_cumprimento||0}%</td>
+
+${colMeses}
+
+<td class="p-3 text-right font-black text-emerald-400">
+${i.total_cumprimento||0}%
+</td>
+
 </tr>`
 }).join('')
 }
@@ -311,19 +368,20 @@ y:{beginAtZero:true,max:100}
 })
 }
 
-async function salvar(v,id,m){
+async function salvar(v,id,mesRef){
 
-if(userP.nivel_acesso!=3){
-alert("Somente responsável pode editar")
+if(userP.nivel_acesso!=1 && userP.nivel_acesso!=2 && userP.nivel_acesso!=3){
+alert("Sem permissão")
 return
 }
 
 await client.from('evolucao_mensal').upsert({
 deliberacao_id:id,
-mes_referencia:m,
+mes_referencia:mesRef,
 percentual_lancado:v
 },{onConflict:'deliberacao_id,mes_referencia'})
 
+// 🔥 ATUALIZA TOTAL AUTOMÁTICO
 await client.from('deliberacoes')
 .update({total_cumprimento:v})
 .eq('id',id)
@@ -387,6 +445,20 @@ arr.map((r,i)=>`
 `).join('')
 }
 
+function renderHeaderMeses(){
+
+let mesAtual = new Date().getMonth()+1
+
+document.getElementById('cols-meses').innerHTML =
+MESES
+.filter(m=>m.n<=mesAtual)
+.map(m=>`
+<th class="${m.n===mesAtual?'text-yellow-400 font-bold':'opacity-40'}">
+${m.label}
+</th>
+`).join('')
+}
+  
 function logout(){
 localStorage.clear()
 location.reload()
