@@ -62,6 +62,12 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 <!-- ABA 1: RESUMO (CARDS SEMAFÓRICOS) -->
 <div id="view-resumo" class="tab-view"><div id="cards-container" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 2xl:grid-cols-28 gap-1"></div></div>
 
+<button id="btn-voltar" onclick="fecharDrill()" 
+style="display:none"
+class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
+← VOLTAR
+</button>
+
 <!-- ABA 2: MONITORAMENTO (TABELA COMPLETA) -->
 <div id="view-mensal" class="tab-view hidden">
 <div class="bg-slate-900/40 rounded-xl border border-white/5 overflow-x-auto">
@@ -114,6 +120,7 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 </div>
 
 <script>
+let filtroItemAtivo = null
 const descItens = {
 "1": "Planejamento Estratégico e Governança",
 "2": "Análise e Revisão do Planejamento Estratégico",
@@ -260,7 +267,7 @@ media>=100 ? 'bg-status-green' :
 let descItem = descItens[item] || `Item ${item}`
 
 return `
-<div class="card-micro ${cor}">
+<div class="card-micro ${cor}" onclick="abrirItem('${item}')">
 <div class="flex flex-col items-center">
 
 <span class="percent-big">${media}%</span>
@@ -270,10 +277,7 @@ ITEM ${item}
 </span>
 
 <span class="text-[7px] text-white/40 text-center px-1">
-${modoResumo==='item'
-? descItem
-: lista.map(s=>`• ${s.identificador}`).slice(0,3).join('<br>')
-}
+${descItem}
 </span>
 
 </div>
@@ -283,13 +287,30 @@ ${modoResumo==='item'
 }).join('')
 }
 
+function abrirItem(item){
+
+filtroItemAtivo = item
+
+// troca para aba monitoramento
+switchTab('mensal')
+
+// renderiza tabela filtrada
+renderTable()
+
+// mostra botão voltar
+document.getElementById('btn-voltar').style.display='block'
+}
+
 function renderTable(){
 
 let mesAtual = new Date().getMonth()+1
 
 document.getElementById('table-body').innerHTML=
-allData.map(i=>{
+let lista = filtroItemAtivo
+? allData.filter(i=>i.identificador?.startsWith(filtroItemAtivo+'.'))
+: allData
 
+lista.map(i=>{
 let dataFormatada = i.data_inicio
 ? new Date(i.data_inicio).toLocaleDateString('pt-BR')
 : (i.prazo_texto || '-')
@@ -529,7 +550,15 @@ ${m.label}
 </th>
 `).join('')
 }
-  
+function fecharDrill(){
+
+filtroItemAtivo = null
+
+switchTab('resumo')
+
+document.getElementById('btn-voltar').style.display='none'
+}
+
 function logout(){
 localStorage.clear()
 location.reload()
