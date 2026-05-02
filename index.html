@@ -78,6 +78,10 @@ tr{position:relative;z-index:1;}
 <button onclick="limparFiltroData()" class="text-xs bg-slate-600 px-2 py-1 rounded">LIMPAR</button>
 </div>
 </div>
+
+<button onclick="toggleOcultarConcluidos()" id="btn-ocultar" class="text-xs bg-slate-700 px-2 py-1 rounded">
+OCULTAR 100%
+</button>
   
 <!-- ABA 1: RESUMO (CARDS SEMAFÓRICOS) -->
 <div id="view-resumo" class="tab-view"><div id="cards-container" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 2xl:grid-cols-28 gap-1"></div></div>
@@ -144,6 +148,7 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 
 <script>
+let ocultarConcluidos=false
 function parseDataLocal(dataStr){
 if(!dataStr) return null
 let p=dataStr.split('-')
@@ -226,124 +231,76 @@ renderChart()
 
 }
 function renderResumo(){
-
 let mapa={}
-
 let base=allData
-
-if(filtroDataInicio || filtroDataFim){
+if(filtroDataInicio||filtroDataFim){
 base=base.filter(i=>{
-
 let d=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
-
-if(!d) return false
-
-if(filtroDataInicio && d<parseDataLocal(filtroDataInicio)) return false
-if(filtroDataFim && d>parseDataLocal(filtroDataFim)) return false
-
+if(!d)return false
+if(filtroDataInicio&&d<parseDataLocal(filtroDataInicio))return false
+if(filtroDataFim&&d>parseDataLocal(filtroDataFim))return false
 return true
-
 })
 }
-
-base.forEach(i=>{let item=i.item||i.subitem
+if(ocultarConcluidos){
+base=base.filter(i=>{
+let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
+return total<100
+})
+}
+base.forEach(i=>{
+let item=(i.subitem||'0').split('.')[0]
 if(!mapa[item])mapa[item]=[]
 mapa[item].push(i)
 })
-
 document.getElementById('cards-container').innerHTML=
 Object.keys(mapa).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(item=>{
-
 let lista=mapa[item]
-
-let media=Math.round(
-lista.reduce((acc,c)=>{
-
-let total=Math.max(
-Number(c.jan||0),
-Number(c.fev||0),
-Number(c.mar||0),
-Number(c.abr||0),
-Number(c.mai||0),
-Number(c.jun||0),
-Number(c.jul||0),
-Number(c.ago||0),
-Number(c.set||0),
-Number(c.out||0),
-Number(c.nov||0),
-Number(c.dez||0)
-)
-
+let media=Math.round(lista.reduce((acc,c)=>{
+let total=Math.max(Number(c.jan||0),Number(c.fev||0),Number(c.mar||0),Number(c.abr||0),Number(c.mai||0),Number(c.jun||0),Number(c.jul||0),Number(c.ago||0),Number(c.set||0),Number(c.out||0),Number(c.nov||0),Number(c.dez||0))
 return acc+total
-
-},0)/lista.length
-)
-
-let cor=
-media<=30?'bg-status-red':
-media>=100?'bg-status-green':
-'bg-status-yellow'
-
+},0)/lista.length)
+let cor=media<=30?'bg-status-red':media>=100?'bg-status-green':'bg-status-yellow'
 let descricao=lista.find(x=>x.descricaoitem)?.descricaoitem||''
-
-return `
-<div class="flex flex-col">
-
-<div class="card-micro ${cor}" onclick="abrirItem('${item}')">
-<span class="percent-big">${media}%</span>
-<span class="text-[9px] text-white/70">${item}</span>
-</div>
-
-<div class="text-[9px] text-slate-400 mt-1 px-1 text-center">
-${descricao}
-</div>
-
-</div>
-`
-
+return `<div class="flex flex-col"><div class="card-micro ${cor}" onclick="abrirItem('${item}')"><span class="percent-big">${media}%</span><span class="text-[9px] text-white/70">${item}</span></div><div class="text-[9px] text-slate-400 mt-1 px-1 text-center">${descricao}</div></div>`
 }).join('')
 }
+  
 function abrirItem(item){
 filtroItemAtivo=item
 switchTab('mensal')
 renderTable()
 document.getElementById('btn-voltar').style.display='block'
 }
+  
 function renderTable(){
-
 let lista=allData
-
-// 🔥 FILTRO POR ITEM
 if(filtroItemAtivo){
-lista=lista.filter(i=>i.item===filtroItemAtivo)
+lista=lista.filter(i=>(i.subitem||'').split('.')[0]===filtroItemAtivo)
 }
-// 🔥 FILTRO POR DATA
-if(filtroDataInicio || filtroDataFim){
+if(filtroDataInicio||filtroDataFim){
 lista=lista.filter(i=>{
-
 let dataBase=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
-
-if(!dataBase) return false
-
+if(!dataBase)return false
 if(filtroDataInicio){
 let dIni=parseDataLocal(filtroDataInicio)
-if(dataBase<dIni) return false
+if(dataBase<dIni)return false
 }
-
 if(filtroDataFim){
 let dFim=parseDataLocal(filtroDataFim)
-if(dataBase>dFim) return false
+if(dataBase>dFim)return false
 }
-
 return true
-
 })
 }
-
+if(ocultarConcluidos){
+lista=lista.filter(i=>{
+let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
+return total<100
+})
+}
 document.getElementById('table-body').innerHTML=lista.map(i=>{
-
 let dataFormatada='-'
-
 if(i.data_inicio){
 let d=new Date(i.data_inicio)
 if(!isNaN(d))dataFormatada=d.toLocaleDateString('pt-BR')
@@ -351,66 +308,15 @@ else dataFormatada=i.prazo_texto||i.data_inicio
 }else{
 dataFormatada=i.prazo_texto||'-'
 }
-
 let jan=Number(i.jan||0)
 let fev=Number(i.fev||0)
 let mar=Number(i.mar||0)
 let abr=Number(i.abr||0)
 let mai=Number(i.mai||0)
-
-let total=Math.max(
-jan,fev,mar,abr,mai,
-Number(i.jun||0),
-Number(i.jul||0),
-Number(i.ago||0),
-Number(i.set||0),
-Number(i.out||0),
-Number(i.nov||0),
-Number(i.dez||0)
-)
-
-let bg=
-total<=30?'bg-red-900/20':
-total>=100?'bg-emerald-900/20':
-'bg-yellow-900/20'
-
-// 🔥 REGRA DE PERMISSÃO MAI
-let podeEditar=
-userP.nivel_acesso==1 ||
-(userP.nivel_acesso!=1 && i.responsavel_id==userP.id)
-
-return `
-<tr class="border-b border-white/5 tr-hover ${bg}">
-
-<td class="p-2 font-black text-blue-400">${i.subitem}</td>
-
-<td class="p-2 td-desc">${i.descricao||'-'}</td>
-
-<td class="text-xs">${i.responsavel||'-'}</td>
-
-<td class="text-xs">${i.setor||'-'}</td>
-
-<td class="td-data">${dataFormatada}</td>
-
-<td class="td-mes opacity-40">${jan}%</td>
-<td class="td-mes opacity-40">${fev}%</td>
-<td class="td-mes opacity-40">${mar}%</td>
-
-<td class="td-mes-strong text-blue-400">${abr}%</td>
-
-<td>
-${
-podeEditar
-?`<input type="number" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','2026-05-01')">`
-:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`
-}
-</td>
-
-<td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
-
-</tr>
-`
-
+let total=Math.max(jan,fev,mar,abr,mai,Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
+let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/20'
+let podeEditar=userP.nivel_acesso==1||(userP.nivel_acesso!=1&&i.responsavel_id==userP.id)
+return `<tr class="border-b border-white/5 tr-hover ${bg}"><td class="p-2 font-black text-blue-400">${i.subitem}</td><td class="p-2 td-desc">${i.descricao||'-'}</td><td class="text-xs">${i.responsavel||'-'}</td><td class="text-xs">${i.setor||'-'}</td><td class="td-data">${dataFormatada}</td><td class="td-mes opacity-40">${jan}%</td><td class="td-mes opacity-40">${fev}%</td><td class="td-mes opacity-40">${mar}%</td><td class="td-mes-strong text-blue-400">${abr}%</td><td>${podeEditar?`<input type="number" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','2026-05-01')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}</td><td class="td-total text-emerald-400">${total.toFixed(2)}%</td></tr>`
 }).join('')
 }
   
@@ -508,7 +414,12 @@ document.getElementById('filtroDataFim').value=''
 renderTable()
 renderResumo()
 }
-
+function toggleOcultarConcluidos(){
+ocultarConcluidos=!ocultarConcluidos
+document.getElementById('btn-ocultar').innerText=ocultarConcluidos?'MOSTRAR 100%':'OCULTAR 100%'
+renderTable()
+renderResumo()
+}
 
 </script>
   
