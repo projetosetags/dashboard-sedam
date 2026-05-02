@@ -251,7 +251,7 @@ await client.from('perfis').delete().eq('id',id)
 carregarDados()
 }
 async function carregarDados(){
-let query=client.from('deliberacoes').select('*,evolucao_mensal(*)')
+let query=client.from('deliberacoes').select('*,evolucao_mensal(*),perfis(nome_completo)')
 // 🔒 CONTROLE POR RESPONSÁVEL
 if(userP.nivel_acesso!=1){
 query=query.eq('responsavel_id',userP.id)
@@ -366,7 +366,7 @@ let abr=evol.find(e=>String(e.mes_referencia).startsWith('2026-04'))?.percentual
 let maiReal=evol.find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado
 if(!abr||abr==0) abr=i.total_cumprimento||0
 let bg=i.status_cor==='red'?'bg-red-900/20':i.status_cor==='yellow'?'bg-yellow-900/20':i.status_cor==='green'?'bg-emerald-900/20':''
-let campoResponsavel=userP.nivel_acesso==1?`<select onchange="alterarResponsavel('${i.id}',this.value)" class="bg-slate-800 text-xs p-1 rounded"><option value="">Selecione</option>${(window.perfis||[]).map(p=>`<option value="${p.id}" ${p.id==i.responsavel_id?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span>${i.responsavel||'-'}</span>`
+let campoResponsavel=userP.nivel_acesso==1?`<select onchange="alterarResponsavel('${i.id}',this.value)" class="bg-slate-800 text-xs p-1 rounded"><option value="">Selecione</option>${(window.perfis||[]).map(p=>`<option value="${p.id}" ${p.id==i.responsavel_id?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span>${i.perfis?.nome_completo||'-'}</span>`
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.identificador}</td>
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
