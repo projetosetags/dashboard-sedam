@@ -198,33 +198,26 @@ let myChart=null
 function login(){let u=document.getElementById('u').value.trim().toLowerCase();client.from('perfis').select('*').eq('username',u).single().then(({data,error})=>{if(error||!data){alert("Usuário não encontrado");return}localStorage.setItem("uid",data.id);init(data.id)})}
 async function init(uid){let {data,error}=await client.from('perfis').select('*').eq('id',uid).single();if(error||!data){alert("Erro perfil");return}userP=data;let {data:pList}=await client.from('perfis').select('*').order('nome_completo');window.perfis=pList||[];document.getElementById('login-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');document.getElementById('dataInicio').value='2025-01-01';document.getElementById('dataFim').value='2028-01-01';filtroDataInicio='2025-01-01';filtroDataFim='2028-01-01';const lastTab=localStorage.getItem('activeTab')||'resumo';switchTab(lastTab);document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")";if(data.nivel_acesso<=2){document.getElementById('pdf-container').innerHTML=`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`}carregarDados()}
 async function carregarDados(){
-
 let query = client.from('deliberacoes').select('*')
-
 // 🔒 CONTROLE POR RESPONSÁVEL
 if(userP.nivel_acesso != 1){
 query = query.eq('responsavel_id', userP.id)
 }
-
 let { data } = await query
-
 if(!data){
 allData = []
 return
 }
-
 // 🔥 TRATAMENTO + ORDENAÇÃO
 allData = (data || [])
 .filter(d => d && d.subitem)
 .sort((a,b)=>
 String(a.subitem).localeCompare(String(b.subitem), undefined, { numeric:true })
 )
-
 // 🔥 CÁLCULO DA MÉDIA (PEGANDO O MAIOR VALOR DOS MESES)
 let media = allData.length
 ? Math.round(
 allData.reduce((acc,c)=>{
-
 let totalItem = Math.max(
 Number(c.jan||0),
 Number(c.fev||0),
@@ -239,23 +232,20 @@ Number(c.out||0),
 Number(c.nov||0),
 Number(c.dez||0)
 )
-
 return acc + totalItem
-
 },0) / allData.length
 )
 : 0
-
 // 🔥 ATUALIZA MÉDIA GERAL
 document.getElementById('total-geral').innerText = media + "%"
-
 // 🔥 RENDERIZAÇÕES
 renderResumo()
 renderTable()
 renderConcluidos()
 renderChart()
-
+carregarSelectSub()
 }
+
 function renderResumo(){
 let mapa={}
 let base=allData
@@ -496,13 +486,44 @@ function renderChartSubitem(){
 let ctx=document.getElementById('chartSubitem')
 if(!ctx)return
 if(chartSubitem)chartSubitem.destroy()
-let i=allData[0]
+let sel=document.getElementById('sel-sub')
+if(!sel)return
+let id=sel.value
+let i=allData.find(x=>x.id==id)
 if(!i)return
 chartSubitem=new Chart(ctx,{
-type:'bar',
-data:{labels:['JAN','FEV','MAR','ABR','MAI'],datasets:[{data:[i.jan||0,i.fev||0,i.mar||0,i.abr||0,i.mai||0],backgroundColor:'#22c55e'}]},
-options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}
+type:'line',
+data:{
+labels:['JAN','FEV','MAR','ABR','MAI'],
+datasets:[{
+label:i.subitem,
+data:[
+Number(i.jan||0),
+Number(i.fev||0),
+Number(i.mar||0),
+Number(i.abr||0),
+Number(i.mai||0)
+],
+borderWidth:3,
+fill:false,
+tension:0.3
+}]
+},
+options:{
+plugins:{legend:{display:true}},
+scales:{y:{beginAtZero:true,max:100}}
+}
 })
+}
+
+function carregarSelectSub(){
+let sel=document.getElementById('sel-sub')
+if(!sel)return
+sel.innerHTML=allData.map(i=>`
+<option value="${i.id}">
+${i.subitem} - ${i.descricao.substring(0,40)}
+</option>
+`).join('')
 }
 
 function renderChartEvolucao(){
