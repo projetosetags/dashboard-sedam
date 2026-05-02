@@ -365,7 +365,7 @@ let abr=evol.find(e=>String(e.mes_referencia).startsWith('2026-04'))?.percentual
 let maiReal=evol.find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado
 if(!abr||abr==0) abr=i.total_cumprimento||0
 let bg=i.status_cor==='red'?'bg-red-900/20':i.status_cor==='yellow'?'bg-yellow-900/20':i.status_cor==='green'?'bg-emerald-900/20':''
-let campoResponsavel=(userP.nivel_acesso==1||userP.nivel_acesso==2)?`<select class="bg-slate-800 text-xs p-1 rounded" onchange="salvarResponsavel('${i.id}',this.value)"><option value="">Selecione</option>${(window.perfis||[]).sort((a,b)=>a.nome_completo.localeCompare(b.nome_completo)).map(p=>`<option value="${p.id}" ${p.id==i.responsavel_id?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span>${i.perfis?.nome_completo||'-'}</span>`
+let campoResponsavel=(userP.nivel_acesso==1||userP.nivel_acesso==2)?`<select class="bg-slate-800 text-xs p-1 rounded" onchange="if(this.value)salvarResponsavel('${i.id}',this.value)"><option value="">Selecione</option>${(window.perfis||[]).sort((a,b)=>a.nome_completo.localeCompare(b.nome_completo)).map(p=>`<option value="${p.id}" ${p.id==i.responsavel_id?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span>${i.perfis?.nome_completo||'-'}</span>`
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.identificador}</td>
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
@@ -573,10 +573,11 @@ document.getElementById('btn-voltar').style.display='none'
 }
   
 async function salvarResponsavel(id,novoId){
+if(!novoId||novoId===''){return}
 let {error}=await client.from('deliberacoes').update({responsavel_id:novoId}).eq('id',id)
 if(error){console.error(error);alert("Erro ao salvar responsável");return}
-await carregarDados()
 }
+  
 function logout(){
 localStorage.clear()
 location.reload()
