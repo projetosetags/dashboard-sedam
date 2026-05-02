@@ -144,6 +144,13 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 
 <script>
+function parseDataLocal(dataStr){
+if(!dataStr) return null
+let p=dataStr.split('-')
+if(p.length!==3) return null
+return new Date(Number(p[0]),Number(p[1])-1,Number(p[2]),12,0,0)
+}
+  
 let filtroDataInicio=null
 let filtroDataFim=null
 let filtroItemAtivo=null
@@ -226,19 +233,16 @@ let base=allData
 
 if(filtroDataInicio || filtroDataFim){
 base=base.filter(i=>{
-let d=null
-if(i.data_inicio){
-let x=new Date(i.data_inicio)
-if(!isNaN(x)) d=x
-}
-if(!d && i.prazo_texto){
-let x=new Date(i.prazo_texto)
-if(!isNaN(x)) d=x
-}
+
+let d=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
+
 if(!d) return false
-if(filtroDataInicio && d<new Date(filtroDataInicio)) return false
-if(filtroDataFim && d>new Date(filtroDataFim)) return false
+
+if(filtroDataInicio && d<parseDataLocal(filtroDataInicio)) return false
+if(filtroDataFim && d>parseDataLocal(filtroDataFim)) return false
+
 return true
+
 })
 }
 
@@ -317,30 +321,22 @@ lista=lista.filter(i=>i.item===filtroItemAtivo)
 if(filtroDataInicio || filtroDataFim){
 lista=lista.filter(i=>{
 
-let dataBase=null
-// tenta data_inicio primeiro
-if(i.data_inicio){
-let d=new Date(i.data_inicio)
-if(!isNaN(d)) dataBase=d
-}
-// fallback: tentar prazo_texto (quando for data)
-if(!dataBase && i.prazo_texto){
-let d=new Date(i.prazo_texto)
-if(!isNaN(d)) dataBase=d
-}
+let dataBase=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
 
 if(!dataBase) return false
 
 if(filtroDataInicio){
-let dIni=new Date(filtroDataInicio)
+let dIni=parseDataLocal(filtroDataInicio)
 if(dataBase<dIni) return false
 }
 
 if(filtroDataFim){
-let dFim=new Date(filtroDataFim)
+let dFim=parseDataLocal(filtroDataFim)
 if(dataBase>dFim) return false
 }
+
 return true
+
 })
 }
 
