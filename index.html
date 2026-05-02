@@ -327,7 +327,19 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}"><td class="p-2 font-b
 }).join('')
 if(userP){
 let pdfHtml=userP.nivel_acesso<=2?`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`:''
-document.getElementById('pdf-container').innerHTML=`${pdfHtml}<span class="text-xs text-emerald-400 font-black">${totalRegistros}</span><span class="text-[9px] text-slate-500"> SUBITENS</span>`
+document.getElementById('pdf-container').innerHTML=`
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-start leading-none">
+<span class="text-xs text-blue-400 font-black">${new Set(lista.map(i=>(i.subitem||'').split('.')[0])).size}</span>
+<span class="text-[9px] text-slate-500">ITENS</span>
+</div>
+<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>
+<div class="flex flex-col items-end leading-none">
+<span class="text-xs text-emerald-400 font-black">${totalRegistros}</span>
+<span class="text-[9px] text-slate-500">SUBITENS</span>
+</div>
+</div>
+`
 }
 }
   
