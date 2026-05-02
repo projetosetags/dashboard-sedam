@@ -353,7 +353,9 @@ let podeEditar =
 let jan = 0
 let fev = 0
 let mar = 0
-let abr = i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado || 0
+let abr = (i.evolucao_mensal||[]).find(e=>
+String(e.mes_referencia).startsWith('2026-04')
+)?.percentual_lancado ?? 0
 let mai = i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado || ''
 // 🔥 COLUNAS CORRETAS
 let colMeses = `
@@ -364,7 +366,7 @@ let colMeses = `
 <td>
 <input type="number"
 class="input-table"
-value="${mai}"
+value="${mai||''}"
 placeholder="0"
 ${!podeEditar?'disabled':''}
 onchange="salvar(this.value,'${i.id}','2026-05-01')">
@@ -396,7 +398,7 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td>
 <input type="number"
 class="input-mes"
-value="${mai}"
+value="${mai||''}"
 placeholder="0"
 ${!podeEditar?'disabled':''}
 onchange="salvar(this.value,'${i.id}','2026-05-01')">
@@ -501,39 +503,24 @@ async function salvar(v,id,mesRef){
 
 v = parseFloat(v)||0
 
-// 🔒 BLOQUEIO SE JÁ ESTIVER 100%
-let item = allData.find(x=>x.id==id)
-if((item?.total_cumprimento||0)>=100){
-alert("Item já concluído (100%)")
-return
-}
-
-// 🔒 PERMISSÃO
-if(!(userP.nivel_acesso==1 || userP.nivel_acesso==2 || (userP.nivel_acesso==3 && item.responsavel_id==userP.id))){
-alert("Sem permissão")
-return
-}
-
-// 🔥 UPSERT
-await client.from('evolucao_mensal').upsert({
+let {error} = await client
+.from('evolucao_mensal')
+.upsert({
 deliberacao_id:id,
 mes_referencia:mesRef,
 percentual_lancado:v
-},{onConflict:'deliberacao_id,mes_referencia'})
+},{
+onConflict:'deliberacao_id,mes_referencia'
+})
 
-// 🔥 RECALCULAR TOTAL (PEGA MAIOR VALOR DOS MESES)
-let meses = await client
-.from('evolucao_mensal')
-.select('percentual_lancado')
-.eq('deliberacao_id',id)
+if(error){
+console.error(error)
+alert("Erro ao salvar")
+return
+}
 
-let total = Math.max(...meses.data.map(m=>parseFloat(m.percentual_lancado)||0))
-
-await client.from('deliberacoes')
-.update({total_cumprimento:total})
-.eq('id',id)
-
-carregarDados()
+// 🔥 RECARREGA IMEDIATO
+await carregarDados()
 }
 
 function gerarRelatorioPDF(){
