@@ -72,10 +72,10 @@ tr{position:relative;z-index:1;}
 <button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-slate-700 px-2 py-1 rounded">SUBITEM</button>
 </div>
 <div class="flex gap-2 items-center">
-<input id="filtroDataInicio" type="date" class="text-xs bg-slate-800 px-2 py-1 rounded">
-<input id="filtroDataFim" type="date" class="text-xs bg-slate-800 px-2 py-1 rounded">
-<button onclick="aplicarFiltroData()" class="text-xs bg-yellow-600 px-2 py-1 rounded">FILTRAR</button>
+<input id="dataInicio" type="date" onchange="aplicarFiltroData()" class="text-xs bg-slate-800 px-2 py-1 rounded">
+<input id="dataFim" type="date" onchange="aplicarFiltroData()" class="text-xs bg-slate-800 px-2 py-1 rounded">
 <button onclick="limparFiltroData()" class="text-xs bg-slate-600 px-2 py-1 rounded">LIMPAR</button>
+<button onclick="toggleOcultarConcluidos()" id="btn-ocultar" class="text-xs bg-slate-700 px-2 py-1 rounded">OCULTAR 100%</button>
 </div>
 </div>
 
@@ -274,31 +274,23 @@ document.getElementById('btn-voltar').style.display='block'
 }
   
 function renderTable(){
-let lista=allData
-if(filtroItemAtivo){
-lista=lista.filter(i=>(i.subitem||'').split('.')[0]===filtroItemAtivo)
-}
-if(filtroDataInicio||filtroDataFim){
+let lista=[...allData]
 lista=lista.filter(i=>{
-let dataBase=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
-if(!dataBase)return false
-if(filtroDataInicio){
-let dIni=parseDataLocal(filtroDataInicio)
-if(dataBase<dIni)return false
+if(filtroItemAtivo){
+if((i.subitem||'').split('.')[0]!==filtroItemAtivo)return false
 }
-if(filtroDataFim){
-let dFim=parseDataLocal(filtroDataFim)
-if(dataBase>dFim)return false
+let dataBase=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
+if(filtroDataInicio||filtroDataFim){
+if(!dataBase)return false
+if(filtroDataInicio&&dataBase<parseDataLocal(filtroDataInicio))return false
+if(filtroDataFim&&dataBase>parseDataLocal(filtroDataFim))return false
+}
+if(ocultarConcluidos){
+let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
+if(total>=100)return false
 }
 return true
 })
-}
-if(ocultarConcluidos){
-lista=lista.filter(i=>{
-let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
-return total<100
-})
-}
 document.getElementById('table-body').innerHTML=lista.map(i=>{
 let dataFormatada='-'
 if(i.data_inicio){
@@ -400,20 +392,21 @@ if(error){console.error(error);alert("Erro ao excluir perfil");return}
 carregarDados()
 }
 function aplicarFiltroData(){
-filtroDataInicio=document.getElementById('filtroDataInicio').value||null
-filtroDataFim=document.getElementById('filtroDataFim').value||null
+filtroDataInicio=document.getElementById('dataInicio').value||null
+filtroDataFim=document.getElementById('dataFim').value||null
 renderTable()
 renderResumo()
 }
 
 function limparFiltroData(){
+document.getElementById('dataInicio').value=''
+document.getElementById('dataFim').value=''
 filtroDataInicio=null
 filtroDataFim=null
-document.getElementById('filtroDataInicio').value=''
-document.getElementById('filtroDataFim').value=''
 renderTable()
 renderResumo()
 }
+  
 function toggleOcultarConcluidos(){
 ocultarConcluidos=!ocultarConcluidos
 document.getElementById('btn-ocultar').innerText=ocultarConcluidos?'MOSTRAR 100%':'OCULTAR 100%'
