@@ -238,7 +238,7 @@ await client.from('perfis').delete().eq('id',id)
 carregarDados()
 }
 async function carregarDados(){
-let query=client.from('deliberacoes').select('*,evolucao_mensal(*),perfis(nome_completo)')
+let query=client.from('deliberacoes').select('*')
 // 🔒 CONTROLE POR RESPONSÁVEL
 if(userP.nivel_acesso!=1){
 query=query.eq('responsavel_id',userP.id)
@@ -272,7 +272,7 @@ let mapa = {}
 
 allData.forEach(i=>{
 
-let item = i.identificador?.split('.')[0] || '0'
+let item = i.subitem?.split('.')[0] || '0'
 
 if(!mapa[item]) mapa[item]=[]
 mapa[item].push(i)
@@ -335,7 +335,7 @@ document.getElementById('btn-voltar').style.display='block'
 }
 
 function renderTable(){
-let lista=filtroItemAtivo?allData.filter(i=>i.identificador?.startsWith(filtroItemAtivo+'.')):allData
+let lista=filtroItemAtivo?allData.filter(i=>i.subitem?.startsWith(filtroItemAtivo+'.')):allData
 document.getElementById('table-body').innerHTML=lista.map(i=>{
 let dataFormatada='-'
 if(i.data_inicio){
@@ -347,24 +347,37 @@ let podeEditar=(userP.nivel_acesso==1)
 let jan=0
 let fev=0
 let mar=0
-let evol=i.evolucao_mensal||[]
+let evol=let evol=i.evolucao_mensal||[]||[]
 let abr=evol.find(e=>String(e.mes_referencia).startsWith('2026-04'))?.percentual_lancado
 let maiReal=evol.find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado
 if(!abr||abr==0) abr=i.total_cumprimento||0
 let bg=i.status_cor==='red'?'bg-red-900/20':i.status_cor==='yellow'?'bg-yellow-900/20':i.status_cor==='green'?'bg-emerald-900/20':''
-let campoResponsavel=podeEditar?`<select class="bg-slate-800 text-xs p-1 rounded border border-emerald-400" onchange="salvarResponsavel('${i.id}',this.value)"><option value="">Selecione</option>${(window.perfis||[]).sort((a,b)=>a.nome_completo.localeCompare(b.nome_completo)).map(p=>`<option value="${p.id}" ${p.id==i.responsavel_id?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span class="opacity-70">${i.perfis?.nome_completo||'-'}</span>`
+let campoResponsavel=podeEditar?`<select class="bg-slate-800 text-xs p-1 rounded border border-emerald-400" onchange="salvarResponsavel('${i.id}',this.value)"><option value="">Selecione</option>${(window.perfis||[]).sort((a,b)=>a.nome_completo.localeCompare(b.nome_completo)).map(p=>`<option value="${p.id}" ${p.id==i.responsavel_id?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span class="opacity-70">${i.responsavel||'-'}</span>`
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
-<td class="p-2 font-black text-blue-400">${i.identificador}</td>
+<td class="p-2 font-black text-blue-400">${i.subitem}</td>
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
 <td class="text-xs">${campoResponsavel}</td>
-<td class="text-xs">${i.coordenadoria||'-'}</td>
+<td class="text-xs">${i.setor||'-'}</td>
 <td class="text-xs">${dataFormatada}</td>
 <td class="td-mes opacity-40">${jan}%</td>
 <td class="td-mes opacity-40">${fev}%</td>
 <td class="td-mes opacity-40">${mar}%</td>
 <td class="td-mes-strong text-blue-400">${abr}%</td>
 <td><input type="number" class="input-mes" value="${maiReal??''}" placeholder="${abr}" ${!podeEditar?'disabled':''} onchange="salvar(this.value,'${i.id}','2026-05-01')"></td>
-<td class="td-total text-emerald-400">${Number(i.total_cumprimento||0).toFixed(2)}%</td>
+<td class="td-total text-emerald-400">${Math.max(
+Number(i.jan||0),
+Number(i.fev||0),
+Number(i.mar||0),
+Number(i.abr||0),
+Number(i.mai||0),
+Number(i.jun||0),
+Number(i.jul||0),
+Number(i.ago||0),
+Number(i.set||0),
+Number(i.out||0),
+Number(i.nov||0),
+Number(i.dez||0)
+).toFixed(2)}%</td>
 </tr>`
 }).join('')
 }
@@ -389,8 +402,8 @@ let mapa = {}
 lista.forEach(i=>{
 
 let chave = modoGrupo === 'item'
-? i.identificador.split('.')[0]   // 1,2,3
-: i.identificador                // 1.1,1.2
+? i.subitem.split('.')[0]   // 1,2,3
+: i.subitem                // 1.1,1.2
 
 if(!mapa[chave]) mapa[chave]=[]
 mapa[chave].push(i)
@@ -414,7 +427,7 @@ ${modoGrupo==='item'?'ITEM':'SUBITEM'} ${k} (${mapa[k].length})
 
 ${mapa[k].map(i=>`
 <div class="ml-2 text-[10px]">
-• <b>${i.identificador}</b> - ${i.descricao}
+• <b>${i.subitem}</b> - ${i.descricao}
 </div>
 `).join('')}
 
@@ -431,7 +444,7 @@ if(myChart)myChart.destroy()
 let mar=0,abr=0,mai=0,count=allData.length||1
 
 allData.forEach(i=>{
-let m=i.evolucao_mensal||[]
+let m=let evol=i.evolucao_mensal||[]||[]
 
 mar+=parseFloat(m.find(e=>e.mes_referencia==='2026-03-01')?.percentual_lancado||0)
 abr+=parseFloat(m.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado||0)
@@ -491,7 +504,7 @@ doc.setFontSize(12)
 doc.text("RELATÓRIO TAG SEDAM 2026",10,10)
 
 let rows=allData.map(i=>[
-i.identificador,
+i.subitem,
 i.descricao?.substring(0,40),
 i.responsavel,
 (i.total_cumprimento||0)+'%'
@@ -519,7 +532,7 @@ function renderRanking(){
 
 // 🔥 ordenar por identificador (1.1, 1.2...)
 let lista = [...allData]
-.filter(i=>i.identificador)
+.filter(i=>i.subitem)
 .sort((a,b)=>
 String(a.identificador).localeCompare(String(b.identificador),undefined,{numeric:true})
 )
@@ -539,7 +552,7 @@ return `
 <div class="flex justify-between border-b border-white/5 py-1">
 
 <span>
-${i.identificador} - ${i.descricao?.substring(0,60)||'-'}
+${i.subitem} - ${i.descricao?.substring(0,60)||'-'}
 </span>
 
 <span class="font-bold ${cor}">
