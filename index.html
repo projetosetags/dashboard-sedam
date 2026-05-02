@@ -312,48 +312,32 @@ document.getElementById('btn-voltar').style.display='block'
 }
 
 function renderTable(){
-
 let mesAtual = new Date().getMonth()+1
-
 // 🔥 CORREÇÃO: lista fora do innerHTML
 let lista = filtroItemAtivo
 ? allData.filter(i=>i.identificador?.startsWith(filtroItemAtivo+'.'))
 : allData
-
 document.getElementById('table-body').innerHTML =
 lista.map(i=>{
-
 let dataFormatada = i.data_inicio
 ? new Date(i.data_inicio).toLocaleDateString('pt-BR')
 : (i.prazo_texto || '-')
-
 // 🔒 PERMISSÃO
 let podeEditar =
 (userP.nivel_acesso==1 || userP.nivel_acesso==2) ||
 (userP.nivel_acesso==3 && i.responsavel_id==userP.id)
-
 // 🔥 MESES FIXOS + DINÂMICO
 let jan = 0
 let fev = 0
 let mar = 0
-
 let abr = i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-04-01')?.percentual_lancado || 0
-
 let mai = i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado || ''
-
-// 🔒 PERMISSÃO
-let podeEditar =
-(userP.nivel_acesso==1 || userP.nivel_acesso==2) ||
-(userP.nivel_acesso==3 && i.responsavel_id==userP.id)
-
 // 🔥 COLUNAS CORRETAS
 let colMeses = `
 <td class="opacity-40">${jan}%</td>
 <td class="opacity-40">${fev}%</td>
 <td class="opacity-40">${mar}%</td>
-
 <td class="font-bold text-blue-300">${abr}%</td>
-
 <td>
 <input type="number"
 class="input-table"
@@ -363,34 +347,27 @@ ${!podeEditar?'disabled':''}
 onchange="salvar(this.value,'${i.id}','2026-05-01')">
 </td>
 `
-
 // 🔥 COR STATUS
 let bg =
 i.status_cor==='red' ? 'bg-red-900/20' :
 i.status_cor==='yellow' ? 'bg-yellow-900/20' :
 i.status_cor==='green' ? 'bg-emerald-900/20' : ''
-
 return `<tr class="border-b border-white/5 ${bg}">
 <td class="p-3 font-black text-blue-400">${i.identificador}</td>
 <td class="p-3">${i.descricao||'-'}</td>
 <td>${i.responsavel||'-'}</td>
 <td>${i.coordenadoria||'-'}</td>
 <td>${dataFormatada}</td>
-
 ${colMeses}
-
 <td class="p-3 text-right font-black text-emerald-400">
 ${i.total_cumprimento||0}%
 </td>
 </tr>`
-
 }).join('')
 }
   
 function renderConcluidos(){
-
 let lista = allData.filter(i=>(i.total_cumprimento||0)>=100)
-
 // 🔥 AGRUPAMENTO
 let mapa = {}
 
@@ -402,9 +379,7 @@ let chave = modoGrupo === 'item'
 
 if(!mapa[chave]) mapa[chave]=[]
 mapa[chave].push(i)
-
 })
-
 // 🔥 CARDS
 document.getElementById('concluidos-container').innerHTML=
 Object.keys(mapa).map(k=>`
@@ -413,7 +388,6 @@ Object.keys(mapa).map(k=>`
 <span class="text-[7px] text-white/50 ml-1">${modoGrupo==='item'?'ITEM':'SUB'} ${k}</span>
 </div>
 `).join('')
-
 // 🔥 LISTA DETALHADA
 document.getElementById('concluidos-list').innerHTML=
 Object.keys(mapa).map(k=>`
