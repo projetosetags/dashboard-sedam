@@ -516,26 +516,39 @@ document.getElementById('tab-'+t).classList.add('tab-active')
 
 function renderRanking(){
 
-let map={}
+// 🔥 ordenar por identificador (1.1, 1.2...)
+let lista = [...allData]
+.filter(i=>i.identificador)
+.sort((a,b)=>
+String(a.identificador).localeCompare(String(b.identificador),undefined,{numeric:true})
+)
 
-allData.forEach(i=>{
-let r=i.responsavel||'---'
-if(!map[r]) map[r]=[]
-map[r].push(i.total_cumprimento||0)
-})
+// 🔥 render SUBITENS
+document.getElementById('ranking').innerHTML =
+lista.map((i,idx)=>{
 
-let arr=Object.keys(map).map(k=>{
-let avg=Math.round(map[k].reduce((a,b)=>a+b,0)/map[k].length)
-return {nome:k,media:avg}
-}).sort((a,b)=>b.media-a.media)
+let v = i.total_cumprimento||0
 
-document.getElementById('ranking').innerHTML=
-arr.map((r,i)=>`
+let cor =
+v<=30 ? 'text-red-400' :
+v>=100 ? 'text-emerald-400' :
+'text-yellow-400'
+
+return `
 <div class="flex justify-between border-b border-white/5 py-1">
-<span>${i+1}º ${r.nome}</span>
-<span class="font-bold">${r.media}%</span>
+
+<span>
+${i.identificador} - ${i.descricao?.substring(0,60)||'-'}
+</span>
+
+<span class="font-bold ${cor}">
+${v}%
+</span>
+
 </div>
-`).join('')
+`
+
+}).join('')
 }
 
 function renderHeaderMeses(){
