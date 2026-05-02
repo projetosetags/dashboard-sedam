@@ -187,7 +187,12 @@ const MESES = [
 let modoGrupo = 'subitem'
 document.addEventListener("DOMContentLoaded",()=>{
 let uid=localStorage.getItem("uid")
-if(uid) init(uid)
+if(uid){
+init(uid)
+}else{
+const lastTab = localStorage.getItem('activeTab')
+if(lastTab) switchTab(lastTab)
+}
 })
 
 const S_URL='https://zvtzbiqfwhggysiuiuxh.supabase.co'
@@ -215,36 +220,28 @@ init(data.id)
 async function init(uid){
 let {data,error}=await client.from('perfis').select('*').eq('id',uid).single()
 if(error||!data){alert("Erro perfil");return}
-
 userP=data
-
 document.getElementById('login-screen').classList.add('hidden')
 document.getElementById('dashboard').classList.remove('hidden')
-
+const lastTab = localStorage.getItem('activeTab') || 'resumo'
+switchTab(lastTab)
 document.getElementById('user-info').innerText=
 data.nome_completo+" | "+data.cargo+" (Nível "+data.nivel_acesso+")"
-
 if(data.nivel_acesso<=2){
 document.getElementById('pdf-container').innerHTML=
 `<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`
 }
-
 carregarDados()
 }
 
 async function carregarDados(){
-
 let query=client.from('deliberacoes').select('*,evolucao_mensal(*)')
-
 // 🔒 CONTROLE POR RESPONSÁVEL
 if(userP.nivel_acesso!=1){
 query=query.eq('responsavel_id',userP.id)
 }
-
 let {data}=await query
-
 if(!data){allData=[];return}
-
 allData=(data||[])
 .filter(d=>d && d.identificador)
 .sort((a,b)=>
@@ -334,79 +331,29 @@ document.getElementById('btn-voltar').style.display='block'
 }
 
 function renderTable(){
-let mesAtual = new Date().getMonth()+1
-// 🔥 CORREÇÃO: lista fora do innerHTML
-let lista = filtroItemAtivo
-? allData.filter(i=>i.identificador?.startsWith(filtroItemAtivo+'.'))
-: allData
-document.getElementById('table-body').innerHTML =
+let lista=filtroItemAtivo?allData.filter(i=>i.identificador?.startsWith(filtroItemAtivo+'.')):allData
+document.getElementById('table-body').innerHTML=
 lista.map(i=>{
-let dataFormatada = i.data_inicio
-? new Date(i.data_inicio).toLocaleDateString('pt-BR')
-: (i.prazo_texto || '-')
-// 🔒 PERMISSÃO
-let podeEditar =
-(userP.nivel_acesso==1 || userP.nivel_acesso==2) ||
-(userP.nivel_acesso==3 && i.responsavel_id==userP.id)
-// 🔥 MESES FIXOS + DINÂMICO
-let jan = 0
-let fev = 0
-let mar = 0
-let abr = (i.evolucao_mensal||[]).find(e=>
-String(e.mes_referencia).startsWith('2026-04')
-)?.percentual_lancado ?? 0
-let mai = i.evolucao_mensal?.find(e=>e.mes_referencia==='2026-05-01')?.percentual_lancado || ''
-// 🔥 COLUNAS CORRETAS
-let colMeses = `
-<td class="opacity-40">${jan}%</td>
-<td class="opacity-40">${fev}%</td>
-<td class="opacity-40">${mar}%</td>
-<td class="font-bold text-blue-300">${abr}%</td>
-<td>
-<input type="number"
-class="input-table"
-value="${mai||''}"
-placeholder="0"
-${!podeEditar?'disabled':''}
-onchange="salvar(this.value,'${i.id}','2026-05-01')">
-</td>
-`
-// 🔥 COR STATUS
-let bg =
-i.status_cor==='red' ? 'bg-red-900/20' :
-i.status_cor==='yellow' ? 'bg-yellow-900/20' :
-i.status_cor==='green' ? 'bg-emerald-900/20' : ''
+let dataFormatada=i.data_inicio?new Date(i.data_inicio).toLocaleDateString('pt-BR'):(i.prazo_texto||'-')
+let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2)||(userP.nivel_acesso==3&&i.responsavel_id==userP.id)
+let jan=0
+let fev=0
+let mar=0
+let abr=i.total_cumprimento||0
+let mai=(i.evolucao_mensal||[]).find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado??''
+let bg=i.status_cor==='red'?'bg-red-900/20':i.status_cor==='yellow'?'bg-yellow-900/20':i.status_cor==='green'?'bg-emerald-900/20':''
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
-
 <td class="p-2 font-black text-blue-400">${i.identificador}</td>
-
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
-
 <td class="text-xs">${i.responsavel||'-'}</td>
-
 <td class="text-xs">${i.coordenadoria||'-'}</td>
-
 <td class="text-xs">${dataFormatada}</td>
-
-<td class="td-mes opacity-40">0%</td>
-<td class="td-mes opacity-40">0%</td>
-<td class="td-mes opacity-40">0%</td>
-
+<td class="td-mes opacity-40">${jan}%</td>
+<td class="td-mes opacity-40">${fev}%</td>
+<td class="td-mes opacity-40">${mar}%</td>
 <td class="td-mes-strong text-blue-400">${abr}%</td>
-
-<td>
-<input type="number"
-class="input-mes"
-value="${mai||''}"
-placeholder="0"
-${!podeEditar?'disabled':''}
-onchange="salvar(this.value,'${i.id}','2026-05-01')">
-</td>
-
-<td class="td-total text-emerald-400">
-${i.total_cumprimento||0}%
-</td>
-
+<td><input type="number" class="input-mes" value="${mai||''}" placeholder="0" ${!podeEditar?'disabled':''} onchange="salvar(this.value,'${i.id}','2026-05-01')"></td>
+<td class="td-total text-emerald-400">${i.total_cumprimento||0}%</td>
 </tr>`
 }).join('')
 }
@@ -518,7 +465,6 @@ alert("Erro ao salvar")
 return
 }
 
-// 🔥 RECARREGA IMEDIATO
 await carregarDados()
 }
 
