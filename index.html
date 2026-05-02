@@ -25,6 +25,29 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 .row-100 { background: rgba(16, 185, 129, 0.12) !important; color: #10b981; font-weight: 700; }
 .legend-box { background: rgba(30,41,59,0.6); border: 1px solid rgba(59,130,246,0.2); padding: 1rem; border-radius: 10px; margin-top: 1rem; font-size: 0.7rem; color: #cbd5e1; white-space: pre-wrap; }
 .btn-pdf { background: #ef4444; color: white; padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 900; text-transform: uppercase; transition: 0.3s; }
+.td-mes { font-size: 12px; font-weight: 700; text-align:center; }
+.td-mes-strong { font-size: 16px; font-weight: 900; text-align:center; }
+.td-total { font-size: 18px; font-weight: 900; text-align:right; }
+
+.td-desc {
+font-size: 11px;
+max-width: 280px;
+white-space: normal;
+line-height: 1.2;
+}
+
+.tr-hover:hover { background: rgba(255,255,255,0.04); }
+
+.input-mes {
+width: 60px;
+font-size: 16px;
+font-weight: 900;
+text-align:center;
+background: #020617;
+border:1px solid rgba(255,255,255,0.1);
+border-radius:6px;
+}
+  
 </style>
 </head>
 <body class="p-2 md:p-4">
@@ -352,16 +375,37 @@ let bg =
 i.status_cor==='red' ? 'bg-red-900/20' :
 i.status_cor==='yellow' ? 'bg-yellow-900/20' :
 i.status_cor==='green' ? 'bg-emerald-900/20' : ''
-return `<tr class="border-b border-white/5 ${bg}">
-<td class="p-3 font-black text-blue-400">${i.identificador}</td>
-<td class="p-3">${i.descricao||'-'}</td>
-<td>${i.responsavel||'-'}</td>
-<td>${i.coordenadoria||'-'}</td>
-<td>${dataFormatada}</td>
-${colMeses}
-<td class="p-3 text-right font-black text-emerald-400">
+return `<tr class="border-b border-white/5 tr-hover ${bg}">
+
+<td class="p-2 font-black text-blue-400">${i.identificador}</td>
+
+<td class="p-2 td-desc">${i.descricao||'-'}</td>
+
+<td class="text-xs">${i.responsavel||'-'}</td>
+
+<td class="text-xs">${i.coordenadoria||'-'}</td>
+
+<td class="text-xs">${dataFormatada}</td>
+
+<td class="td-mes opacity-40">0%</td>
+<td class="td-mes opacity-40">0%</td>
+<td class="td-mes opacity-40">0%</td>
+
+<td class="td-mes-strong text-blue-400">${abr}%</td>
+
+<td>
+<input type="number"
+class="input-mes"
+value="${mai}"
+placeholder="0"
+${!podeEditar?'disabled':''}
+onchange="salvar(this.value,'${i.id}','2026-05-01')">
+</td>
+
+<td class="td-total text-emerald-400">
 ${i.total_cumprimento||0}%
 </td>
+
 </tr>`
 }).join('')
 }
@@ -455,20 +499,38 @@ y:{beginAtZero:true,max:100}
 
 async function salvar(v,id,mesRef){
 
-if(userP.nivel_acesso!=1 && userP.nivel_acesso!=2 && userP.nivel_acesso!=3){
+v = parseFloat(v)||0
+
+// 🔒 BLOQUEIO SE JÁ ESTIVER 100%
+let item = allData.find(x=>x.id==id)
+if((item?.total_cumprimento||0)>=100){
+alert("Item já concluído (100%)")
+return
+}
+
+// 🔒 PERMISSÃO
+if(!(userP.nivel_acesso==1 || userP.nivel_acesso==2 || (userP.nivel_acesso==3 && item.responsavel_id==userP.id))){
 alert("Sem permissão")
 return
 }
 
+// 🔥 UPSERT
 await client.from('evolucao_mensal').upsert({
 deliberacao_id:id,
 mes_referencia:mesRef,
 percentual_lancado:v
 },{onConflict:'deliberacao_id,mes_referencia'})
 
-// 🔥 ATUALIZA TOTAL AUTOMÁTICO
+// 🔥 RECALCULAR TOTAL (PEGA MAIOR VALOR DOS MESES)
+let meses = await client
+.from('evolucao_mensal')
+.select('percentual_lancado')
+.eq('deliberacao_id',id)
+
+let total = Math.max(...meses.data.map(m=>parseFloat(m.percentual_lancado)||0))
+
 await client.from('deliberacoes')
-.update({total_cumprimento:v})
+.update({total_cumprimento:total})
 .eq('id',id)
 
 carregarDados()
