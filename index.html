@@ -211,13 +211,13 @@ function renderResumo(){
 let mapa={}
 
 allData.forEach(i=>{
-let item=i.item||i.subitem.split('.')[0]
+let item=i.item||i.subitem
 if(!mapa[item])mapa[item]=[]
 mapa[item].push(i)
 })
 
 document.getElementById('cards-container').innerHTML=
-Object.keys(mapa).map(item=>{
+Object.keys(mapa).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(item=>{
 
 let lista=mapa[item]
 
@@ -249,7 +249,6 @@ media<=30?'bg-status-red':
 media>=100?'bg-status-green':
 'bg-status-yellow'
 
-// 🔥 pega descrição do primeiro do grupo
 let descricao=lista.find(x=>x.descricaoitem)?.descricaoitem||''
 
 return `
@@ -257,7 +256,7 @@ return `
 
 <div class="card-micro ${cor}" onclick="abrirItem('${item}')">
 <span class="percent-big">${media}%</span>
-<span class="text-[9px] text-white/70">ITEM ${item}</span>
+<span class="text-[9px] text-white/70">${item}</span>
 </div>
 
 <div class="text-[9px] text-slate-400 mt-1 px-1 text-center">
@@ -275,7 +274,86 @@ switchTab('mensal')
 renderTable()
 document.getElementById('btn-voltar').style.display='block'
 }
-function renderTable(){let lista=filtroItemAtivo?allData.filter(i=>i.subitem&&i.subitem.startsWith(filtroItemAtivo+'.')):allData;document.getElementById('table-body').innerHTML=lista.map(i=>{let dataFormatada='-';if(i.data_inicio){let d=new Date(i.data_inicio);if(!isNaN(d))dataFormatada=d.toLocaleDateString('pt-BR');else dataFormatada=i.prazo_texto||i.data_inicio}else{dataFormatada=i.prazo_texto||'-'}let jan=Number(i.jan||0);let fev=Number(i.fev||0);let mar=Number(i.mar||0);let abr=Number(i.abr||0);let mai=Number(i.mai||0);let total=Math.max(jan,fev,mar,abr,mai,Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0));let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/20';let podeEditar=(userP.nivel_acesso==1)||(userP.id==i.responsavel_id);return `<tr class="border-b border-white/5 tr-hover ${bg}"><td class="p-2 font-black text-blue-400">${i.subitem}</td><td class="p-2 td-desc">${i.descricao||'-'}</td><td class="text-xs">${i.responsavel||'-'}</td><td class="text-xs">${i.setor||'-'}</td><td class="text-xs">${dataFormatada}</td><td class="td-mes opacity-40">${jan}%</td><td class="td-mes opacity-40">${fev}%</td><td class="td-mes opacity-40">${mar}%</td><td class="td-mes-strong text-blue-400">${abr}%</td><td><input type="number" class="input-mes" value="${mai||''}" ${!podeEditar?'disabled':''} onchange="salvar(this.value,'${i.id}','mai')"></td><td class="td-total text-emerald-400">${total.toFixed(2)}%</td></tr>`}).join('')}
+function renderTable(){
+
+let lista=filtroItemAtivo
+?allData.filter(i=>i.item===filtroItemAtivo)
+:allData
+
+document.getElementById('table-body').innerHTML=lista.map(i=>{
+
+let dataFormatada='-'
+
+if(i.data_inicio){
+let d=new Date(i.data_inicio)
+if(!isNaN(d))dataFormatada=d.toLocaleDateString('pt-BR')
+else dataFormatada=i.prazo_texto||i.data_inicio
+}else{
+dataFormatada=i.prazo_texto||'-'
+}
+
+let jan=Number(i.jan||0)
+let fev=Number(i.fev||0)
+let mar=Number(i.mar||0)
+let abr=Number(i.abr||0)
+let mai=Number(i.mai||0)
+
+let total=Math.max(
+jan,fev,mar,abr,mai,
+Number(i.jun||0),
+Number(i.jul||0),
+Number(i.ago||0),
+Number(i.set||0),
+Number(i.out||0),
+Number(i.nov||0),
+Number(i.dez||0)
+)
+
+let bg=
+total<=30?'bg-red-900/20':
+total>=100?'bg-emerald-900/20':
+'bg-yellow-900/20'
+
+// 🔥 REGRA DE PERMISSÃO MAI
+let podeEditar=
+userP.nivel_acesso==1 ||
+(userP.nivel_acesso!=1 && i.responsavel_id==userP.id)
+
+return `
+<tr class="border-b border-white/5 tr-hover ${bg}">
+
+<td class="p-2 font-black text-blue-400">${i.subitem}</td>
+
+<td class="p-2 td-desc">${i.descricao||'-'}</td>
+
+<td class="text-xs">${i.responsavel||'-'}</td>
+
+<td class="text-xs">${i.setor||'-'}</td>
+
+<td class="text-xs">${dataFormatada}</td>
+
+<td class="td-mes opacity-40">${jan}%</td>
+<td class="td-mes opacity-40">${fev}%</td>
+<td class="td-mes opacity-40">${mar}%</td>
+
+<td class="td-mes-strong text-blue-400">${abr}%</td>
+
+<td>
+${
+podeEditar
+?`<input type="number" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','2026-05-01')">`
+:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`
+}
+</td>
+
+<td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
+
+</tr>
+`
+
+}).join('')
+}
+  
 function renderConcluidos(){let lista=allData.filter(i=>Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))>=100);let mapa={};lista.forEach(i=>{let chave=modoGrupo==='item'?i.subitem.split('.')[0]:i.subitem;if(!mapa[chave])mapa[chave]=[];mapa[chave].push(i)});document.getElementById('concluidos-container').innerHTML=Object.keys(mapa).map(k=>`<div class="card-micro bg-status-green"><span class="percent-big">${mapa[k].length}</span><span class="text-[7px] text-white/50 ml-1">${modoGrupo==='item'?'ITEM':'SUB'} ${k}</span></div>`).join('');document.getElementById('concluidos-list').innerHTML=Object.keys(mapa).map(k=>`<div class="mb-3"><div class="text-emerald-400 font-bold mb-1">${modoGrupo==='item'?'ITEM':'SUBITEM'} ${k} (${mapa[k].length})</div>${mapa[k].map(i=>`<div class="ml-2 text-[10px]">• <b>${i.subitem}</b> - ${i.descricao}</div>`).join('')}</div>`).join('')}
 function renderChart(){let ctx=document.getElementById('barChart').getContext('2d');if(myChart)myChart.destroy();let mar=0,abr=0,mai=0,count=allData.length||1;allData.forEach(i=>{mar+=Number(i.mar||0);abr+=Number(i.abr||0);mai+=Number(i.mai||0)});mar=Math.round(mar/count);abr=Math.round(abr/count);mai=Math.round(mai/count);myChart=new Chart(ctx,{type:'bar',data:{labels:['MAR','ABR','MAI'],datasets:[{data:[mar,abr,mai],backgroundColor:[mar>=100?'#10b981':mar<=30?'#ef4444':'#f59e0b',abr>=100?'#10b981':abr<=30?'#ef4444':'#f59e0b',mai>=100?'#10b981':mai<=30?'#ef4444':'#f59e0b']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}})}
 function switchTab(t){localStorage.setItem('activeTab',t);document.querySelectorAll('.tab-view').forEach(v=>v.classList.add('hidden'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('tab-active'));document.getElementById('view-'+t).classList.remove('hidden');document.getElementById('tab-'+t).classList.add('tab-active')}
