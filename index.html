@@ -332,15 +332,17 @@ document.getElementById('btn-voltar').style.display='block'
 
 function renderTable(){
 let lista=filtroItemAtivo?allData.filter(i=>i.identificador?.startsWith(filtroItemAtivo+'.')):allData
-document.getElementById('table-body').innerHTML=
-lista.map(i=>{
+document.getElementById('table-body').innerHTML=lista.map(i=>{
 let dataFormatada=i.data_inicio?new Date(i.data_inicio).toLocaleDateString('pt-BR'):(i.prazo_texto||'-')
 let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2)||(userP.nivel_acesso==3&&i.responsavel_id==userP.id)
 let jan=0
 let fev=0
 let mar=0
-let abr=i.total_cumprimento||0
-let mai=(i.evolucao_mensal||[]).find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado??''
+let evol=i.evolucao_mensal||[]
+let abr=evol.find(e=>String(e.mes_referencia).startsWith('2026-04'))?.percentual_lancado
+let maiReal=evol.find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado
+if(!abr||abr==0) abr=i.total_cumprimento||0
+let maiExibir=(maiReal===undefined||maiReal===null||maiReal==='')?abr:maiReal
 let bg=i.status_cor==='red'?'bg-red-900/20':i.status_cor==='yellow'?'bg-yellow-900/20':i.status_cor==='green'?'bg-emerald-900/20':''
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.identificador}</td>
@@ -352,7 +354,12 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="td-mes opacity-40">${fev}%</td>
 <td class="td-mes opacity-40">${mar}%</td>
 <td class="td-mes-strong text-blue-400">${abr}%</td>
-<td><input type="number" class="input-mes" value="${mai||''}" placeholder="0" ${!podeEditar?'disabled':''} onchange="salvar(this.value,'${i.id}','2026-05-01')"></td>
+<td><input type="number"
+class="input-mes"
+value="${(i.evolucao_mensal||[]).find(e=>String(e.mes_referencia).startsWith('2026-05'))?.percentual_lancado ?? ''}"
+placeholder="${abr}"
+${!podeEditar?'disabled':''}
+onchange="salvar(this.value,'${i.id}','2026-05-01')"></td>
 <td class="td-total text-emerald-400">${i.total_cumprimento||0}%</td>
 </tr>`
 }).join('')
@@ -446,25 +453,17 @@ y:{beginAtZero:true,max:100}
 }
 
 async function salvar(v,id,mesRef){
-
-v = parseFloat(v)||0
-
-let {error} = await client
-.from('evolucao_mensal')
-.upsert({
-deliberacao_id:id,
-mes_referencia:mesRef,
-percentual_lancado:v
-},{
-onConflict:'deliberacao_id,mes_referencia'
-})
-
-if(error){
-console.error(error)
-alert("Erro ao salvar")
-return
-}
-
+v=parseFloat(v)||0
+let item=allData.find(x=>x.id==id)
+if(!item){alert("Item não encontrado");return}
+if((item.total_cumprimento||0)>=100){alert("Item já concluído (100%)");return}
+let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2)||(userP.nivel_acesso==3&&item.responsavel_id==userP.id)
+if(!podeEditar){alert("Sem permissão");return}
+let {error}=await client.from('evolucao_mensal').upsert({deliberacao_id:id,mes_referencia:mesRef,percentual_lancado:v},{onConflict:'deliberacao_id,mes_referencia'})
+if(error){console.error(error);alert("Erro ao salvar");return}
+let {data:meses}=await client.from('evolucao_mensal').select('percentual_lancado').eq('deliberacao_id',id)
+let total=Math.max(...(meses||[]).map(m=>parseFloat(m.percentual_lancado)||0))
+await client.from('deliberacoes').update({total_cumprimento:total}).eq('id',id)
 await carregarDados()
 }
 
