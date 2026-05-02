@@ -66,9 +66,17 @@ tr{position:relative;z-index:1;}
 <button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Cumpridos</button>
 </nav>
 
-<div class="flex gap-2 mb-3">
+<div class="flex gap-2 mb-3 items-center justify-between">
+<div class="flex gap-2">
 <button onclick="modoResumo='item';renderResumo()" class="text-xs bg-blue-600 px-2 py-1 rounded">ITEM</button>
 <button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-slate-700 px-2 py-1 rounded">SUBITEM</button>
+</div>
+<div class="flex gap-2 items-center">
+<input id="filtroDataInicio" type="date" class="text-xs bg-slate-800 px-2 py-1 rounded">
+<input id="filtroDataFim" type="date" class="text-xs bg-slate-800 px-2 py-1 rounded">
+<button onclick="aplicarFiltroData()" class="text-xs bg-yellow-600 px-2 py-1 rounded">FILTRAR</button>
+<button onclick="limparFiltroData()" class="text-xs bg-slate-600 px-2 py-1 rounded">LIMPAR</button>
+</div>
 </div>
   
 <!-- ABA 1: RESUMO (CARDS SEMAFÓRICOS) -->
@@ -136,6 +144,8 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 
 <script>
+let filtroDataInicio=null
+let filtroDataFim=null
 let filtroItemAtivo=null
 const descItens={"1":"Planejamento Estratégico e Governança","2":"Análise e Revisão do Planejamento Estratégico","3":"Atualização e Consolidação do Plano Estratégico","4":"Governança e Monitoramento Estratégico","5":"Mapeamento e Melhoria de Processos","6":"Desenvolvimento e Estruturação de Sistemas","7":"Adequação Normativa e Legal","8":"Capacitação Técnica e Sensoriamento","9":"Desenvolvimento de Sistemas e Integração","10":"Integração e Expansão Tecnológica","12":"Transparência e Portal Público","15":"Revisão de Plano de Ação","24":"Cadastro de Unidades de Conservação","25":"Programas Ambientais e REDD+","30":"Articulação Institucional","31":"Organização e Gestão Operacional","33":"Monitoramento e Coleta de Dados","45":"Ações Integradas e Cooperação"}
 let modoResumo='subitem'
@@ -212,8 +222,27 @@ function renderResumo(){
 
 let mapa={}
 
-allData.forEach(i=>{
-let item=i.item||i.subitem
+let base=allData
+
+if(filtroDataInicio || filtroDataFim){
+base=base.filter(i=>{
+let d=null
+if(i.data_inicio){
+let x=new Date(i.data_inicio)
+if(!isNaN(x)) d=x
+}
+if(!d && i.prazo_texto){
+let x=new Date(i.prazo_texto)
+if(!isNaN(x)) d=x
+}
+if(!d) return false
+if(filtroDataInicio && d<new Date(filtroDataInicio)) return false
+if(filtroDataFim && d>new Date(filtroDataFim)) return false
+return true
+})
+}
+
+base.forEach(i=>{let item=i.item||i.subitem
 if(!mapa[item])mapa[item]=[]
 mapa[item].push(i)
 })
@@ -278,9 +307,42 @@ document.getElementById('btn-voltar').style.display='block'
 }
 function renderTable(){
 
-let lista=filtroItemAtivo
-?allData.filter(i=>i.item===filtroItemAtivo)
-:allData
+let lista=allData
+
+// 🔥 FILTRO POR ITEM
+if(filtroItemAtivo){
+lista=lista.filter(i=>i.item===filtroItemAtivo)
+}
+// 🔥 FILTRO POR DATA
+if(filtroDataInicio || filtroDataFim){
+lista=lista.filter(i=>{
+
+let dataBase=null
+// tenta data_inicio primeiro
+if(i.data_inicio){
+let d=new Date(i.data_inicio)
+if(!isNaN(d)) dataBase=d
+}
+// fallback: tentar prazo_texto (quando for data)
+if(!dataBase && i.prazo_texto){
+let d=new Date(i.prazo_texto)
+if(!isNaN(d)) dataBase=d
+}
+
+if(!dataBase) return false
+
+if(filtroDataInicio){
+let dIni=new Date(filtroDataInicio)
+if(dataBase<dIni) return false
+}
+
+if(filtroDataFim){
+let dFim=new Date(filtroDataFim)
+if(dataBase>dFim) return false
+}
+return true
+})
+}
 
 document.getElementById('table-body').innerHTML=lista.map(i=>{
 
@@ -435,6 +497,23 @@ let {error}=await client.from('perfis').delete().eq('id',id)
 if(error){console.error(error);alert("Erro ao excluir perfil");return}
 carregarDados()
 }
+function aplicarFiltroData(){
+filtroDataInicio=document.getElementById('filtroDataInicio').value||null
+filtroDataFim=document.getElementById('filtroDataFim').value||null
+renderTable()
+renderResumo()
+}
+
+function limparFiltroData(){
+filtroDataInicio=null
+filtroDataFim=null
+document.getElementById('filtroDataInicio').value=''
+document.getElementById('filtroDataFim').value=''
+renderTable()
+renderResumo()
+}
+
+
 </script>
   
   
