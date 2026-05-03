@@ -656,49 +656,23 @@ function logout(){localStorage.clear();location.reload()}
 
   
 <script>
-
-function getMesAtualIndex(){
-return new Date().getMonth()
-}
-
-
+function getMesAtualIndex(){return new Date().getMonth()}
 async function salvarResponsavel(id,novoId){
 if(!novoId)return
-if(userP.nivel_acesso!=1){
-alert("Sem permissão")
-return
-}
+if(userP.nivel_acesso!=1){alert("Sem permissão");return}
 let p=(window.perfis||[]).find(x=>String(x.id)===String(novoId))
-if(!p){
-alert("Perfil não encontrado")
-return
-}
-console.log("ALTERANDO RESPONSÁVEL:",id,p.nome_completo)
-let {error}=await client
-.from('deliberacoes')
-.update({
-responsavel:p.nome_completo,
-responsavel_id:novoId
-})
-.eq('id',id)
-if(error){
-console.error("ERRO:",error)
-alert("Erro ao salvar responsável")
-return
-}
+if(!p){alert("Perfil não encontrado");return}
+let {error}=await client.from('deliberacoes').update({responsavel:p.nome_completo,responsavel_id:p.id}).eq('id',id)
+if(error){console.error(error);alert("Erro ao salvar responsável");return}
 let item=allData.find(x=>String(x.id)===String(id))
-if(item){
-item.responsavel=p.nome_completo
-item.responsavel_id=novoId
-}
+if(item){item.responsavel=p.nome_completo;item.responsavel_id=p.id}
 renderTable()
 }
-  
 function renderSelects(){
 let selItem=document.getElementById('sel-item')
 let selSub=document.getElementById('sel-sub')
 if(!selItem||!selSub)return
-let itens=[...new Set(allData.map(i=>i.subitem.split('.')[0]))]
+let itens=[...new Set(allData.map(i=>(i.subitem||'').split('.')[0]).filter(x=>x))]
 selItem.innerHTML='<option value="total">TOTAL</option>'+itens.map(i=>`<option value="${i}">ITEM ${i}</option>`).join('')
 selItem.onchange=()=>updateSubSelect()
 updateSubSelect()
@@ -706,309 +680,73 @@ updateSubSelect()
 function updateSubSelect(){
 let selItem=document.getElementById('sel-item')
 let selSub=document.getElementById('sel-sub')
+if(!selItem||!selSub)return
 let v=selItem.value
-let lista=v==='total'?allData:allData.filter(i=>i.subitem.startsWith(v+'.'))
+let lista=v==='total'?allData:allData.filter(i=>(i.subitem||'').startsWith(v+'.'))
 selSub.innerHTML=lista.map(i=>`<option value="${i.subitem}">${i.subitem}</option>`).join('')
-renderChart()
+if(typeof renderChart==="function")renderChart()
 }
-
 async function gerarRelatorioPDF(){
 const {jsPDF}=window.jspdf
-
 let query=client.from('deliberacoes').select('*')
-
-/* 🔒 FILTRO POR USUÁRIO */
-if(userP.nivel_acesso!=1){
-query=query.eq('responsavel_id',userP.id)
-}
-
+if(userP.nivel_acesso!=1){query=query.eq('responsavel_id',userP.id)}
 let {data,error}=await query
-
-if(error||!data){
-alert("Erro ao gerar PDF")
-return
-}
-
+if(error||!data){alert("Erro ao gerar PDF");return}
 let doc=new jsPDF()
 doc.setFontSize(10)
-/* 🔥 TÍTULO PERSONALIZADO */
-doc.text(
-userP.nivel_acesso==1
-? "RELATÓRIO GERAL - TAG SEDAM"
-: "RELATÓRIO INDIVIDUAL - "+(userP.nome_completo||''),
-10,10
-)
-
+doc.text(userP.nivel_acesso==1?"RELATÓRIO GERAL - TAG SEDAM":"RELATÓRIO INDIVIDUAL - "+(userP.nome_completo||''),10,10)
 let rows=data.map(i=>{
-let total=Math.max(
-Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),
-Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),
-Number(i.jul||0),Number(i.ago||0),Number(i.set||0),
-Number(i.out||0),Number(i.nov||0),Number(i.dez||0)
-)
-return[
-i.subitem,
-(i.descricao||'').substring(0,40),
-i.responsavel||'-',
-total+'%'
-]
+let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
+return[i.subitem,(i.descricao||'').substring(0,40),i.responsavel||'-',total+'%']
 })
-
-doc.autoTable({
-head:[['Subitem','Descrição','Responsável','%']],
-body:rows,
-startY:15,
-styles:{fontSize:6}
-})
-
-doc.save(
-userP.nivel_acesso==1
-? "relatorio_geral.pdf"
-: "relatorio_"+(userP.username||'usuario')+".pdf"
-)
+doc.autoTable({head:[['Subitem','Descrição','Responsável','%']],body:rows,startY:15,styles:{fontSize:6}})
+doc.save(userP.nivel_acesso==1?"relatorio_geral.pdf":"relatorio_"+(userP.username||'usuario')+".pdf")
 }
-
-function mesFromData(data){
-return ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][new Date(data).getMonth()]
-}
-  
+function mesFromData(data){return['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][new Date(data).getMonth()]}
 async function salvar(valor,id,campo){
-let v=String(valor).replace(',','.')
-v=parseFloat(v)
-if(isNaN(v))v=0
-if(v<0||v>100){
-alert("Informe um valor entre 0 e 100")
-return
-}
+let v=parseFloat(String(valor).replace(',','.'));if(isNaN(v))v=0
+if(v<0||v>100){alert("Informe 0 a 100");return}
 let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2||userP.nivel_acesso==3)
-if(!podeEditar){
-alert("Sem permissão")
-return
-}
-console.log("SALVANDO:",campo,v)
-let {error}=await client
-.from('deliberacoes')
-.update({[campo]:v})
-.eq('id',id)
-if(error){
-console.error("ERRO SUPABASE:",error)
-alert("Erro ao salvar")
-return
-}
+if(!podeEditar){alert("Sem permissão");return}
+let {error}=await client.from('deliberacoes').update({[campo]:v}).eq('id',id)
+if(error){console.error(error);alert("Erro ao salvar");return}
 carregarDados()
 }
-  
 async function alterarResponsavel(id,respId){
 let p=(window.perfis||[]).find(x=>String(x.id)===String(respId))
 if(!p)return
-
-let payload={
-responsavel:p.nome_completo,
-responsavel_id:p.id
-}
-
-let {error}=await client
-.from('deliberacoes')
-.update(payload)
-.eq('id',id)
-
-if(error){
-console.error(error)
-alert("Erro ao salvar responsável")
-return
-}
-
+let {error}=await client.from('deliberacoes').update({responsavel:p.nome_completo,responsavel_id:p.id}).eq('id',id)
+if(error){console.error(error);alert("Erro ao salvar responsável");return}
 carregarDados()
 }
-
-async function criarPerfil(nome){
-if(!nome)return
-let {error}=await client.from('perfis').insert({nome_completo:nome})
-if(error){console.error(error);alert("Erro ao criar perfil");return}
-carregarDados()
-}
-async function editarPerfil(id,nome){
-if(!id||!nome)return
-let {error}=await client.from('perfis').update({nome_completo:nome}).eq('id',id)
-if(error){console.error(error);alert("Erro ao editar perfil");return}
-carregarDados()
-}
-async function excluirPerfil(id){
-if(!id)return
-if(!confirm("Excluir perfil?"))return
-let {error}=await client.from('perfis').delete().eq('id',id)
-if(error){console.error(error);alert("Erro ao excluir perfil");return}
-carregarDados()
-}
-function aplicarFiltroData(){
-filtroDataInicio=document.getElementById('dataInicio').value||null
-filtroDataFim=document.getElementById('dataFim').value||null
-renderTable()
-renderResumo()
-}
-
-function limparFiltroData(){
-document.getElementById('dataInicio').value='2025-01-01'
-document.getElementById('dataFim').value='2028-01-01'
-filtroDataInicio='2025-01-01'
-filtroDataFim='2028-01-01'
-renderTable()
-renderResumo()
-}
-  
-function toggleOcultarConcluidos(){
-ocultarConcluidos=!ocultarConcluidos
-let b=document.getElementById('btn-ocultar')
-if(b)b.innerText=ocultarConcluidos?'MOSTRAR 100%':'OCULTAR 100%'
-renderTable()
-renderResumo()
-}
-
-let modoGrafico='todos'
-let chartTotal,chartItem,chartSubitem,chartEvolucao
-
-function truncarTexto(txt,limite=60){
-if(!txt)return'-'
-if(txt.length<=limite)return txt
-let corte=txt.substring(0,limite)
-let ultimoEspaco=corte.lastIndexOf(' ')
-if(ultimoEspaco>0)corte=corte.substring(0,ultimoEspaco)
-return corte+'...'
-}
-
-function carregarSelectSub(){
-let sel=document.getElementById('sel-sub')
-if(!sel)return
-sel.innerHTML=allData.map(i=>`
-<option value="${i.id}">
-${i.subitem} - ${truncarTexto(i.descricao,60)}
-</option>
-`).join('')
-}
-
+function aplicarFiltroData(){filtroDataInicio=document.getElementById('dataInicio').value||null;filtroDataFim=document.getElementById('dataFim').value||null;renderTable();renderResumo()}
+function limparFiltroData(){document.getElementById('dataInicio').value='2025-01-01';document.getElementById('dataFim').value='2028-01-01';filtroDataInicio='2025-01-01';filtroDataFim='2028-01-01';renderTable();renderResumo()}
+function toggleOcultarConcluidos(){ocultarConcluidos=!ocultarConcluidos;let b=document.getElementById('btn-ocultar');if(b)b.innerText=ocultarConcluidos?'MOSTRAR 100%':'OCULTAR 100%';renderTable();renderResumo()}
+function truncarTexto(t,l=60){if(!t)return'-';if(t.length<=l)return t;let c=t.substring(0,l);let u=c.lastIndexOf(' ');if(u>0)c=c.substring(0,u);return c+'...'}
 let chartMaster=null
 function initPainelGrafico(){
+let tipo=document.getElementById('tipoGrafico')
+let item=document.getElementById('filtroItem')
+let sub=document.getElementById('filtroSubitem')
+if(!tipo||!item||!sub){console.warn("elementos gráfico não encontrados");return}
 popularItens()
 atualizarLista3()
-document.getElementById('tipoGrafico').onchange=()=>{
-atualizarLista3()
+tipo.onchange=()=>{atualizarLista3();renderGraficoMaster()}
+item.onchange=()=>{atualizarLista3();renderGraficoMaster()}
+sub.onchange=()=>renderGraficoMaster()
 renderGraficoMaster()
 }
-document.getElementById('filtroItem').onchange=()=>{
-atualizarLista3()
-renderGraficoMaster()
-}
-document.getElementById('filtroSubitem').onchange=renderGraficoMaster
-renderGraficoMaster()
-}
-
 function popularItens(){
-let sel=document.getElementById('filtroItem')
-if(!sel)return
+let sel=document.getElementById('filtroItem');if(!sel)return
 let mapa={}
 allData.forEach(i=>{
-let item=(i.numitem||'').toString().trim()
-if(!item)return
-if(!mapa[item]){
-mapa[item]={
-num:item,
-descricao:i.descricaoitem||'-'
-}
-}
+let n=(i.numitem||'').toString().trim()
+if(!n)return
+if(!mapa[n])mapa[n]={num:n,descricao:i.descricaoitem||'-'}
 })
-let lista=Object.values(mapa)
-.sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
-sel.innerHTML='<option value="todos">TODOS OS ITENS</option>'+
-lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
+let lista=Object.values(mapa).sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
+sel.innerHTML='<option value="todos">TODOS OS ITENS</option>'+lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
 }
-
-function popularSubitens(){
-let sel=document.getElementById('filtroSubitem')
-let selItem=document.getElementById('filtroItem')
-if(!sel||!selItem)return
-let v=selItem.value
-let lista=v==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(v+'.'))
-sel.innerHTML=lista.map(i=>`<option value="${i.id}">${i.subitem} - ${(i.descricao||'-').substring(0,40)}</option>`).join('')
-} 
-function renderGraficoMaster(){
-let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy()
-let tipo=document.getElementById('tipoGrafico').value
-let selItem=document.getElementById('filtroItem').value
-let selSub=document.getElementById('filtroSubitem').value
-let descBox=document.getElementById('descSubitem');if(descBox)descBox.innerHTML=''
-let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
-let mesAtual=getMesAtualIndex()
-let labels=meses.slice(0,mesAtual+1)
-let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899']
-let datasets=[]
-if(tipo==='item'){
-let itemSelecionado=selSub
-if(!itemSelecionado||itemSelecionado==='todos')return
-let lista=allData.filter(i=>(i.numitem||'').toString()===itemSelecionado)
-if(!lista.length)return
-let arr=[]
-for(let m=0;m<=mesAtual;m++){
-let mesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][m]
-let soma=lista.reduce((a,c)=>a+Number(c[mesKey]??0),0)
-arr.push(Math.round(soma/(lista.length||1)))
-}
-datasets=[{label:'ITEM '+itemSelecionado,data:arr,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
-let itemDesc=lista.find(x=>x.descricaoitem)||lista[0]||{}
-if(descBox){descBox.innerHTML=`<b>ITEM ${itemSelecionado}</b> - ${itemDesc.descricaoitem||itemDesc.descricao||'-'}`}
-}
-if(tipo==='subitem'){
-let i=allData.find(x=>String(x.id)===String(selSub))
-if(!i)return
-let valores=[
-Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),
-Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),
-Number(i.jul??0),Number(i.ago??0),Number(i.set??0),
-Number(i.out??0),Number(i.nov??0),Number(i.dez??0)
-]
-datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
-if(descBox){descBox.innerHTML=`<b>${i.subitem}</b> - ${i.descricao||'-'}`}
-}
-if(!datasets.length)return
-chartMaster=new Chart(ctx,{
-type:'bar',
-data:{labels,datasets},
-options:{
-responsive:true,
-plugins:{
-legend:{display:true,labels:{color:'#cbd5f5'}},
-tooltip:{callbacks:{label:(ctx)=>ctx.raw+'%'}}
-},
-scales:{y:{beginAtZero:true,max:100,ticks:{callback:(v)=>v+'%'}}},
-animation:{duration:800}
-},
-plugins:[{
-id:'labels',
-afterDatasetsDraw(chart){
-let {ctx}=chart
-chart.data.datasets.forEach((dataset,i)=>{
-let meta=chart.getDatasetMeta(i)
-meta.data.forEach((bar,index)=>{
-let val=dataset.data[index]
-ctx.fillStyle='#fff'
-ctx.font='bold 10px Arial'
-ctx.textAlign='center'
-ctx.fillText(val+'%',bar.x,bar.y-5)
-})
-})
-}
-}]
-})
-}
-
-function mediaMes(lista,mes){
-return Math.round(lista.reduce((a,c)=>a+Number(c[mes]??0),0)/lista.length)
-}
-function getGraficoBase64(){
-let canvas=document.getElementById('chartMaster')
-if(!canvas)return null
-return canvas.toDataURL('image/png',1.0)
-}
-
 function atualizarLista3(){
 let sel=document.getElementById('filtroSubitem')
 let tipo=document.getElementById('tipoGrafico').value
@@ -1017,83 +755,62 @@ if(!sel)return
 if(tipo==='item'){
 let mapa={}
 allData.forEach(i=>{
-let item=(i.numitem||'').toString().trim()
-if(!item)return
-if(!mapa[item]){
-mapa[item]={
-num:item,
-descricao:i.descricaoitem||'-'
-}
-}
+let n=(i.numitem||'').toString().trim()
+if(!n)return
+if(!mapa[n])mapa[n]={num:n,descricao:i.descricaoitem||'-'}
 })
-let lista=Object.values(mapa)
-.sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
+let lista=Object.values(mapa).sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
 sel.innerHTML=lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
 }else{
-let lista=selItem==='todos'
-? allData
-: allData.filter(i=>(i.numitem||'').toString()===selItem)
-lista=lista.sort((a,b)=>a.subitem.localeCompare(b.subitem,undefined,{numeric:true}))
+let lista=selItem==='todos'?allData:allData.filter(i=>(i.numitem||'').toString()===selItem)
+lista=lista.sort((a,b)=>(a.subitem||'').localeCompare(b.subitem||'',undefined,{numeric:true}))
 sel.innerHTML=lista.map(i=>`<option value="${i.id}">${i.subitem} - ${truncarTexto(i.descricao||'-',60)}</option>`).join('')
 }
 }
-
+function renderGraficoMaster(){
+let el=document.getElementById('chartMaster');if(!el)return
+let ctx=el.getContext('2d');if(!ctx)return
+if(chartMaster)chartMaster.destroy()
+let tipo=document.getElementById('tipoGrafico').value
+let selItem=document.getElementById('filtroItem').value
+let selSub=document.getElementById('filtroSubitem').value
+let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
+let mesAtual=getMesAtualIndex()
+let labels=meses.slice(0,mesAtual+1)
+let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899']
+let datasets=[]
+if(tipo==='item'){
+if(!selSub||selSub==='todos')return
+let lista=allData.filter(i=>(i.numitem||'').toString()===selSub)
+if(!lista.length)return
+let arr=[]
+for(let m=0;m<=mesAtual;m++){
+let mesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][m]
+let soma=lista.reduce((a,c)=>a+Number(c[mesKey]??0),0)
+arr.push(Math.round(soma/(lista.length||1)))
+}
+datasets=[{label:'ITEM '+selSub,data:arr,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+}
+if(tipo==='subitem'){
+let i=allData.find(x=>String(x.id)===String(selSub))
+if(!i)return
+let valores=[Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),Number(i.jul??0),Number(i.ago??0),Number(i.set??0),Number(i.out??0),Number(i.nov??0),Number(i.dez??0)]
+datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+}
+if(!datasets.length)return
+chartMaster=new Chart(ctx,{type:'bar',data:{labels,datasets},options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#cbd5f5'}},tooltip:{callbacks:{label:(ctx)=>ctx.raw+'%'}}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:(v)=>v+'%'}}}}})
+}
+function mediaMes(lista,mes){return Math.round(lista.reduce((a,c)=>a+Number(c[mes]??0),0)/lista.length)}
 async function backupCompleto(){
-alert("Gerando backup completo...")
 let {data:delib}=await client.from('deliberacoes').select('*')
 let {data:perfis}=await client.from('perfis').select('*')
-gerarCSV(delib,"deliberacoes")
-gerarCSV(perfis,"perfis")
+gerarCSV(delib,"deliberacoes");gerarCSV(perfis,"perfis")
 gerarJSON({deliberacoes:delib,perfis:perfis})
 gerarPDFBackup(delib)
-alert("Backup concluído")
 }
-
-  function gerarCSV(dados,nome){
-if(!dados||!dados.length)return
-let cols=Object.keys(dados[0])
-let csv=cols.join(";")+"\n"
-dados.forEach(l=>{
-csv+=cols.map(c=>`"${(l[c]??'').toString().replace(/"/g,'""')}"`).join(";")+"\n"
-})
-let blob=new Blob([csv],{type:"text/csv"})
-let a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download=nome+"_"+Date.now()+".csv"
-a.click()
-
-function gerarJSON(obj){
-let blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"})
-let a=document.createElement("a")
-a.href=URL.createObjectURL(blob)
-a.download="backup_completo_"+Date.now()+".json"
-a.click()
-}
-
-function gerarPDFBackup(dados){
-const {jsPDF}=window.jspdf
-let doc=new jsPDF()
-doc.setFontSize(10)
-doc.text("BACKUP DELIBERAÇÕES",10,10)
-let rows=dados.map(i=>[
-i.subitem,
-(i.descricao||'').substring(0,40),
-i.responsavel||'-',
-Math.max(
-i.jan||0,i.fev||0,i.mar||0,i.abr||0,i.mai||0,
-i.jun||0,i.jul||0,i.ago||0,i.set||0,i.out||0,i.nov||0,i.dez||0
-)+'%'
-])
-doc.autoTable({
-head:[['Subitem','Descrição','Responsável','%']],
-body:rows,
-startY:15,
-styles:{fontSize:6}
-})
-doc.save("backup_deliberacoes.pdf")
-}
-    
-
+function gerarCSV(d,n){if(!d||!d.length)return;let c=Object.keys(d[0]);let csv=c.join(";")+"\n";d.forEach(l=>{csv+=c.map(k=>`"${(l[k]??'').toString().replace(/"/g,'""')}"`).join(";")+"\n"});let b=new Blob([csv],{type:"text/csv"});let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n+"_"+Date.now()+".csv";a.click()}
+function gerarJSON(o){let b=new Blob([JSON.stringify(o,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="backup_"+Date.now()+".json";a.click()}
+function gerarPDFBackup(d){const {jsPDF}=window.jspdf;let doc=new jsPDF();doc.setFontSize(10);doc.text("BACKUP DELIBERAÇÕES",10,10);let rows=d.map(i=>[i.subitem,(i.descricao||'').substring(0,40),i.responsavel||'-',Math.max(i.jan||0,i.fev||0,i.mar||0,i.abr||0,i.mai||0,i.jun||0,i.jul||0,i.ago||0,i.set||0,i.out||0,i.nov||0,i.dez||0)+'%']);doc.autoTable({head:[['Subitem','Descrição','Responsável','%']],body:rows,startY:15,styles:{fontSize:6}});doc.save("backup_deliberacoes.pdf")}
 </script>
   
   
