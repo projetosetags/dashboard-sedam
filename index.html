@@ -202,35 +202,51 @@ if(userP.nivel_acesso!=1)return
 let {data,error}=await client.from('perfis').select('*').order('nome_completo')
 if(error){console.error(error);return}
 window.perfis=data||[]
-let html=window.perfis.map(p=>`
-<div class="flex items-center justify-between border-b border-white/10 py-1">
-<div>
-<b>${p.nome_completo}</b> | ${p.cargo||'-'} | N${p.nivel_acesso||'-'} | ${p.setor||'-'}
-</div>
-<div class="flex gap-2">
-<button onclick="editarPerfil('${p.id}')" class="bg-blue-600 px-2 py-1 rounded">Editar</button>
+let html=`
+<table class="w-full text-xs">
+<thead>
+<tr class="text-slate-400 border-b border-white/20">
+<th class="text-left p-2">Nome</th>
+<th class="text-left p-2">Username</th>
+<th class="text-left p-2">Cargo</th>
+<th class="text-left p-2">Setor</th>
+<th class="text-left p-2">Nível</th>
+<th class="text-right p-2">Ações</th>
+</tr>
+</thead>
+<tbody>
+${window.perfis.map(p=>`
+<tr class="border-b border-white/10 hover:bg-white/5">
+<td class="p-2">${p.nome_completo||'-'}</td>
+<td class="p-2">@${p.username||'-'}</td>
+<td class="p-2">${p.cargo||'-'}</td>
+<td class="p-2">${p.setor||'-'}</td>
+<td class="p-2">N${p.nivel_acesso||'-'}</td>
+<td class="p-2 text-right">
+<button onclick="editarPerfil('${p.id}')" class="bg-blue-600 px-2 py-1 rounded mr-1">Editar</button>
 <button onclick="excluirPerfil('${p.id}')" class="bg-red-600 px-2 py-1 rounded">Excluir</button>
-</div>
-</div>
-`).join('')
+</td>
+</tr>
+`).join('')}
+</tbody>
+</table>
+`
 document.getElementById('listaPerfis').innerHTML=html
 }
 
-  let editPerfilId=null
+let editPerfilId=null
 async function salvarPerfil(){
-if(userP.nivel_acesso!=1){alert("Sem permissão");return}
-let nome=document.getElementById('p_nome').value.trim()
-let user=document.getElementById('p_user').value.trim()
-let cargo=document.getElementById('p_cargo').value.trim()
-let setor=document.getElementById('p_setor').value.trim()
-let nivel=parseInt(document.getElementById('p_nivel').value||0)
-if(!nome||!user){alert("Preencha nome e username");return}
+if(userP.nivel_acesso!=1)return
 let payload={
-nome_completo:nome,
-username:user,
-cargo:cargo,
-setor:setor,
-nivel_acesso:nivel
+nome_completo:document.getElementById('p_nome').value.trim(),
+username:document.getElementById('p_user').value.trim(),
+cargo:document.getElementById('p_cargo').value.trim(),
+setor:document.getElementById('p_setor').value.trim(),
+nivel_acesso:Number(document.getElementById('p_nivel').value||3)
+}
+if(!payload.nome_completo||!payload.username){
+alert("Preencha nome e username")
+return
 }
 let res
 if(editPerfilId){
@@ -245,8 +261,8 @@ await carregarPerfis()
 await atualizarResponsaveis()
 }
 
-  function editarPerfil(id){
-let p=(window.perfis||[]).find(x=>x.id==id)
+function editarPerfil(id){
+let p=window.perfis.find(x=>x.id==id)
 if(!p)return
 editPerfilId=id
 document.getElementById('p_nome').value=p.nome_completo||''
@@ -254,11 +270,14 @@ document.getElementById('p_user').value=p.username||''
 document.getElementById('p_cargo').value=p.cargo||''
 document.getElementById('p_setor').value=p.setor||''
 document.getElementById('p_nivel').value=p.nivel_acesso||3
+window.scrollTo({top:0,behavior:'smooth'})
 }
 
 async function excluirPerfil(id){
 if(userP.nivel_acesso!=1)return
-if(!confirm("Excluir perfil?"))return
+let p=window.perfis.find(x=>x.id==id)
+if(!p)return
+if(!confirm(`Excluir ${p.nome_completo}?`))return
 let {error}=await client.from('perfis').delete().eq('id',id)
 if(error){console.error(error);alert("Erro ao excluir");return}
 await carregarPerfis()
