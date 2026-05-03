@@ -564,21 +564,26 @@ let pb=parseSubitemParts(b.includes('.')?b:(b+'.0'))
 if(pa.n1!==pb.n1)return pa.n1-pb.n1
 return pa.n2-pb.n2
 })
-let html=keys.map(k=>{
+
+let html=''
+
+keys.forEach(k=>{
 let lista=mapa[k]||[]
-if(!lista.length)return''
+if(!lista.length)return
 let media=Math.round(lista.reduce((acc,c)=>acc+getTotal(c),0)/(lista.length||1))
 let cor=media<=30?'bg-status-red':media>=100?'bg-status-green':'bg-status-yellow'
 let descricao=lista.find(x=>x.descricaoitem&&x.descricaoitem.trim())?.descricaoitem||lista.find(x=>x.descricao&&x.descricao.trim())?.descricao||''
 let itemClick=(modoResumo==='item'?k:k.split('.')[0])
-return `<div class="flex flex-col">
+
+html+=`<div class="flex flex-col">
 <div class="card-micro ${cor}" onclick="abrirItem('${itemClick}')">
 <span class="percent-big">${media}%</span>
 <span class="text-[9px] text-white/70">${k}</span>
 </div>
 <div class="text-[9px] text-slate-400 mt-1 px-1 text-center">${descricao}</div>
 </div>`
-}).join('')
+})
+
 let el=document.getElementById('cards-container')
 if(el)el.innerHTML=html
 }
