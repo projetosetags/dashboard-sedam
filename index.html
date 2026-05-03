@@ -35,7 +35,7 @@ body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; ma
 .input-mes {width: 60px;font-size: 16px;font-weight: 900;text-align:center;background: #020617;border:1px solid rgba(255,255,255,0.1);border-radius:6px;}
 select{position:relative;z-index:10;pointer-events:auto;}
 tr{position:relative;z-index:1;}
-
+select{cursor:pointer}
   
 </style>
 
@@ -217,7 +217,7 @@ let userP=null
 let allData=[]
 let myChart=null
 function login(){let u=document.getElementById('u').value.trim().toLowerCase();client.from('perfis').select('*').eq('username',u).single().then(({data,error})=>{if(error||!data){alert("Usuário não encontrado");return}localStorage.setItem("uid",data.id);init(data.id)})}
-async function init(uid){let {data,error}=await client.from('perfis').select('*').eq('id',uid).single();if(error||!data){alert("Erro perfil");return}userP=data;let {data:pList}=await client.from('perfis').select('*').order('nome_completo');window.perfis=pList||[];document.getElementById('login-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');document.getElementById('dataInicio').value='2025-01-01';document.getElementById('dataFim').value='2028-01-01';filtroDataInicio='2025-01-01';filtroDataFim='2028-01-01';const lastTab=localStorage.getItem('activeTab')||'resumo';switchTab(lastTab);document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")";if(data.nivel_acesso<=2){document.getElementById('pdf-container').innerHTML=`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`}carregarDados()}
+async function init(uid){let {data,error}=await client.from('perfis').select('*').eq('id',uid).single();if(error||!data){alert("Erro perfil");return}userP=data;userP.nivel_acesso=Number(userP.nivel_acesso||0);let {data:pList}=await client.from('perfis').select('*').order('nome_completo');window.perfis=pList||[];document.getElementById('login-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');document.getElementById('dataInicio').value='2025-01-01';document.getElementById('dataFim').value='2028-01-01';filtroDataInicio='2025-01-01';filtroDataFim='2028-01-01';const lastTab=localStorage.getItem('activeTab')||'resumo';switchTab(lastTab);document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")";if(data.nivel_acesso<=2){document.getElementById('pdf-container').innerHTML=`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`}carregarDados()}
 
 async function carregarDados(){
 let query = client.from('deliberacoes').select('*')
@@ -341,7 +341,7 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.subitem}</td>
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
 <td class="text-xs">
-${userP.nivel_acesso==1?
+${userP.nivel_acesso===1?
 `<select onchange="salvarResponsavel('${i.id}',this.value)" class="bg-slate-800 text-xs p-1 rounded w-full">
 <option value="">-</option>
 ${(window.perfis||[]).map(p=>`<option value="${p.id}" ${p.nome_completo===i.responsavel?'selected':''}>${p.nome_completo}</option>`).join('')}
@@ -376,13 +376,37 @@ function logout(){localStorage.clear();location.reload()}
 
 <script>
 async function salvarResponsavel(id,novoId){
-if(!novoId||novoId==='')return
-let p=(window.perfis||[]).find(x=>x.id==novoId)
-if(!p)return
-let {error}=await client.from('deliberacoes').update({responsavel:p.nome_completo,responsavel_id:novoId}).eq('id',id)
-if(error){console.error(error);alert("Erro ao salvar responsável");return}
-carregarDados()
+if(!novoId)return
+if(userP.nivel_acesso!=1){
+alert("Sem permissão")
+return
 }
+let p=(window.perfis||[]).find(x=>String(x.id)===String(novoId))
+if(!p){
+alert("Perfil não encontrado")
+return
+}
+console.log("ALTERANDO RESPONSÁVEL:",id,p.nome_completo)
+let {error}=await client
+.from('deliberacoes')
+.update({
+responsavel:p.nome_completo,
+responsavel_id:novoId
+})
+.eq('id',id)
+if(error){
+console.error("ERRO:",error)
+alert("Erro ao salvar responsável")
+return
+}
+let item=allData.find(x=>String(x.id)===String(id))
+if(item){
+item.responsavel=p.nome_completo
+item.responsavel_id=novoId
+}
+renderTable()
+}
+  
 function renderSelects(){
 let selItem=document.getElementById('sel-item')
 let selSub=document.getElementById('sel-sub')
