@@ -68,6 +68,7 @@ select{cursor:pointer}
 <button onclick="switchTab('analise')" id="tab-analise" class="tab-btn">Gráficos</button>
 <button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Cumpridos</button>
 <button id="tab-perfis" onclick="switchTab('perfis')" class="tab-btn hidden">PERFIS</button>
+<button id="tab-usuarios" onclick="switchTab('usuarios')" class="tab-btn">USUÁRIOS</button>
 </nav>
 
 <div class="flex gap-2 mb-3 items-center justify-between">
@@ -165,10 +166,37 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 <div id="listaPerfis" class="text-xs"></div>
 </div>
+
+<div id="view-usuarios" class="tab-view hidden">
+<div class="text-xs text-slate-300 mb-2 font-bold">USUÁRIOS CADASTRADOS</div>
+<div id="listaUsuarios" class="text-xs"></div>
+</div>
+
   
 </div>
 
 <script>
+async function carregarUsuarios(){
+let {data,error}=await client
+.from('perfis')
+.select('nome_completo,username')
+.order('nome_completo')
+
+if(error){
+console.error(error)
+return
+}
+
+let html=(data||[]).map(u=>`
+<div class="flex justify-between border-b border-white/10 py-1">
+<span>${u.nome_completo||'-'}</span>
+<span class="text-slate-400">@${u.username||'-'}</span>
+</div>
+`).join('')
+
+document.getElementById('listaUsuarios').innerHTML=html
+}
+
 async function carregarPerfis(){
 if(userP.nivel_acesso!=1)return
 let {data,error}=await client.from('perfis').select('*').order('nome_completo')
@@ -536,6 +564,11 @@ initPainelGrafico()
 if(t==='perfis'){
 setTimeout(()=>{
 carregarPerfis()
+},200)
+}
+if(t==='usuarios'){
+setTimeout(()=>{
+carregarUsuarios()
 },200)
 }
 }
