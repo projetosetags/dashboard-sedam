@@ -574,33 +574,52 @@ let lista=v==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(v+'.'
 sel.innerHTML=lista.map(i=>`<option value="${i.id}">${i.subitem} - ${(i.descricao||'-').substring(0,40)}</option>`).join('')
 } 
 function renderGraficoMaster(){
-let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy();let tipo=document.getElementById('tipoGrafico').value;let selItem=document.getElementById('filtroItem').value;let selSub=document.getElementById('filtroSubitem').value;let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];let mesAtual=getMesAtualIndex();let labels=meses.slice(0,mesAtual+1);let datasets=[];
+let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy();let tipo=document.getElementById('tipoGrafico').value;let selItem=document.getElementById('filtroItem').value;let selSub=document.getElementById('filtroSubitem').value;let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];let mesAtual=getMesAtualIndex();let labels=meses.slice(0,mesAtual+1);let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899'];let datasets=[];
+if(tipo==='subitem'){
+let i=allData.find(x=>String(x.id)===String(selSub));if(!i)return;let valores=[Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),Number(i.jul??0),Number(i.ago??0),Number(i.set??0),Number(i.out??0),Number(i.nov??0),Number(i.dez??0)];
+datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+}
 if(tipo==='item'){
 let mapa={};let base=selItem==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(selItem+'.'));
 base.forEach(i=>{let item=(i.subitem||'').split('.')[0];if(!mapa[item])mapa[item]=[];mapa[item].push(i)});
-datasets=Object.keys(mapa).map(k=>{
-let lista=mapa[k];
-let arr=[
-mediaMes(lista,'jan'),mediaMes(lista,'fev'),mediaMes(lista,'mar'),
-mediaMes(lista,'abr'),mediaMes(lista,'mai'),mediaMes(lista,'jun'),
-mediaMes(lista,'jul'),mediaMes(lista,'ago'),mediaMes(lista,'set'),
-mediaMes(lista,'out'),mediaMes(lista,'nov'),mediaMes(lista,'dez')
-];
-return{label:'ITEM '+k,data:arr.slice(0,mesAtual+1),borderWidth:2,fill:false}
-});
+let medias=[];
+for(let m=0;m<=mesAtual;m++){
+let mesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][m];
+let soma=0;let count=0;
+Object.values(mapa).forEach(lista=>{soma+=mediaMes(lista,mesKey);count++});
+medias.push(Math.round(soma/(count||1)));
 }
-if(tipo==='subitem'){
-let i=allData.find(x=>String(x.id)===String(selSub));
-if(!i)return;
-let valores=[
-Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),
-Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),
-Number(i.jul??0),Number(i.ago??0),Number(i.set??0),
-Number(i.out??0),Number(i.nov??0),Number(i.dez??0)
-];
-datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),borderWidth:3,fill:false}];
+datasets=[{label:'MÉDIA ITEM',data:medias,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
 }
-chartMaster=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#cbd5f5'}}},scales:{y:{beginAtZero:true,max:100}}}});
+chartMaster=new Chart(ctx,{
+type:'bar',
+data:{labels,datasets},
+options:{
+responsive:true,
+plugins:{
+legend:{display:true,labels:{color:'#cbd5f5'}},
+tooltip:{callbacks:{label:(ctx)=>ctx.raw+'%'}}
+},
+scales:{y:{beginAtZero:true,max:100,ticks:{callback:(v)=>v+'%'}}},
+animation:{duration:800}
+},
+plugins:[{
+id:'labels',
+afterDatasetsDraw(chart){
+let {ctx}=chart
+chart.data.datasets.forEach((dataset,i)=>{
+let meta=chart.getDatasetMeta(i)
+meta.data.forEach((bar,index)=>{
+let val=dataset.data[index]
+ctx.fillStyle='#fff'
+ctx.font='bold 10px Arial'
+ctx.textAlign='center'
+ctx.fillText(val+'%',bar.x,bar.y-5)
+})
+})
+}
+}]
+})
 }
 
 function mediaMes(lista,mes){
