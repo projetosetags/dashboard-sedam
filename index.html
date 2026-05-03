@@ -585,9 +585,23 @@ renderGraficoMaster()
 function popularItens(){
 let sel=document.getElementById('filtroItem')
 if(!sel)return
-let itens=[...new Set(allData.map(i=>(i.subitem||'').split('.')[0]))]
-sel.innerHTML='<option value="todos">TODOS ITENS</option>'+itens.sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(i=>`<option value="${i}">ITEM ${i}</option>`).join('')
+let mapa={}
+allData.forEach(i=>{
+let item=(i.subitem||'').split('.')[0]
+if(!item)return
+if(!mapa[item]){
+mapa[item]={
+num:item,
+descricao:i.descricaoitem||i.descricao||'-'
 }
+}
+})
+let lista=Object.values(mapa)
+.sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
+sel.innerHTML='<option value="todos">TODOS ITENS</option>'+
+lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
+}
+
 function popularSubitens(){
 let sel=document.getElementById('filtroSubitem')
 let selItem=document.getElementById('filtroItem')
@@ -618,7 +632,7 @@ let soma=lista.reduce((a,c)=>a+Number(c[mesKey]??0),0)
 arr.push(Math.round(soma/(lista.length||1)))
 }
 datasets=[{label:'ITEM '+itemSelecionado,data:arr,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
-let itemDesc=lista.find(x=>x.descricaoitem)||lista[0]
+let itemDesc=allData.find(x=>(x.subitem||'').startsWith(itemSelecionado+'.')&&(x.descricaoitem||x.descricao))
 if(descBox){descBox.innerHTML=`<b>ITEM ${itemSelecionado}</b> - ${itemDesc.descricaoitem||itemDesc.descricao||'-'}`}
 }
 if(tipo==='subitem'){
@@ -672,41 +686,33 @@ let canvas=document.getElementById('chartMaster')
 if(!canvas)return null
 return canvas.toDataURL('image/png',1.0)
 }
+
 function atualizarLista3(){
 let sel=document.getElementById('filtroSubitem')
 let tipo=document.getElementById('tipoGrafico').value
 let selItem=document.getElementById('filtroItem').value
 if(!sel)return
-function truncar(txt,limite=60){
-if(!txt)return'-'
-if(txt.length<=limite)return txt
-let corte=txt.substring(0,limite)
-let ult=corte.lastIndexOf(' ')
-if(ult>0)corte=corte.substring(0,ult)
-return corte+'...'
-}
 if(tipo==='item'){
 let mapa={}
 allData.forEach(i=>{
 let item=(i.subitem||'').split('.')[0]
-if(!mapa[item])mapa[item]=i
+if(!item)return
+if(!mapa[item]){
+mapa[item]={
+num:item,
+descricao:i.descricaoitem||i.descricao||'-'
+}
+}
 })
 let lista=Object.values(mapa)
-sel.innerHTML=lista
-.sort((a,b)=>a.subitem.localeCompare(b.subitem,undefined,{numeric:true}))
-.map(i=>{
-let item=(i.subitem||'').split('.')[0]
-let desc=i.descricaoitem||i.descricao||'-'
-return `<option value="${item}">ITEM ${item} - ${truncar(desc)}</option>`
-}).join('')
+.sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
+sel.innerHTML=lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
 }else{
 let lista=selItem==='todos'
 ? allData
 : allData.filter(i=>(i.subitem||'').startsWith(selItem+'.'))
-sel.innerHTML=lista
-.sort((a,b)=>a.subitem.localeCompare(b.subitem,undefined,{numeric:true}))
-.map(i=>`<option value="${i.id}">${i.subitem} - ${truncar(i.descricao||'-')}</option>`)
-.join('')
+lista=lista.sort((a,b)=>a.subitem.localeCompare(b.subitem,undefined,{numeric:true}))
+sel.innerHTML=lista.map(i=>`<option value="${i.id}">${i.subitem} - ${truncarTexto(i.descricao||'-',60)}</option>`).join('')
 }
 }
 
