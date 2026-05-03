@@ -587,18 +587,18 @@ let sel=document.getElementById('filtroItem')
 if(!sel)return
 let mapa={}
 allData.forEach(i=>{
-let item=(i.subitem||'').split('.')[0]
+let item=(i.numitem||'').toString().trim()||((i.subitem||'').split('.')[0])
 if(!item)return
 if(!mapa[item]){
 mapa[item]={
 num:item,
-descricao:i.descricaoitem||i.descricao||'-'
+descricao:i.descricaoitem||'-'
 }
 }
 })
 let lista=Object.values(mapa)
 .sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
-sel.innerHTML='<option value="todos">TODOS ITENS</option>'+
+sel.innerHTML='<option value="todos">TODOS os ITENS</option>'+
 lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
 }
 
@@ -695,12 +695,12 @@ if(!sel)return
 if(tipo==='item'){
 let mapa={}
 allData.forEach(i=>{
-let item=(i.subitem||'').split('.')[0]
+let item=(i.numitem||'').toString().trim()||((i.subitem||'').split('.')[0])
 if(!item)return
 if(!mapa[item]){
 mapa[item]={
 num:item,
-descricao:i.descricaoitem||i.descricao||'-'
+descricao:i.descricaoitem||'-'
 }
 }
 })
