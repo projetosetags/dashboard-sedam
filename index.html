@@ -449,11 +449,13 @@ return
 userP=data
 userP.nivel_acesso=Number(userP.nivel_acesso||0)
 
+/* 🔓 LIBERA ABA PERFIS */
 if(userP.nivel_acesso==1){
 let btn=document.getElementById('tab-perfis')
 if(btn)btn.classList.remove('hidden')
 }
 
+/* 🔄 CARREGA LISTA DE PERFIS */
 let {data:pList}=await client
 .from('perfis')
 .select('*')
@@ -461,6 +463,7 @@ let {data:pList}=await client
 
 window.perfis=pList||[]
 
+/* 🔥 UI */
 document.getElementById('login-screen').classList.add('hidden')
 document.getElementById('dashboard').classList.remove('hidden')
 
@@ -470,32 +473,48 @@ document.getElementById('dataFim').value='2028-01-01'
 filtroDataInicio='2025-01-01'
 filtroDataFim='2028-01-01'
 
+/* 🔁 VOLTA PARA ÚLTIMA ABA */
 const lastTab=localStorage.getItem('activeTab')||'resumo'
 switchTab(lastTab)
 
+/* 👤 INFO USUÁRIO */
 document.getElementById('user-info').innerText=
 data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
+
+/* 🔥 CONTAINER PDF */
+let pdfBox=document.getElementById('pdf-container')
+
+if(pdfBox){
+
+pdfBox.innerHTML=''
+
+/* 📄 BOTÃO PDF */
 if(data.nivel_acesso<=2){
-document.getElementById('pdf-container').innerHTML=`
-<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`
+let btnPdf=document.createElement('button')
+btnPdf.innerText='PDF A4'
+btnPdf.className='btn-pdf'
+btnPdf.onclick=gerarRelatorioPDF
+pdfBox.appendChild(btnPdf)
 }
-/* 🔥 BACKUP SÓ ADMIN (NÍVEL 1) */
+
+/* 💾 BOTÃO BACKUP (APENAS ADMIN) */
 if(data.nivel_acesso==1){
-let top=document.querySelector('#pdf-container').parentElement
-if(top && !document.getElementById('btnBackup')){
-let btn=document.createElement('button')
-btn.id='btnBackup'
-btn.innerText='BACKUP'
-btn.className='bg-purple-600 px-3 py-1 rounded ml-2'
-btn.onclick=backupCompleto
-top.insertBefore(btn,document.getElementById('pdf-container'))
+let btnBackup=document.createElement('button')
+btnBackup.id='btnBackup'
+btnBackup.innerText='BACKUP'
+btnBackup.className='bg-purple-600 px-3 py-1 rounded ml-2'
+btnBackup.onclick=backupCompleto
+pdfBox.appendChild(btnBackup)
 }
+
 }
-`
-/* 🔥 PATCH 008 — CARREGAR PAINEL DE PERFIS */
+
+/* 🔥 CARREGA PERFIS */
 if(userP.nivel_acesso==1){
 carregarPerfis()
 }
+
+/* 🔄 CARREGA DADOS */
 carregarDados()
 }
 
