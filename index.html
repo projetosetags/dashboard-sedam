@@ -374,7 +374,20 @@ function fecharDrill(){filtroItemAtivo=null;renderResumo();document.getElementBy
 function logout(){localStorage.clear();location.reload()}
 </script>
 
+
+
+
+
+
+
+  
 <script>
+
+function getMesAtualIndex(){
+return new Date().getMonth()
+}
+
+
 async function salvarResponsavel(id,novoId){
 if(!novoId)return
 if(userP.nivel_acesso!=1){
@@ -568,7 +581,9 @@ if(chartMaster)chartMaster.destroy()
 let tipo=document.getElementById('tipoGrafico').value
 let selItem=document.getElementById('filtroItem').value
 let selSub=document.getElementById('filtroSubitem').value
-let labels=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
+let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
+let mesAtual=getMesAtualIndex()
+let labels=meses.slice(0,mesAtual+1)
 let datasets=[]
 if(tipo==='item'){
 let mapa={}
@@ -582,12 +597,14 @@ datasets=Object.keys(mapa).map(k=>{
 let lista=mapa[k]
 return{
 label:'ITEM '+k,
-data:[
+let arr=[
 mediaMes(lista,'jan'),mediaMes(lista,'fev'),mediaMes(lista,'mar'),
 mediaMes(lista,'abr'),mediaMes(lista,'mai'),mediaMes(lista,'jun'),
 mediaMes(lista,'jul'),mediaMes(lista,'ago'),mediaMes(lista,'set'),
 mediaMes(lista,'out'),mediaMes(lista,'nov'),mediaMes(lista,'dez')
-],
+]
+data:arr.slice(0,mesAtual+1),
+
 borderWidth:2,
 fill:false
 }
@@ -598,12 +615,13 @@ let i=allData.find(x=>String(x.id)===String(selSub))
 if(!i)return
 datasets=[{
 label:i.subitem,
-data:[
+let valores=[
 Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),
 Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),
 Number(i.jul??0),Number(i.ago??0),Number(i.set??0),
 Number(i.out??0),Number(i.nov??0),Number(i.dez??0)
-],
+]
+data:valores.slice(0,mesAtual+1)
 borderWidth:3,
 fill:false
 }]
