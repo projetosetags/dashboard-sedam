@@ -155,6 +155,30 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 
 <script>
+function parseSubitemParts(s){
+let [i,rest]=String(s||'0.0').split('.')
+let n1=parseInt(i)||0
+let n2=parseInt((rest||'0').replace(/[^\d].*$/,''))||0
+let suf=(rest||'').replace(/^\d+/,'')||''
+return {n1,n2,suf}
+}
+function compareSubitem(a,b){
+let pa=parseSubitemParts(a.subitem)
+let pb=parseSubitemParts(b.subitem)
+if(pa.n1!==pb.n1)return pa.n1-pb.n1
+if(pa.n2!==pb.n2)return pa.n2-pb.n2
+return pa.suf.localeCompare(pb.suf)
+}
+function getItemKey(i){
+return (i.item&&i.item!==''?i.item:(String(i.subitem||'0.0').split('.')[0]))
+}
+function getTotal(i){
+return Math.max(
+Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),
+Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0)
+)
+}
+  
 function formatarDataBR(dataStr){
 if(!dataStr)return'-'
 let p=dataStr.split('-')
@@ -197,6 +221,7 @@ let allData=[]
 let myChart=null
 function login(){let u=document.getElementById('u').value.trim().toLowerCase();client.from('perfis').select('*').eq('username',u).single().then(({data,error})=>{if(error||!data){alert("Usuário não encontrado");return}localStorage.setItem("uid",data.id);init(data.id)})}
 async function init(uid){let {data,error}=await client.from('perfis').select('*').eq('id',uid).single();if(error||!data){alert("Erro perfil");return}userP=data;let {data:pList}=await client.from('perfis').select('*').order('nome_completo');window.perfis=pList||[];document.getElementById('login-screen').classList.add('hidden');document.getElementById('dashboard').classList.remove('hidden');document.getElementById('dataInicio').value='2025-01-01';document.getElementById('dataFim').value='2028-01-01';filtroDataInicio='2025-01-01';filtroDataFim='2028-01-01';const lastTab=localStorage.getItem('activeTab')||'resumo';switchTab(lastTab);document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")";if(data.nivel_acesso<=2){document.getElementById('pdf-container').innerHTML=`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`}carregarDados()}
+
 async function carregarDados(){
 let query = client.from('deliberacoes').select('*')
 // 🔒 CONTROLE POR RESPONSÁVEL
@@ -211,9 +236,9 @@ return
 // 🔥 TRATAMENTO + ORDENAÇÃO
 allData = (data || [])
 .filter(d => d && d.subitem)
-.sort((a,b)=>
-String(a.subitem).localeCompare(String(b.subitem), undefined, { numeric:true })
-)
+allData=(data||[])
+.filter(d=>d&&d.subitem)
+.sort(compareSubitem)
 // 🔥 CÁLCULO DA MÉDIA (PEGANDO O MAIOR VALOR DOS MESES)
 let media = allData.length
 ? Math.round(
@@ -248,7 +273,7 @@ carregarSelectSub()
 
 function renderResumo(){
 let mapa={}
-let base=allData
+let base=[...allData]
 if(filtroDataInicio||filtroDataFim){
 base=base.filter(i=>{
 let d=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
@@ -259,26 +284,31 @@ return true
 })
 }
 if(ocultarConcluidos){
-base=base.filter(i=>{
-let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
-return total<100
-})
+base=base.filter(i=>getTotal(i)<100)
 }
 base.forEach(i=>{
-let item=(i.subitem||'0').split('.')[0]
-if(!mapa[item])mapa[item]=[]
-mapa[item].push(i)
+let key=(modoResumo==='item')?getItemKey(i):i.subitem
+if(!mapa[key])mapa[key]=[]
+mapa[key].push(i)
 })
-document.getElementById('cards-container').innerHTML=
-Object.keys(mapa).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(item=>{
-let lista=mapa[item]
-let media=Math.round(lista.reduce((acc,c)=>{
-let total=Math.max(Number(c.jan||0),Number(c.fev||0),Number(c.mar||0),Number(c.abr||0),Number(c.mai||0),Number(c.jun||0),Number(c.jul||0),Number(c.ago||0),Number(c.set||0),Number(c.out||0),Number(c.nov||0),Number(c.dez||0))
-return acc+total
-},0)/lista.length)
+let keys=Object.keys(mapa).sort((a,b)=>{
+let pa=parseSubitemParts(a.includes('.')?a:(a+'.0'))
+let pb=parseSubitemParts(b.includes('.')?b:(b+'.0'))
+if(pa.n1!==pb.n1)return pa.n1-pb.n1
+return pa.n2-pb.n2
+})
+document.getElementById('cards-container').innerHTML=keys.map(k=>{
+let lista=mapa[k]
+let media=Math.round(lista.reduce((acc,c)=>acc+getTotal(c),0)/lista.length)
 let cor=media<=30?'bg-status-red':media>=100?'bg-status-green':'bg-status-yellow'
 let descricao=lista.find(x=>x.descricaoitem)?.descricaoitem||''
-return `<div class="flex flex-col"><div class="card-micro ${cor}" onclick="abrirItem('${item}')"><span class="percent-big">${media}%</span><span class="text-[9px] text-white/70">${item}</span></div><div class="text-[9px] text-slate-400 mt-1 px-1 text-center">${descricao}</div></div>`
+return `<div class="flex flex-col">
+<div class="card-micro ${cor}" onclick="abrirItem('${modoResumo==='item'?k:String(k).split('.')[0]}')">
+<span class="percent-big">${media}%</span>
+<span class="text-[9px] text-white/70">${k}</span>
+</div>
+<div class="text-[9px] text-slate-400 mt-1 px-1 text-center">${descricao}</div>
+</div>`
 }).join('')
 }
   
@@ -290,10 +320,10 @@ document.getElementById('btn-voltar').style.display='block'
 }
   
 function renderTable(){
-let lista=[...allData]
+let lista=[...allData].sort(compareSubitem)
 lista=lista.filter(i=>{
 if(filtroItemAtivo){
-if((i.subitem||'').split('.')[0]!==filtroItemAtivo)return false
+if(getItemKey(i)!==filtroItemAtivo)return false
 }
 let dataBase=parseDataLocal(i.data_inicio)||parseDataLocal(i.prazo_texto)
 if(filtroDataInicio||filtroDataFim){
@@ -301,52 +331,34 @@ if(!dataBase)return false
 if(filtroDataInicio&&dataBase<parseDataLocal(filtroDataInicio))return false
 if(filtroDataFim&&dataBase>parseDataLocal(filtroDataFim))return false
 }
-if(ocultarConcluidos){
-let total=Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
-if(total>=100)return false
-}
+if(ocultarConcluidos&&getTotal(i)>=100)return false
 return true
 })
 let totalRegistros=lista.length
 document.getElementById('table-body').innerHTML=lista.map(i=>{
-let dataFormatada='-'
-if(i.data_inicio){
-dataFormatada=formatarDataBR(i.data_inicio)
-}else{
-dataFormatada=i.prazo_texto||'-'
-}
-let jan=Number(i.jan||0)
-let fev=Number(i.fev||0)
-let mar=Number(i.mar||0)
-let abr=Number(i.abr||0)
-let mai=Number(i.mai||0)
-let total=Math.max(jan,fev,mar,abr,mai,Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))
+let dataFormatada=i.data_inicio?formatarDataBR(i.data_inicio):(i.prazo_texto||'-')
+let jan=Number(i.jan||0),fev=Number(i.fev||0),mar=Number(i.mar||0),abr=Number(i.abr||0),mai=Number(i.mai||0)
+let total=getTotal(i)
 let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/20'
-let podeEditar=userP&& (userP.nivel_acesso==1||(userP.nivel_acesso!=1&&i.responsavel_id==userP.id))
-return `<tr class="border-b border-white/5 tr-hover ${bg}"><td class="p-2 font-black text-blue-400">${i.subitem}</td><td class="p-2 td-desc">${i.descricao||'-'}</td><td class="text-xs">${i.responsavel||'-'}</td><td class="text-xs">${i.setor||'-'}</td><td class="td-data">${dataFormatada}</td><td class="td-mes opacity-40">${jan}%</td><td class="td-mes opacity-40">${fev}%</td><td class="td-mes opacity-40">${mar}%</td><td class="td-mes-strong text-blue-400">${abr}%</td><td>${podeEditar?`<input type="number" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','2026-05-01')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}</td><td class="td-total text-emerald-400">${total.toFixed(2)}%</td></tr>`
+let podeEditar=userP.nivel_acesso==1||(userP.nivel_acesso!=1&&i.responsavel_id==userP.id)
+return `<tr class="border-b border-white/5 tr-hover ${bg}">
+<td class="p-2 font-black text-blue-400">${i.subitem}</td>
+<td class="p-2 td-desc">${i.descricao||'-'}</td>
+<td class="text-xs">${i.responsavel||'-'}</td>
+<td class="text-xs">${i.setor||'-'}</td>
+<td class="td-data">${dataFormatada}</td>
+<td class="td-mes opacity-40">${jan}%</td>
+<td class="td-mes opacity-40">${fev}%</td>
+<td class="td-mes opacity-40">${mar}%</td>
+<td class="td-mes-strong text-blue-400">${abr}%</td>
+<td>${podeEditar?`<input type="number" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','2026-05-01')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}</td>
+<td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
+</tr>`
 }).join('')
-if(userP){
-let pdfHtml=userP.nivel_acesso<=2?`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`:''
-const totalItens=new Set(
-lista
-.map(i=>(i.subitem||'').trim())
-.filter(s=>s.includes('.'))
-.map(s=>s.split('.')[0])
-).size
-const totalSubitens=totalRegistros
-document.getElementById('pdf-container').innerHTML=`
-<div class="flex items-center gap-4">
-<div class="flex flex-col items-start leading-none">
-<span class="text-xs text-blue-400 font-black">${totalItens}</span>
-<span class="text-[9px] text-slate-500">ITENS</span>
-</div>
-<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>
-<div class="flex flex-col items-end leading-none">
-<span class="text-xs text-emerald-400 font-black">${totalSubitens}</span>
-<span class="text-[9px] text-slate-500">SUBITENS</span>
-</div>
-</div>
-`
+if(userP&&userP.nivel_acesso<=2){
+document.getElementById('pdf-container').innerHTML=`<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button><span class="text-xs text-emerald-400 font-black">${new Set(allData.map(x=>getItemKey(x))).size}</span><span class="text-[9px] text-slate-500"> ITENS</span><span class="text-xs text-emerald-400 font-black ml-2">${totalRegistros}</span><span class="text-[9px] text-slate-500"> SUBITENS</span>`
+}else{
+document.getElementById('pdf-container').innerHTML=`<span class="text-xs text-emerald-400 font-black">${new Set(allData.map(x=>getItemKey(x))).size}</span><span class="text-[9px] text-slate-500"> ITENS</span><span class="text-xs text-emerald-400 font-black ml-2">${totalRegistros}</span><span class="text-[9px] text-slate-500"> SUBITENS</span>`
 }
 }
   
