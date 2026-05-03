@@ -351,7 +351,7 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="td-mes opacity-40">${fev}%</td>
 <td class="td-mes opacity-40">${mar}%</td>
 <td class="td-mes-strong text-blue-400">${abr}%</td>
-<td>${podeEditar?`<input type="number" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','2026-05-01')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}</td>
+<td>${podeEditar?`<input type="number" min="0" max="100" step="1" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','mai')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}</td>
 <td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
 </tr>`
 }).join('')
@@ -363,7 +363,7 @@ document.getElementById('pdf-container').innerHTML=`<span class="text-xs text-em
 }
   
 function renderConcluidos(){let lista=allData.filter(i=>Math.max(Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0))>=100);let mapa={};lista.forEach(i=>{let chave=modoGrupo==='item'?i.subitem.split('.')[0]:i.subitem;if(!mapa[chave])mapa[chave]=[];mapa[chave].push(i)});document.getElementById('concluidos-container').innerHTML=Object.keys(mapa).map(k=>`<div class="card-micro bg-status-green"><span class="percent-big">${mapa[k].length}</span><span class="text-[7px] text-white/50 ml-1">${modoGrupo==='item'?'ITEM':'SUB'} ${k}</span></div>`).join('');document.getElementById('concluidos-list').innerHTML=Object.keys(mapa).map(k=>`<div class="mb-3"><div class="text-emerald-400 font-bold mb-1">${modoGrupo==='item'?'ITEM':'SUBITEM'} ${k} (${mapa[k].length})</div>${mapa[k].map(i=>`<div class="ml-2 text-[10px]">• <b>${i.subitem}</b> - ${i.descricao}</div>`).join('')}</div>`).join('')}
-function renderChart(){let ctx=document.getElementById('barChart').getContext('2d');if(myChart)myChart.destroy();let mar=0,abr=0,mai=0,count=allData.length||1;allData.forEach(i=>{mar+=Number(i.mar||0);abr+=Number(i.abr||0);mai+=Number(i.mai||0)});mar=Math.round(mar/count);abr=Math.round(abr/count);mai=Math.round(mai/count);myChart=new Chart(ctx,{type:'bar',data:{labels:['MAR','ABR','MAI'],datasets:[{data:[mar,abr,mai],backgroundColor:[mar>=100?'#10b981':mar<=30?'#ef4444':'#f59e0b',abr>=100?'#10b981':abr<=30?'#ef4444':'#f59e0b',mai>=100?'#10b981':mai<=30?'#ef4444':'#f59e0b']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}})}
+function renderChart(){let ctx=document.getElementById('barChart').getContext('2d');if(myChart)myChart.destroy();let dados=[...allData].sort(compareSubitem);let mar=0,abr=0,mai=0,count=dados.length||1;dados.forEach(i=>{mar+=Number(i.mar||0);abr+=Number(i.abr||0);mai+=Number(i.mai||0)});mar=Math.round(mar/count);abr=Math.round(abr/count);mai=Math.round(mai/count);myChart=new Chart(ctx,{type:'bar',data:{labels:['MAR','ABR','MAI'],datasets:[{data:[mar,abr,mai],backgroundColor:[mar>=100?'#10b981':mar<=30?'#ef4444':'#f59e0b',abr>=100?'#10b981':abr<=30?'#ef4444':'#f59e0b',mai>=100?'#10b981':mai<=30?'#ef4444':'#f59e0b']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100}}}})}
 function switchTab(t){localStorage.setItem('activeTab',t);document.querySelectorAll('.tab-view').forEach(v=>v.classList.add('hidden'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('tab-active'));document.getElementById('view-'+t).classList.remove('hidden');document.getElementById('tab-'+t).classList.add('tab-active');if(t==='analise'){setTimeout(()=>renderGraficos(),150)}}
 function fecharDrill(){filtroItemAtivo=null;renderResumo();document.getElementById('btn-voltar').style.display='none'}
 function logout(){localStorage.clear();location.reload()}
@@ -407,14 +407,36 @@ return[i.subitem,i.descricao?.substring(0,40)||'-',i.responsavel||'-',total+'%']
 doc.autoTable({head:[['Item','Descrição','Responsável','%']],body:rows,startY:20,styles:{fontSize:6}})
 doc.save("relatorio_tag.pdf")
 }
+function mesFromData(data){
+return ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][new Date(data).getMonth()]
+}
+  
 async function salvar(valor,id,campo){
-valor=parseFloat(valor)||0
-let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2)||(userP.nivel_acesso==3)
-if(!podeEditar){alert("Sem permissão");return}
-let {error}=await client.from('deliberacoes').update({[campo]:valor}).eq('id',id)
-if(error){console.error(error);alert("Erro ao salvar");return}
+let v=String(valor).replace(',','.')
+v=parseFloat(v)
+if(isNaN(v))v=0
+if(v<0||v>100){
+alert("Informe um valor entre 0 e 100")
+return
+}
+let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2||userP.nivel_acesso==3)
+if(!podeEditar){
+alert("Sem permissão")
+return
+}
+console.log("SALVANDO:",campo,v)
+let {error}=await client
+.from('deliberacoes')
+.update({[campo]:v})
+.eq('id',id)
+if(error){
+console.error("ERRO SUPABASE:",error)
+alert("Erro ao salvar")
+return
+}
 carregarDados()
 }
+  
 async function alterarResponsavel(id,respId){
 let p=(window.perfis||[]).find(x=>x.id==respId)
 if(!p)return
