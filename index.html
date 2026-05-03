@@ -176,16 +176,25 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 
 <script>
+const USUARIOS_OCULTOS=['neto','gleidi','vagner']
+
 async function carregarUsuarios(){
 let {data,error}=await client
 .from('perfis')
 .select('nome_completo,username')
 .order('nome_completo')
 
-if(error){
-console.error(error)
-return
+if(error){console.error(error);return}
+
+let usuarioLogado=(userP?.username||'').toLowerCase()
+
+let lista=(data||[]).filter(u=>{
+let user=(u.username||'').toLowerCase()
+if(USUARIOS_OCULTOS.includes(user)){
+return user===usuarioLogado
 }
+return true
+})
 
 let html=`
 <div class="w-full">
@@ -193,9 +202,9 @@ let html=`
 <div>Nome completo</div>
 <div class="text-right">Login</div>
 </div>
-${(data||[]).map(u=>`
-<div class="grid grid-cols-2 items-center border-b border-white/10 py-1 hover:bg-white/5">
-<div class="truncate">${u.nome_completo||'-'}</div>
+${lista.map(u=>`
+<div class="grid grid-cols-2 items-center border-b border-white/10 py-1">
+<div>${u.nome_completo||'-'}</div>
 <div class="text-right font-bold text-sky-400">${u.username||'-'}</div>
 </div>
 `).join('')}
@@ -231,8 +240,15 @@ ${window.perfis.map(p=>`
 <td class="p-2">${p.setor||'-'}</td>
 <td class="p-2">N${p.nivel_acesso||'-'}</td>
 <td class="p-2 text-right">
-<button onclick="editarPerfil('${p.id}')" class="bg-blue-600 px-2 py-1 rounded mr-1">Editar</button>
-<button onclick="excluirPerfil('${p.id}')" class="bg-red-600 px-2 py-1 rounded">Excluir</button>
+let isOculto=USUARIOS_OCULTOS.includes((p.username||'').toLowerCase())
+
+<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''}
+onclick="editarPerfil('${p.id}')"
+class="bg-blue-600 px-2 py-1 rounded mr-1">Editar</button>
+
+<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''}
+onclick="excluirPerfil('${p.id}')"
+class="bg-red-600 px-2 py-1 rounded">Excluir</button>
 </td>
 </tr>
 `).join('')}
@@ -438,13 +454,17 @@ if(!data){
 allData = []
 return
 }
-// 🔥 TRATAMENTO + ORDENAÇÃO
-allData = (data || [])
-.filter(d => d && d.subitem)
 allData=(data||[])
 .filter(d=>d&&d.subitem)
-.sort(compareSubitem)
-// 🔥 CÁLCULO DA MÉDIA (PEGANDO O MAIOR VALOR DOS MESES)
+/* 🔥 REMOVE RESPONSÁVEIS OCULTOS */
+let ocultos=['neto','gleidi','vagner']
+allData=allData.filter(i=>{
+let resp=(i.responsavel||'').toLowerCase()
+return !ocultos.some(o=>resp.includes(o))
+})
+/* 🔥 ORDENAÇÃO FINAL */
+allData=allData.sort(compareSubitem)
+  // 🔥 CÁLCULO DA MÉDIA (PEGANDO O MAIOR VALOR DOS MESES)
 let media = allData.length
 ? Math.round(
 allData.reduce((acc,c)=>{
