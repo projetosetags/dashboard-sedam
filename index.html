@@ -478,7 +478,8 @@ allData = []
 return
 }
 allData=(data||[])
-.filter(d=>d&&d.subitem)
+.filter(d=>d&&d.subitem&&d.descricao)
+.sort(compareSubitem)
 /* 🔥 REMOVE RESPONSÁVEIS OCULTOS */
 let ocultos=['neto','gleidi','vagner']
 allData=allData.filter(i=>{
@@ -798,12 +799,28 @@ carregarDados()
 }
   
 async function alterarResponsavel(id,respId){
-let p=(window.perfis||[]).find(x=>x.id==respId)
+let p=(window.perfis||[]).find(x=>String(x.id)===String(respId))
 if(!p)return
-let {error}=await client.from('deliberacoes').update({responsavel:p.nome_completo,responsavel_id:respId}).eq('id',id)
-if(error){console.error(error);alert("Erro ao alterar responsável");return}
+
+let payload={
+responsavel:p.nome_completo,
+responsavel_id:p.id
+}
+
+let {error}=await client
+.from('deliberacoes')
+.update(payload)
+.eq('id',id)
+
+if(error){
+console.error(error)
+alert("Erro ao salvar responsável")
+return
+}
+
 carregarDados()
 }
+
 async function criarPerfil(nome){
 if(!nome)return
 let {error}=await client.from('perfis').insert({nome_completo:nome})
