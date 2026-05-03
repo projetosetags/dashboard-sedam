@@ -129,6 +129,7 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 <div class="bg-slate-900/40 p-4 rounded-xl mb-4">
 <canvas id="chartMaster"></canvas>
+<div id="descSubitem" class="text-xs text-slate-300 mt-2 px-2"></div>
 </div>
 <div id="ranking" class="mt-6 text-xs"></div>
 <div class="flex gap-2 mb-4">
@@ -546,8 +547,22 @@ renderResumo()
 let modoGrafico='todos'
 let chartTotal,chartItem,chartSubitem,chartEvolucao
 
+function truncarTexto(txt,limite=50){
+if(!txt)return'-'
+if(txt.length<=limite)return txt
+let corte=txt.substring(0,limite)
+let ultimoEspaco=corte.lastIndexOf(' ')
+if(ultimoEspaco>0)corte=corte.substring(0,ultimoEspaco)
+return corte+'...'
+}
 function carregarSelectSub(){
-let sel=document.getElementById('sel-sub');if(!sel)return;sel.innerHTML=allData.map(i=>`<option value="${i.id}">${i.subitem} - ${(i.descricao||'-').substring(0,40)}</option>`).join('')
+let sel=document.getElementById('sel-sub')
+if(!sel)return
+sel.innerHTML=allData.map(i=>`
+<option value="${i.id}">
+${i.subitem} - ${truncarTexto(i.descricao,60)}
+</option>
+`).join('')
 }
 
 let chartMaster=null
@@ -574,10 +589,11 @@ let lista=v==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(v+'.'
 sel.innerHTML=lista.map(i=>`<option value="${i.id}">${i.subitem} - ${(i.descricao||'-').substring(0,40)}</option>`).join('')
 } 
 function renderGraficoMaster(){
-let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy();let tipo=document.getElementById('tipoGrafico').value;let selItem=document.getElementById('filtroItem').value;let selSub=document.getElementById('filtroSubitem').value;let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];let mesAtual=getMesAtualIndex();let labels=meses.slice(0,mesAtual+1);let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899'];let datasets=[];
+let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy();let tipo=document.getElementById('tipoGrafico').value;let selItem=document.getElementById('filtroItem').value;let selSub=document.getElementById('filtroSubitem').value;let descBox=document.getElementById('descSubitem');if(descBox)descBox.innerHTML='';let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];let mesAtual=getMesAtualIndex();let labels=meses.slice(0,mesAtual+1);let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899'];let datasets=[];
 if(tipo==='subitem'){
 let i=allData.find(x=>String(x.id)===String(selSub));if(!i)return;let valores=[Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),Number(i.jul??0),Number(i.ago??0),Number(i.set??0),Number(i.out??0),Number(i.nov??0),Number(i.dez??0)];
-datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}];
+if(descBox){descBox.innerHTML=`<b>${i.subitem}</b> - ${i.descricao||'-'}`}
 }
 if(tipo==='item'){
 let mapa={};let base=selItem==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(selItem+'.'));
@@ -589,7 +605,8 @@ let soma=0;let count=0;
 Object.values(mapa).forEach(lista=>{soma+=mediaMes(lista,mesKey);count++});
 medias.push(Math.round(soma/(count||1)));
 }
-datasets=[{label:'MÉDIA ITEM',data:medias,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+datasets=[{label:'MÉDIA ITEM',data:medias,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}];
+if(descBox)descBox.innerHTML=''
 }
 chartMaster=new Chart(ctx,{
 type:'bar',
