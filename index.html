@@ -56,10 +56,19 @@ select{cursor:pointer}
 <header class="flex justify-between items-center mb-4 px-2">
 <div><h2 class="text-lg font-black text-blue-400 leading-none tracking-tighter uppercase">Painel de Auditoria TAG 2026</h2><p id="user-info" class="text-[9px] text-slate-500 mt-1 uppercase italic"></p></div>
 <div class="flex items-center gap-4">
+<button id="btnBackup" onclick="backupCompleto()" class="text-[10px] bg-indigo-600 px-3 py-1 rounded font-bold hidden">
+BACKUP
+</button>
 <div id="pdf-container" class="flex items-center gap-2"></div>
-<div class="text-right border-l border-white/10 pl-4"><span class="block text-[7px] text-slate-500 font-bold uppercase">Média Geral TAG</span><span id="total-geral" class="text-2xl font-black text-emerald-400">0%</span></div>
-<button onclick="logout()" class="text-[9px] bg-white/5 text-slate-400 px-2 py-1 rounded">SAIR</button>
+<div class="text-right border-l border-white/10 pl-4">
+<span class="block text-[7px] text-slate-500 font-bold uppercase">Média Geral TAG</span>
+<span id="total-geral" class="text-2xl font-black text-emerald-400">0%</span>
 </div>
+<button onclick="logout()" class="text-[9px] bg-white/5 text-slate-400 px-2 py-1 rounded">
+SAIR
+</button>
+</div>
+
 </header>
 
 <nav class="flex gap-1 mb-4 border-b border-white/5 overflow-x-auto">
@@ -451,18 +460,27 @@ switchTab(lastTab)
 
 document.getElementById('user-info').innerText=
 data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
-
-if(data.nivel_acesso<=2)
+if(data.nivel_acesso<=2){
 document.getElementById('pdf-container').innerHTML=`
-<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>
-<button onclick="backupCompleto()" class="bg-purple-600 px-3 py-1 rounded ml-2">BACKUP</button>
+<button onclick="gerarRelatorioPDF()" class="btn-pdf">PDF A4</button>`
+}
+/* 🔥 BACKUP SÓ ADMIN (NÍVEL 1) */
+if(data.nivel_acesso==1){
+let top=document.querySelector('#pdf-container').parentElement
+if(top && !document.getElementById('btnBackup')){
+let btn=document.createElement('button')
+btn.id='btnBackup'
+btn.innerText='BACKUP'
+btn.className='bg-purple-600 px-3 py-1 rounded ml-2'
+btn.onclick=backupCompleto
+top.insertBefore(btn,document.getElementById('pdf-container'))
+}
+}
 `
-
 /* 🔥 PATCH 008 — CARREGAR PAINEL DE PERFIS */
 if(userP.nivel_acesso==1){
 carregarPerfis()
 }
-
 carregarDados()
 }
 
