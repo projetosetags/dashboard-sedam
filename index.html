@@ -547,7 +547,7 @@ renderResumo()
 let modoGrafico='todos'
 let chartTotal,chartItem,chartSubitem,chartEvolucao
 
-function truncarTexto(txt,limite=50){
+function truncarTexto(txt,limite=60){
 if(!txt)return'-'
 if(txt.length<=limite)return txt
 let corte=txt.substring(0,limite)
@@ -555,6 +555,7 @@ let ultimoEspaco=corte.lastIndexOf(' ')
 if(ultimoEspaco>0)corte=corte.substring(0,ultimoEspaco)
 return corte+'...'
 }
+
 function carregarSelectSub(){
 let sel=document.getElementById('sel-sub')
 if(!sel)return
@@ -568,12 +569,19 @@ ${i.subitem} - ${truncarTexto(i.descricao,60)}
 let chartMaster=null
 function initPainelGrafico(){
 popularItens()
-popularSubitens()
-document.getElementById('tipoGrafico').onchange=renderGraficoMaster
-document.getElementById('filtroItem').onchange=()=>{popularSubitens();renderGraficoMaster()}
+atualizarLista3()
+document.getElementById('tipoGrafico').onchange=()=>{
+atualizarLista3()
+renderGraficoMaster()
+}
+document.getElementById('filtroItem').onchange=()=>{
+atualizarLista3()
+renderGraficoMaster()
+}
 document.getElementById('filtroSubitem').onchange=renderGraficoMaster
 renderGraficoMaster()
 }
+
 function popularItens(){
 let sel=document.getElementById('filtroItem')
 if(!sel)return
@@ -589,24 +597,41 @@ let lista=v==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(v+'.'
 sel.innerHTML=lista.map(i=>`<option value="${i.id}">${i.subitem} - ${(i.descricao||'-').substring(0,40)}</option>`).join('')
 } 
 function renderGraficoMaster(){
-let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy();let tipo=document.getElementById('tipoGrafico').value;let selItem=document.getElementById('filtroItem').value;let selSub=document.getElementById('filtroSubitem').value;let descBox=document.getElementById('descSubitem');if(descBox)descBox.innerHTML='';let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];let mesAtual=getMesAtualIndex();let labels=meses.slice(0,mesAtual+1);let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899'];let datasets=[];
-if(tipo==='subitem'){
-let i=allData.find(x=>String(x.id)===String(selSub));if(!i)return;let valores=[Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),Number(i.jul??0),Number(i.ago??0),Number(i.set??0),Number(i.out??0),Number(i.nov??0),Number(i.dez??0)];
-datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}];
-if(descBox){descBox.innerHTML=`<b>${i.subitem}</b> - ${i.descricao||'-'}`}
-}
+let el=document.getElementById('chartMaster');if(!el)return;let ctx=el.getContext('2d');if(!ctx)return;if(chartMaster)chartMaster.destroy()
+let tipo=document.getElementById('tipoGrafico').value
+let selItem=document.getElementById('filtroItem').value
+let selSub=document.getElementById('filtroSubitem').value
+let descBox=document.getElementById('descSubitem');if(descBox)descBox.innerHTML=''
+let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
+let mesAtual=getMesAtualIndex()
+let labels=meses.slice(0,mesAtual+1)
+let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899']
+let datasets=[]
 if(tipo==='item'){
-let mapa={};let base=selItem==='todos'?allData:allData.filter(i=>(i.subitem||'').startsWith(selItem+'.'));
-base.forEach(i=>{let item=(i.subitem||'').split('.')[0];if(!mapa[item])mapa[item]=[];mapa[item].push(i)});
-let medias=[];
+let itemSelecionado=selSub
+let lista=allData.filter(i=>(i.subitem||'').startsWith(itemSelecionado+'.'))
+if(!lista.length)return
+let arr=[]
 for(let m=0;m<=mesAtual;m++){
-let mesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][m];
-let soma=0;let count=0;
-Object.values(mapa).forEach(lista=>{soma+=mediaMes(lista,mesKey);count++});
-medias.push(Math.round(soma/(count||1)));
+let mesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'][m]
+let soma=lista.reduce((a,c)=>a+Number(c[mesKey]??0),0)
+arr.push(Math.round(soma/(lista.length||1)))
 }
-datasets=[{label:'MÉDIA ITEM',data:medias,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}];
-if(descBox)descBox.innerHTML=''
+datasets=[{label:'ITEM '+itemSelecionado,data:arr,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+let itemDesc=lista.find(x=>x.descricaoitem)||lista[0]
+if(descBox){descBox.innerHTML=`<b>ITEM ${itemSelecionado}</b> - ${itemDesc.descricaoitem||itemDesc.descricao||'-'}`}
+}
+if(tipo==='subitem'){
+let i=allData.find(x=>String(x.id)===String(selSub))
+if(!i)return
+let valores=[
+Number(i.jan??0),Number(i.fev??0),Number(i.mar??0),
+Number(i.abr??0),Number(i.mai??0),Number(i.jun??0),
+Number(i.jul??0),Number(i.ago??0),Number(i.set??0),
+Number(i.out??0),Number(i.nov??0),Number(i.dez??0)
+]
+datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
+if(descBox){descBox.innerHTML=`<b>${i.subitem}</b> - ${i.descricao||'-'}`}
 }
 chartMaster=new Chart(ctx,{
 type:'bar',
@@ -647,7 +672,43 @@ let canvas=document.getElementById('chartMaster')
 if(!canvas)return null
 return canvas.toDataURL('image/png',1.0)
 }
-
+function atualizarLista3(){
+let sel=document.getElementById('filtroSubitem')
+let tipo=document.getElementById('tipoGrafico').value
+let selItem=document.getElementById('filtroItem').value
+if(!sel)return
+function truncar(txt,limite=60){
+if(!txt)return'-'
+if(txt.length<=limite)return txt
+let corte=txt.substring(0,limite)
+let ult=corte.lastIndexOf(' ')
+if(ult>0)corte=corte.substring(0,ult)
+return corte+'...'
+}
+if(tipo==='item'){
+let mapa={}
+allData.forEach(i=>{
+let item=(i.subitem||'').split('.')[0]
+if(!mapa[item])mapa[item]=i
+})
+let lista=Object.values(mapa)
+sel.innerHTML=lista
+.sort((a,b)=>a.subitem.localeCompare(b.subitem,undefined,{numeric:true}))
+.map(i=>{
+let item=(i.subitem||'').split('.')[0]
+let desc=i.descricaoitem||i.descricao||'-'
+return `<option value="${item}">ITEM ${item} - ${truncar(desc)}</option>`
+}).join('')
+}else{
+let lista=selItem==='todos'
+? allData
+: allData.filter(i=>(i.subitem||'').startsWith(selItem+'.'))
+sel.innerHTML=lista
+.sort((a,b)=>a.subitem.localeCompare(b.subitem,undefined,{numeric:true}))
+.map(i=>`<option value="${i.id}">${i.subitem} - ${truncar(i.descricao||'-')}</option>`)
+.join('')
+}
+}
 
 </script>
   
