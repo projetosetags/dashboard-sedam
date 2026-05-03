@@ -181,20 +181,22 @@ const USUARIOS_OCULTOS=['neto','gleidi','vagner']
 async function carregarUsuarios(){
 let {data,error}=await client
 .from('perfis')
-.select('nome_completo,username')
+.select('nome_completo,username,nivel_acesso')
 .order('nome_completo')
 
-if(error){console.error(error);return}
-
-let usuarioLogado=(userP?.username||'').toLowerCase()
-
-let lista=(data||[]).filter(u=>{
-let user=(u.username||'').toLowerCase()
-if(USUARIOS_OCULTOS.includes(user)){
-return user===usuarioLogado
+if(error){
+console.error(error)
+return
 }
-return true
-})
+
+let lista=data||[]
+
+/* 🔒 REGRA DE VISUALIZAÇÃO */
+if(userP.nivel_acesso==3){
+lista=lista.filter(u=>
+(u.username||'').toLowerCase()===(userP.username||'').toLowerCase()
+)
+}
 
 let html=`
 <div class="w-full">
