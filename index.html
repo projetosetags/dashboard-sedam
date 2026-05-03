@@ -417,8 +417,23 @@ const client=supabase.createClient(S_URL,S_KEY)
 let userP=null
 let allData=[]
 let myChart=null
-function login(){let u=document.getElementById('u').value.trim().toLowerCase();client.from('perfis').select('*').eq('username',u).single().then(({data,error})=>{if(error||!data){alert("Usuário não encontrado");return}localStorage.setItem("uid",data.id);init(data.id)})}
 
+  function login(){
+let u=document.getElementById('u').value.trim().toLowerCase()
+let s=document.getElementById('p')?document.getElementById('p').value.trim():''
+if(!u){alert("Informe o usuário");return}
+client.from('perfis').select('*').eq('username',u).single().then(({data,error})=>{
+if(error||!data){alert("Usuário não encontrado");return}
+if(s&&s!=="123456"){alert("Senha inválida");return}
+localStorage.setItem("uid",data.id)
+localStorage.setItem("login_time",Date.now())
+init(data.id)
+}).catch(e=>{
+console.error(e)
+alert("Erro na conexão")
+})
+}
+  
 async function init(uid){
 let {data,error}=await client
 .from('perfis')
@@ -564,9 +579,7 @@ let pb=parseSubitemParts(b.includes('.')?b:(b+'.0'))
 if(pa.n1!==pb.n1)return pa.n1-pb.n1
 return pa.n2-pb.n2
 })
-
 let html=''
-
 keys.forEach(k=>{
 let lista=mapa[k]||[]
 if(!lista.length)return
@@ -574,7 +587,6 @@ let media=Math.round(lista.reduce((acc,c)=>acc+getTotal(c),0)/(lista.length||1))
 let cor=media<=30?'bg-status-red':media>=100?'bg-status-green':'bg-status-yellow'
 let descricao=lista.find(x=>x.descricaoitem&&x.descricaoitem.trim())?.descricaoitem||lista.find(x=>x.descricao&&x.descricao.trim())?.descricao||''
 let itemClick=(modoResumo==='item'?k:k.split('.')[0])
-
 html+=`<div class="flex flex-col">
 <div class="card-micro ${cor}" onclick="abrirItem('${itemClick}')">
 <span class="percent-big">${media}%</span>
@@ -583,11 +595,9 @@ html+=`<div class="flex flex-col">
 <div class="text-[9px] text-slate-400 mt-1 px-1 text-center">${descricao}</div>
 </div>`
 })
-
 let el=document.getElementById('cards-container')
 if(el)el.innerHTML=html
 }
-
   
 function abrirItem(item){
 filtroItemAtivo=item
