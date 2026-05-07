@@ -675,10 +675,29 @@ pdfBox.innerHTML=''
 /* 📄 BOTÃO PDF */
 if(data.nivel_acesso<=2){
 let btnPdf=document.createElement('button')
-btnPdf.innerText='PDF A4'
-btnPdf.className='btn-pdf'
-btnPdf.onclick=gerarRelatorioPDF
-pdfBox.appendChild(btnPdf)
+let btnResumo=document.createElement('button')
+btnResumo.innerText='PDF RESUMO'
+btnResumo.className='btn-pdf'
+btnResumo.onclick=gerarPDFResumo
+pdfBox.appendChild(btnResumo)
+
+let btnMonitor=document.createElement('button')
+btnMonitor.innerText='PDF MONITORAMENTO'
+btnMonitor.className='btn-pdf'
+btnMonitor.onclick=gerarPDFMonitoramento
+pdfBox.appendChild(btnMonitor)
+
+let btnGrafico=document.createElement('button')
+btnGrafico.innerText='PDF GRÁFICOS'
+btnGrafico.className='btn-pdf'
+btnGrafico.onclick=gerarPDFGraficos
+pdfBox.appendChild(btnGrafico)
+
+let btnCumpridos=document.createElement('button')
+btnCumpridos.innerText='PDF 100%'
+btnCumpridos.className='btn-pdf'
+btnCumpridos.onclick=gerarPDFCumpridos
+pdfBox.appendChild(btnCumpridos)
 }
 
 /* 💾 BOTÃO BACKUP (APENAS ADMIN) */
@@ -1316,6 +1335,243 @@ gerarPDFBackup(delib)
 function gerarCSV(d,n){if(!d||!d.length)return;let c=Object.keys(d[0]);let csv=c.join(";")+"\n";d.forEach(l=>{csv+=c.map(k=>`"${(l[k]??'').toString().replace(/"/g,'""')}"`).join(";")+"\n"});let b=new Blob([csv],{type:"text/csv"});let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n+"_"+Date.now()+".csv";a.click()}
 function gerarJSON(o){let b=new Blob([JSON.stringify(o,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="backup_"+Date.now()+".json";a.click()}
 function gerarPDFBackup(d){const {jsPDF}=window.jspdf;let doc=new jsPDF();doc.setFontSize(10);doc.text("BACKUP DELIBERAÇÕES",10,10);let rows=d.map(i=>[i.subitem,(i.descricao||'').substring(0,40),i.responsavel||'-',Math.max(i.jan||0,i.fev||0,i.mar||0,i.abr||0,i.mai||0,i.jun||0,i.jul||0,i.ago||0,i.set||0,i.out||0,i.nov||0,i.dez||0)+'%']);doc.autoTable({head:[['Subitem','Descrição','Responsável','%']],body:rows,startY:15,styles:{fontSize:6}});doc.save("backup_deliberacoes.pdf")}
+async function gerarPDFResumo(){
+
+const {jsPDF}=window.jspdf
+
+let doc=new jsPDF('p','mm','a4')
+
+let lista=[...allData].sort(compareSubitem)
+
+doc.setFontSize(14)
+doc.text('RESUMO EXECUTIVO - TAG SEDAM 2026',10,12)
+
+let rows=lista.map(i=>{
+
+let total=getTotal(i)
+
+return[
+i.subitem||'-',
+i.descricao||'-',
+total+'%'
+]
+
+})
+
+doc.autoTable({
+startY:20,
+head:[['Subitem','Descrição','%']],
+body:rows,
+styles:{
+fontSize:7,
+overflow:'linebreak'
+},
+columnStyles:{
+0:{cellWidth:22},
+1:{cellWidth:145},
+2:{cellWidth:20,halign:'center'}
+},
+didDrawPage:function(){
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.getNumberOfPages()
+doc.setFontSize(7)
+doc.text('Página '+p+' de '+t,195,290,{align:'right'})
+}
+})
+
+doc.save('pdf_resumo_tag_sedam.pdf')
+
+}
+
+async function gerarPDFMonitoramento(){
+
+const {jsPDF}=window.jspdf
+
+let doc=new jsPDF('l','mm','a4')
+
+let lista=[...allData].sort(compareSubitem)
+
+doc.setFontSize(14)
+doc.text('MONITORAMENTO COMPLETO - TAG SEDAM 2026',10,12)
+
+let rows=lista.map(i=>[
+i.subitem||'-',
+i.descricao||'-',
+i.responsavel||'-',
+i.jan||0,
+i.fev||0,
+i.mar||0,
+i.abr||0,
+i.mai||0,
+getTotal(i)+'%'
+])
+
+doc.autoTable({
+startY:20,
+head:[['Sub','Descrição','Responsável','JAN','FEV','MAR','ABR','MAI','TOTAL']],
+body:rows,
+styles:{
+fontSize:6,
+overflow:'linebreak'
+},
+columnStyles:{
+0:{cellWidth:15},
+1:{cellWidth:120},
+2:{cellWidth:45},
+3:{cellWidth:12},
+4:{cellWidth:12},
+5:{cellWidth:12},
+6:{cellWidth:12},
+7:{cellWidth:12},
+8:{cellWidth:18}
+},
+didDrawPage:function(){
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.getNumberOfPages()
+doc.setFontSize(7)
+doc.text('Página '+p+' de '+t,285,200,{align:'right'})
+}
+})
+
+let finalY=doc.lastAutoTable.finalY+10
+
+doc.setFontSize(10)
+
+doc.text(
+'Resumo Inteligente: O painel de monitoramento demonstra acompanhamento detalhado da evolução mensal dos subitens estratégicos do TAG SEDAM 2026, permitindo rastreabilidade operacional, verificação de desempenho institucional e consolidação das entregas executadas pelas unidades responsáveis.',
+10,
+finalY,
+{maxWidth:260}
+)
+
+doc.save('pdf_monitoramento_tag_sedam.pdf')
+
+}
+
+async function gerarPDFGraficos(){
+
+const {jsPDF}=window.jspdf
+
+let doc=new jsPDF('p','mm','a4')
+
+doc.setFontSize(14)
+doc.text('ANÁLISE GRÁFICA - TAG SEDAM 2026',10,12)
+
+let meses=['JAN','FEV','MAR','ABR','MAI']
+
+let y=30
+
+meses.forEach((m,idx)=>{
+
+let key=['jan','fev','mar','abr','mai'][idx]
+
+let media=Math.round(
+allData.reduce((acc,c)=>acc+Number(c[key]||0),0)/(allData.length||1)
+)
+
+doc.setFontSize(11)
+
+doc.text(
+m+' → '+media+'% de execução média consolidada',
+20,
+y
+)
+
+y+=15
+
+})
+
+let melhorMes=''
+let maior=-1
+
+;['jan','fev','mar','abr','mai'].forEach((m,idx)=>{
+
+let media=Math.round(
+allData.reduce((acc,c)=>acc+Number(c[m]||0),0)/(allData.length||1)
+)
+
+if(media>maior){
+maior=media
+melhorMes=meses[idx]
+}
+
+})
+
+doc.setFontSize(10)
+
+doc.text(
+'O painel gráfico evidencia a evolução percentual das metas estratégicas monitoradas, permitindo análise temporal do desempenho institucional. O melhor desempenho consolidado ocorreu em '+melhorMes+', atingindo média geral de '+maior+'% de execução.',
+10,
+120,
+{maxWidth:185}
+)
+
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.getNumberOfPages()
+
+doc.setFontSize(7)
+doc.text('Página '+p+' de '+t,195,290,{align:'right'})
+
+doc.save('pdf_graficos_tag_sedam.pdf')
+
+}
+
+async function gerarPDFCumpridos(){
+
+const {jsPDF}=window.jspdf
+
+let doc=new jsPDF('p','mm','a4')
+
+let lista=allData
+.filter(i=>getTotal(i)>=100)
+.sort(compareSubitem)
+
+doc.setFontSize(14)
+
+doc.text('SUBITENS 100% CUMPRIDOS - TAG SEDAM 2026',10,12)
+
+let rows=lista.map(i=>[
+i.subitem||'-',
+i.descricao||'-',
+i.responsavel||'-'
+])
+
+doc.autoTable({
+startY:20,
+head:[['Subitem','Descrição','Responsável']],
+body:rows,
+styles:{
+fontSize:7,
+overflow:'linebreak'
+},
+columnStyles:{
+0:{cellWidth:22},
+1:{cellWidth:120},
+2:{cellWidth:45}
+},
+didDrawPage:function(){
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.getNumberOfPages()
+doc.setFontSize(7)
+doc.text('Página '+p+' de '+t,195,290,{align:'right'})
+}
+})
+
+let finalY=doc.lastAutoTable.finalY+10
+
+doc.setFontSize(10)
+
+doc.text(
+'O painel de subitens concluídos evidencia as ações estratégicas integralmente executadas, refletindo maturidade operacional, capacidade de entrega institucional e aderência às metas pactuadas no TAG SEDAM 2026.',
+10,
+finalY,
+{maxWidth:185}
+)
+
+doc.save('pdf_100_cumpridos_tag_sedam.pdf')
+
+}
+
 </script>
   
   
