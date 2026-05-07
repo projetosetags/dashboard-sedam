@@ -952,18 +952,20 @@ document.getElementById('concluidos-container').innerHTML=
 
 Object.keys(mapa).map(k=>`
 
-<div class="card-micro bg-status-green">
+<div class="card-micro bg-status-green flex flex-col items-center justify-center">
 
-<span class="percent-big">
-${k}
+<span class="percent-big" style="font-size:22px;">
+${String(k).split('.')[0]}
 </span>
 
 <span 
-class="text-[8px] ml-1 font-black"
+class="text-[11px] font-black leading-none"
 style="color:#000000!important;"
 >
-${modoGrupo==='item'?'ITEM':'SUB'}
+${String(k).includes('.')?String(k).split('.')[1]:'0'}
 </span>
+
+</div>
 
 </div>
 
