@@ -1465,7 +1465,26 @@ if(!n)return
 if(!mapa[n])mapa[n]={num:n,descricao:i.descricaoitem||'-'}
 })
 let lista=Object.values(mapa).sort((a,b)=>a.num.localeCompare(b.num,undefined,{numeric:true}))
-sel.innerHTML='<option value="todos">TODOS OS ITENS</option>'+lista.map(i=>`<option value="${i.num}">ITEM ${i.num} - ${truncarTexto(i.descricao,60)}</option>`).join('')
+
+let abrTotal=Math.round(
+allData.reduce((acc,c)=>acc+Number(c.abr||0),0)/(allData.length||1)
+)
+
+let maiTotal=Math.round(
+allData.reduce((acc,c)=>acc+Number(c.mai||0),0)/(allData.length||1)
+)
+
+sel.innerHTML=
+`<option value="todos">
+TOTAL DE ITENS/SUBITENS (${abrTotal}% → ${maiTotal}%)
+</option>`+
+
+lista.map(i=>
+`<option value="${i.num}">
+ITEM ${i.num} - ${truncarTexto(i.descricao,60)}
+</option>`
+).join('')
+
 }
 function atualizarLista3(){
 let sel=document.getElementById('filtroSubitem')
@@ -1507,7 +1526,15 @@ let datasets=[]
 if(tipo==='item'){
 
 if(selSub==='todos'){
-
+window.graficoAtualInfo={
+tipo:'todos',
+abril:Math.round(
+allData.reduce((acc,c)=>acc+Number(c.abr||0),0)/(allData.length||1)
+),
+maio:Math.round(
+allData.reduce((acc,c)=>acc+Number(c.mai||0),0)/(allData.length||1)
+)
+}
 let itens=[...new Set(allData.map(i=>(i.item||'').toString()))]
 
 let datasets=itens.map((it,idx)=>{
@@ -1765,10 +1792,14 @@ let textoIA=''
 
 if(info.tipo==='item'){
 
-if(info.subitem==='todos'){
+if(info.tipo==='todos'){
+
+let abr=info.abril||0
+let mai=info.maio||0
+let dif=mai-abr
 
 textoIA=
-'O gráfico apresentado demonstra a evolução consolidada de TODOS os itens estratégicos monitorados no TAG SEDAM 2026, permitindo análise comparativa entre os grupos de ações institucionais ao longo do período avaliado. A visualização evidencia diferenças de desempenho, ritmo de execução e maturidade operacional entre os itens monitorados.'
+'O gráfico apresentado demonstra a evolução consolidada do conjunto TOTAL de itens e subitens monitorados no TAG SEDAM 2026. Observa-se evolução média global de '+abr+'% no mês de abril para '+mai+'% no mês de maio, representando crescimento consolidado de '+dif+' pontos percentuais. O comportamento gráfico evidencia avanço institucional das ações estratégicas monitoradas, permitindo análise integrada da efetividade operacional e da maturidade das entregas executadas pelas unidades responsáveis.'
 
 }else{
 
@@ -1776,15 +1807,22 @@ let itemAtual=info.subitem
 
 let lista=allData.filter(i=>(i.item||'').toString()===itemAtual)
 
-let media=Math.round(
+let abril=Math.round(
 lista.reduce((acc,c)=>{
-return acc+getTotal(c)
+return acc+Number(c.abr||0)
 },0)/(lista.length||1)
 )
 
-textoIA=
-'O gráfico demonstra especificamente a evolução do ITEM '+itemAtual+' do TAG SEDAM 2026, apresentando comportamento operacional das ações vinculadas a este grupo estratégico. A média consolidada atual do item encontra-se em '+media+'%, permitindo avaliação objetiva da execução, progresso mensal e efetividade das entregas relacionadas.'
+let maio=Math.round(
+lista.reduce((acc,c)=>{
+return acc+Number(c.mai||0)
+},0)/(lista.length||1)
+)
 
+let evolucao=maio-abril
+
+textoIA=
+'O gráfico demonstra especificamente a evolução do ITEM '+itemAtual+' do TAG SEDAM 2026. Observa-se evolução consolidada de '+abril+'% no mês de abril para '+maio+'% no mês de maio, representando variação positiva de '+evolucao+' pontos percentuais. O comportamento evidencia avanço operacional das ações vinculadas a este grupo estratégico, permitindo avaliação objetiva da execução, progresso mensal e efetividade das entregas relacionadas.'
 }
 
 }else{
