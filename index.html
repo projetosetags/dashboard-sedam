@@ -989,7 +989,47 @@ keys=keys.sort(compareSubitem)
 
 }
 
+let totalCards=keys.length
+
 document.getElementById('concluidos-container').innerHTML=
+
+`
+
+<div 
+class="card-micro bg-status-green flex flex-col items-center justify-center"
+style="
+min-height:92px;
+padding:8px;
+border:3px solid #166534;
+background:#dcfce7;
+"
+>
+
+<div
+style="
+font-size:34px;
+font-weight:900;
+line-height:1;
+color:#166534;
+"
+>
+${totalCards}
+</div>
+
+<div
+style="
+font-size:12px;
+font-weight:900;
+margin-top:6px;
+color:#000;
+"
+>
+TOTAL 100%
+</div>
+
+</div>
+
+`+
 
 keys.map(k=>{
 
@@ -1731,6 +1771,9 @@ gerarPDFBackup(delib)
 }
 function gerarCSV(d,n){if(!d||!d.length)return;let c=Object.keys(d[0]);let csv=c.join(";")+"\n";d.forEach(l=>{csv+=c.map(k=>`"${(l[k]??'').toString().replace(/"/g,'""')}"`).join(";")+"\n"});let b=new Blob([csv],{type:"text/csv"});let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n+"_"+Date.now()+".csv";a.click()}
 function gerarJSON(o){let b=new Blob([JSON.stringify(o,null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="backup_"+Date.now()+".json";a.click()}
+
+const NOTA_TECNICA_PDF=`As informações constantes neste painel, gráficos, indicadores e relatórios possuem caráter preliminar e meramente informativo, sendo baseadas nos dados declarados e apresentados até o presente momento pelos jurisdicionados envolvidos. Ressalta-se que tais informações ainda não passaram pela análise técnica de consistência documental, verificação de evidências, validação metodológica e conferência conclusiva pela equipe técnica de auditores designados. A validação oficial ocorrerá posteriormente, por meio da análise técnica dos relatórios de execução, documentos comprobatórios e demais evidências encaminhadas pelos órgãos e entidades responsáveis, culminando na emissão do respectivo Relatório de Monitoramento e demais manifestações técnicas oficiais do Tribunal de Contas.`
+  
 function gerarPDFBackup(d){const {jsPDF}=window.jspdf;let doc=new jsPDF();doc.setFontSize(10);doc.text("BACKUP DELIBERAÇÕES",10,10);let rows=d.map(i=>[i.subitem,(i.descricao||'').substring(0,40),i.responsavel||'-',Math.max(i.jan||0,i.fev||0,i.mar||0,i.abr||0,i.mai||0,i.jun||0,i.jul||0,i.ago||0,i.set||0,i.out||0,i.nov||0,i.dez||0)+'%']);doc.autoTable({head:[['Subitem','Descrição','Responsável','%']],body:rows,startY:15,styles:{fontSize:6}});doc.save("backup_deliberacoes.pdf")}
 async function gerarPDFResumo(){
 
@@ -1798,6 +1841,7 @@ doc.text('MONITORAMENTO COMPLETO - TAG SEDAM 2026',10,12)
 let rows=lista.map(i=>[
 i.subitem||'-',
 i.descricao||'-',
+i.produto||'-',
 i.responsavel||'-',
 i.jan||0,
 i.fev||0,
@@ -1809,7 +1853,7 @@ getTotal(i)+'%'
 
 doc.autoTable({
 startY:20,
-head:[['Sub','Descrição','Responsável','JAN','FEV','MAR','ABR','MAI','TOTAL']],
+head:[['Sub','Descrição','Produtos','Responsável','JAN','FEV','MAR','ABR','MAI','TOTAL']],
 body:rows,
 styles:{
 fontSize:6,
@@ -1817,15 +1861,15 @@ overflow:'linebreak'
 },
 columnStyles:{
 0:{cellWidth:15},
-1:{cellWidth:120},
-2:{cellWidth:45},
-3:{cellWidth:12},
-4:{cellWidth:12},
-5:{cellWidth:12},
-6:{cellWidth:12},
-7:{cellWidth:12},
-8:{cellWidth:18}
-},
+1:{cellWidth:78},
+2:{cellWidth:70},
+3:{cellWidth:42},
+4:{cellWidth:10},
+5:{cellWidth:10},
+6:{cellWidth:10},
+7:{cellWidth:10},
+8:{cellWidth:10},
+9:{cellWidth:15}
 didDrawPage:function(){
 let p=doc.internal.getCurrentPageInfo().pageNumber
 let t=doc.internal.getNumberOfPages()
