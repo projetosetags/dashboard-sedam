@@ -270,8 +270,7 @@ SAIR
 
 <div class="flex gap-2 mb-3 items-center justify-between">
 <div class="flex gap-2">
-<button onclick="modoResumo='item';renderResumo()" class="text-xs bg-blue-600 px-2 py-1 rounded">ITEM</button>
-<button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-slate-700 px-2 py-1 rounded">SUBITEM</button>
+<button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-blue-600 px-2 py-1 rounded">SUBITEM</button>
 </div>
 <div class="flex gap-2 items-center">
 <input id="dataInicio" type="date" onchange="aplicarFiltroData()" class="text-xs bg-slate-800 px-2 py-1 rounded">
@@ -323,7 +322,6 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 <div id="view-analise" class="tab-view hidden">
 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
 <select id="tipoGrafico" class="bg-slate-800 p-2 rounded text-sm">
-<option value="item">POR ITEM</option>
 <option value="subitem">POR SUBITEM</option>
 </select>
 <select id="filtroItem" class="bg-slate-800 p-2 rounded text-sm"></select>
@@ -335,35 +333,7 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 <div id="ranking" class="mt-6 text-xs"></div>
 <div class="flex gap-2 mb-4">
-<button 
-onclick="
-modoGrupo='item';
-this.classList.add('bg-blue-600');
-this.classList.remove('bg-slate-700');
-document.getElementById('btnSubitem').classList.remove('bg-blue-600');
-document.getElementById('btnSubitem').classList.add('bg-slate-700');
-renderConcluidos();
-"
-id="btnItem"
-class="text-xs bg-blue-600 px-2 py-1 rounded"
->
-ITEM
-</button>
 
-<button 
-onclick="
-modoGrupo='subitem';
-this.classList.add('bg-blue-600');
-this.classList.remove('bg-slate-700');
-document.getElementById('btnItem').classList.remove('bg-blue-600');
-document.getElementById('btnItem').classList.add('bg-slate-700');
-renderConcluidos();
-"
-id="btnSubitem"
-class="text-xs bg-slate-700 px-2 py-1 rounded"
->
-SUBITEM
-</button>
 </div>
 </div>
 
