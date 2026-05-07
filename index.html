@@ -334,8 +334,35 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 <div id="ranking" class="mt-6 text-xs"></div>
 <div class="flex gap-2 mb-4">
-<button onclick="modoGrupo='item';renderConcluidos()" class="text-xs bg-blue-600 px-2 py-1 rounded">AGRUPAR POR ITEM</button>
-<button onclick="modoGrupo='subitem';renderConcluidos()" class="text-xs bg-slate-700 px-2 py-1 rounded">AGRUPAR POR SUBITEM</button>
+<button 
+onclick="
+modoGrupo='item';
+this.classList.add('bg-blue-600');
+this.classList.remove('bg-slate-700');
+document.getElementById('btnSubitem').classList.remove('bg-blue-600');
+document.getElementById('btnSubitem').classList.add('bg-slate-700');
+renderConcluidos();
+"
+id="btnItem"
+class="text-xs bg-blue-600 px-2 py-1 rounded"
+>
+ITEM
+</button>
+
+<button 
+onclick="
+modoGrupo='subitem';
+this.classList.add('bg-blue-600');
+this.classList.remove('bg-slate-700');
+document.getElementById('btnItem').classList.remove('bg-blue-600');
+document.getElementById('btnItem').classList.add('bg-slate-700');
+renderConcluidos();
+"
+id="btnSubitem"
+class="text-xs bg-slate-700 px-2 py-1 rounded"
+>
+SUBITEM
+</button>
 </div>
 </div>
 
@@ -939,8 +966,8 @@ let mapa={}
 lista.forEach(i=>{
 
 let chave=modoGrupo==='item'
-?(i.item||String(i.subitem).split('.')[0])
-:(i.subitem||i.identificador||'')
+?(i.item||'-')
+:(i.subitem||'-')
 
 if(!mapa[chave])mapa[chave]=[]
 
@@ -948,50 +975,73 @@ mapa[chave].push(i)
 
 })
 
-document.getElementById('concluidos-container').innerHTML=
-
-Object.keys(mapa).map(k=>{
-
-let itemMaior=''
-let itemMenor=''
+let keys=Object.keys(mapa)
 
 if(modoGrupo==='item'){
 
-itemMaior=String(k).split('.')[0]
-itemMenor='ITEM'
+keys=keys.sort((a,b)=>{
+return parseFloat(a)-parseFloat(b)
+})
 
 }else{
 
-itemMaior=String(k)
-itemMenor=(String(k).split('.')[0]||'')
+keys=keys.sort(compareSubitem)
+
+}
+
+document.getElementById('concluidos-container').innerHTML=
+
+keys.map(k=>{
+
+let reg=mapa[k][0]
+
+let numeroGrande=''
+let numeroPequeno=''
+
+if(modoGrupo==='item'){
+
+numeroGrande=reg.item||'-'
+numeroPequeno=reg.subitem||'-'
+
+}else{
+
+numeroGrande=reg.subitem||'-'
+numeroPequeno=reg.item||'-'
 
 }
 
 return `
 
-<div class="card-micro bg-status-green flex flex-col items-center justify-center">
-
-<span 
-class="percent-big"
+<div 
+class="card-micro bg-status-green flex flex-col items-center justify-center"
 style="
-font-size:22px;
-line-height:1;
+min-height:92px;
+padding:8px;
 "
 >
-${itemMaior}
-</span>
 
-<span 
+<div
 style="
-font-size:11px;
+font-size:28px;
 font-weight:900;
-color:#000000;
 line-height:1;
-margin-top:4px;
+color:#4b4038;
 "
 >
-${itemMenor}
-</span>
+${numeroGrande}
+</div>
+
+<div
+style="
+font-size:13px;
+font-weight:900;
+line-height:1;
+margin-top:8px;
+color:#000000;
+"
+>
+${numeroPequeno}
+</div>
 
 </div>
 
@@ -1001,7 +1051,7 @@ ${itemMenor}
 
 document.getElementById('concluidos-list').innerHTML=
 
-Object.keys(mapa).map(k=>`
+keys.map(k=>`
 
 <div class="mb-3">
 
