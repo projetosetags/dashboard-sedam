@@ -373,14 +373,49 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 </div>
 
 <div id="view-tcero" class="tab-view hidden">
-<div class="flex gap-2 mb-3" id="boxCadastroTCERO">
-<input id="t_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-1/4">
-<input id="t_user" placeholder="Usuário" class="bg-slate-800 p-2 rounded text-xs w-1/6">
-<input id="t_senha" placeholder="Senha" class="bg-slate-800 p-2 rounded text-xs w-1/6">
-<input id="t_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-1/4">
-<button onclick="salvarPerfilTCERO()" class="bg-blue-700 px-3 py-2 rounded text-xs">SALVAR</button>
+<div class="text-xs text-slate-300 mb-2 font-bold uppercase">SERVIDORES TCE-RO</div>
+
+<div class="flex flex-wrap gap-2 mb-4" id="boxCadastroTCERO">
+
+<input id="t_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-[240px]">
+
+<input id="t_user" placeholder="Usuário" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
+
+<input id="t_senha" placeholder="Senha" class="bg-slate-800 p-2 rounded text-xs w-[90px]">
+
+<input id="t_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-[220px]">
+
+<select id="t_pdf" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
+<option value="false">SEM PDF</option>
+<option value="true">COM PDF</option>
+</select>
+
+<select id="t_nivel" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
+<option value="4">Visualização</option>
+<option value="1">Administrador</option>
+</select>
+
+<button onclick="salvarPerfilTCERO()" class="bg-blue-700 px-3 py-2 rounded text-xs">
+SALVAR
+</button>
+
 </div>
+
+<div class="overflow-x-auto">
+
+<div class="grid grid-cols-6 gap-2 text-[10px] font-black uppercase border-b border-white/20 pb-2 mb-2">
+<div>Nome</div>
+<div>Usuário</div>
+<div>Cargo</div>
+<div>Nível</div>
+<div>PDF</div>
+<div>Ações</div>
+</div>
+
 <div id="listaTCERO" class="text-xs"></div>
+
+</div>
+
 </div>
 
 <div id="view-usuarios" class="tab-view hidden">
@@ -758,16 +793,33 @@ userP=data
 window.userP=data
 userP.nivel_acesso=Number(userP.nivel_acesso||0)
 /* 🔓 LIBERA ABA PERFIS */
-if(userP.nivel_acesso===1){
 let adminsTCERO=['manoel','vagner','gleidi']
-if(adminsTCERO.includes((userP.username||'').toLowerCase())){
+
+if(
+Number(userP.nivel_acesso)===1 ||
+adminsTCERO.includes((userP.username||'').toLowerCase())
+){
+
+let btn=document.getElementById('tab-perfis')
+
+if(btn){
+btn.classList.remove('hidden')
+btn.style.display='inline-flex'
+}
+
+}
+
+if(
+adminsTCERO.includes((userP.username||'').toLowerCase())
+){
+
 let tabTCERO=document.getElementById('tab-tcero')
+
 if(tabTCERO){
 tabTCERO.classList.remove('hidden')
+tabTCERO.style.display='inline-flex'
 }
-}
-let btn=document.getElementById('tab-perfis')
-if(btn)btn.classList.remove('hidden')
+
 }
 /* 🔄 CARREGA LISTA DE PERFIS */
 let {data:pList}=await client.from('perfis').select('*').order('nome_completo')
@@ -2163,44 +2215,108 @@ doc.save('pdf_100_cumpridos_tag_sedam.pdf')
 
 async function carregarTCERO(){
 
+if(!userP)return
+
+let admins=['manoel','vagner','gleidi']
+
+if(
+!admins.includes(
+(userP.username||'').toLowerCase()
+)
+){
+return
+}
+
 let {data,error}=await client
-.from('perfis')
+.from('perfistce')
 .select('*')
-.eq('orgao','TCERO')
 .order('nome_completo')
 
-if(error)return
+if(error){
+console.log(error)
+return
+}
 
 let html=''
 
-data.forEach(p=>{
+;(data||[]).forEach(p=>{
 
 html+=`
-<div class="grid grid-cols-6 gap-2 mb-2 bg-slate-900/30 p-2 rounded">
-<div>${p.nome_completo||'-'}</div>
-<div>${p.username||'-'}</div>
-<div>${p.senha||'-'}</div>
-<div>${p.cargo||'-'}</div>
-<div>Nível ${p.nivel_acesso||'-'}</div>
-<div class="flex gap-1">
+<div class="grid grid-cols-6 gap-2 mb-2 bg-slate-900/30 p-2 rounded items-center">
+
+<div class="text-[11px] font-bold break-words">
+${p.nome_completo||'-'}
+</div>
+
+<div class="text-sky-400 font-black">
+${p.username||'-'}
+</div>
+
+<div class="text-[10px] break-words">
+${p.cargo||'-'}
+</div>
+
+<div class="font-black">
 ${
-['manoel','vagner'].includes((userP.username||'').toLowerCase())
+Number(p.nivel_acesso)===1
+?
+'<span class="text-emerald-400">ADMIN</span>'
+:
+'<span class="text-yellow-400">VISUALIZAÇÃO</span>'
+}
+</div>
+
+<div>
+${
+p.permissao_pdf
+?
+'<span class="text-emerald-400 font-black">PDF</span>'
+:
+'<span class="text-slate-400">SEM PDF</span>'
+}
+</div>
+
+<div class="flex gap-1 flex-wrap">
+
+${
+['manoel','vagner'].includes(
+(userP.username||'').toLowerCase()
+)
 ?
 `
-<button onclick="excluirTCERO('${p.id}')" class="bg-red-700 px-2 py-1 rounded text-[10px]">
+<button
+onclick="excluirTCERO('${p.id}')"
+class="bg-red-700 px-2 py-1 rounded text-[10px]"
+>
 EXCLUIR
 </button>
 `
 :
 ''
 }
+
 </div>
+
 </div>
 `
 
 })
 
 document.getElementById('listaTCERO').innerHTML=html
+
+if(
+!['manoel','vagner'].includes(
+(userP.username||'').toLowerCase()
+)
+){
+
+let box=document.getElementById('boxCadastroTCERO')
+
+if(box){
+box.style.display='none'
+}
+
+}
 
 }
 
