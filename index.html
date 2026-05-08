@@ -780,7 +780,6 @@ localStorage.getItem('activeTab')||'resumo'
 carregarDados()
 
 }
-  
 async function init(uid){
 document.body.classList.remove("login-bg")
 let tabelaLogin='perfis'
@@ -799,38 +798,31 @@ userP=data
 window.userP=data
 userP.nivel_acesso=Number(userP.nivel_acesso||0)
 let adminsTCERO=['manoel','vagner','gleidi','charles']
-if(
-Number(userP.nivel_acesso)===1||
-adminsTCERO.includes((userP.username||'').toLowerCase())
-){
+if(Number(userP.nivel_acesso)===1||adminsTCERO.includes((userP.username||'').toLowerCase())){
 let btn=document.getElementById('tab-perfis')
 if(btn){
 btn.classList.remove('hidden')
 btn.style.display='inline-flex'
 }
 }
-if(
-adminsTCERO.includes((userP.username||'').toLowerCase())
-){
+if(adminsTCERO.includes((userP.username||'').toLowerCase())){
 let tabTCERO=document.getElementById('tab-tcero')
 if(tabTCERO){
 tabTCERO.classList.remove('hidden')
 tabTCERO.style.display='inline-flex'
 }
 }
-let {data:pList}=await client
-.from('perfis')
-.select('*')
-.order('nome_completo')
+let {data:pList}=await client.from('perfis').select('*').order('nome_completo')
 window.perfis=pList||[]
+let {data:tList}=await client.from('perfistce').select('*').order('nome_completo')
+window.perfisTCERO=tList||[]
 document.getElementById('login-screen').classList.add('hidden')
 document.getElementById('dashboard').classList.remove('hidden')
 document.getElementById('dataInicio').value='2025-01-01'
 document.getElementById('dataFim').value='2028-01-01'
 filtroDataInicio='2025-01-01'
 filtroDataFim='2028-01-01'
-document.getElementById('user-info').innerText=
-data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
+document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
 let pdfBox=document.getElementById('pdf-container')
 if(pdfBox){
 pdfBox.innerHTML=''
@@ -853,10 +845,7 @@ backupBox.appendChild(btnBackup)
 }
 }
 }
-if(
-userP.nivel_acesso===1||
-adminsTCERO.includes((userP.username||'').toLowerCase())
-){
+if(userP.nivel_acesso===1||adminsTCERO.includes((userP.username||'').toLowerCase())){
 carregarPerfis()
 }
 if(userP.nivel_acesso===4){
@@ -867,22 +856,13 @@ document.querySelectorAll('textarea').forEach(x=>{
 x.disabled=true
 })
 document.querySelectorAll('select').forEach(x=>{
-if(
-x.id!=='filtroItem'&&
-x.id!=='filtroSubitem'&&
-x.id!=='tipoGrafico'
-){
+if(x.id!=='filtroItem'&&x.id!=='filtroSubitem'&&x.id!=='tipoGrafico'){
 x.disabled=true
 }
 })
 document.querySelectorAll('button').forEach(b=>{
 let txt=(b.innerText||'').toUpperCase()
-if(
-txt.includes('SALVAR')||
-txt.includes('EXCLUIR')||
-txt.includes('EDITAR')||
-txt.includes('ALTERAR')
-){
+if(txt.includes('SALVAR')||txt.includes('EXCLUIR')||txt.includes('ALTERAR')){
 b.style.display='none'
 }
 })
@@ -892,9 +872,7 @@ b.style.display='none'
 })
 }
 }
-switchTab(
-localStorage.getItem('activeTab')||'resumo'
-)
+switchTab(localStorage.getItem('activeTab')||'resumo')
 await carregarDados()
 }
 
@@ -903,14 +881,8 @@ if(!window.userP){
 console.log('userP não carregado')
 return
 }
-let query=client
-.from('deliberacoes')
-.select('*')
-if(
-userP&&
-Number(userP.nivel_acesso)!==1&&
-Number(userP.nivel_acesso)!==4
-){
+let query=client.from('deliberacoes').select('*')
+if(userP&&Number(userP.nivel_acesso)!==1&&Number(userP.nivel_acesso)!==4){
 query=query.eq('responsavel_id',userP.id)
 }
 let {data,error}=await query
@@ -923,25 +895,16 @@ if(!data){
 allData=[]
 return
 }
-allData=(data||[])
-.filter(d=>d&&d.subitem&&d.descricao)
-.sort(compareSubitem)
+allData=(data||[]).filter(d=>d&&d.subitem&&d.descricao).sort(compareSubitem)
 let ocultos=['neto','gleidi','vagner']
-if(
-!['manoel','gleidi','vagner','charles'].includes(
-(userP.username||'').toLowerCase()
-)
-){
+if(!['manoel','gleidi','vagner','charles'].includes((userP.username||'').toLowerCase())){
 allData=allData.filter(i=>{
 let resp=(i.responsavel||'').toLowerCase()
 return !ocultos.some(o=>resp.includes(o))
 })
 }
 allData=allData.sort(compareSubitem)
-let media=allData.length
-?
-Math.round(
-allData.reduce((acc,c)=>{
+let media=allData.length?Math.round(allData.reduce((acc,c)=>{
 let totalItem=Math.max(
 Number(c.jan||0),
 Number(c.fev||0),
@@ -957,10 +920,7 @@ Number(c.nov||0),
 Number(c.dez||0)
 )
 return acc+totalItem
-},0)/(allData.length||1)
-)
-:
-0
+},0)/(allData.length||1)):0
 let box=document.getElementById('total-geral')
 if(box){
 box.innerText=media+'%'
@@ -1019,14 +979,14 @@ html+=`<div class="flex flex-col">
 let el=document.getElementById('cards-container')
 if(el)el.innerHTML=html
 }
-  
+
 function abrirItem(item){
 filtroItemAtivo=item
 switchTab('mensal')
 renderTable()
 document.getElementById('btn-voltar').style.display='block'
 }
-  
+
 function renderTable(){
 let lista=[...allData].sort(compareSubitem)
 lista=lista.filter(i=>{
@@ -1045,16 +1005,20 @@ return true
 let totalRegistros=lista.length
 document.getElementById('table-body').innerHTML=lista.map(i=>{
 let dataFormatada=i.data_inicio?formatarDataBR(i.data_inicio):(i.prazo_texto||'-')
-let jan=Number(i.jan||0),fev=Number(i.fev||0),mar=Number(i.mar||0),abr=Number(i.abr||0),mai=Number(i.mai||0)
+let jan=Number(i.jan||0)
+let fev=Number(i.fev||0)
+let mar=Number(i.mar||0)
+let abr=Number(i.abr||0)
+let mai=Number(i.mai||0)
 let total=getTotal(i)
 let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/20'
-let podeEditar=
-userP&&(
-Number(userP.nivel_acesso)===1||
-Number(userP.nivel_acesso)===2||
-String(i.responsavel_id)===String(userP.id)
-)
-let responsavelAtual=i.responsavel||'-'
+let podeEditar=userP&&(Number(userP.nivel_acesso)===1||Number(userP.nivel_acesso)===2||String(i.responsavel_id)===String(userP.id))
+let responsavelTexto=i.responsavel||'-'
+let listaPerfis=[...(window.perfis||[]),...(window.perfisTCERO||[])]
+let perfilResponsavel=listaPerfis.find(p=>String(p.id)===String(i.responsavel_id))
+if(perfilResponsavel){
+responsavelTexto=perfilResponsavel.nome_completo
+}
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.subitem}</td>
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
@@ -1063,20 +1027,14 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}">
 ${userP&&Number(userP.nivel_acesso)===1?
 `<select onchange="salvarResponsavel('${i.id}',this.value)" class="bg-slate-100 text-slate-900 font-semibold text-xs p-1 rounded w-full">
 <option value="">-</option>
-${(window.perfis||[]).map(p=>`
+${listaPerfis.map(p=>`
 <option value="${p.id}" ${String(p.id)===String(i.responsavel_id)?'selected':''}>
 ${p.nome_completo}
 </option>
 `).join('')}
 </select>`
 :
-`<span class="text-slate-800 font-semibold">
-${
-(window.perfis||[]).find(p=>
-String(p.id)===String(i.responsavel_id)
-)?.nome_completo||'-'
-}
-</span>`
+`<span class="text-slate-800 font-semibold">${responsavelTexto}</span>`
 }
 </td>
 <td class="text-xs">${i.setor||'-'}</td>
@@ -1086,62 +1044,34 @@ String(p.id)===String(i.responsavel_id)
 <td class="td-mes opacity-40">${mar}%</td>
 <td class="td-mes-strong text-blue-400">${abr}%</td>
 <td>
-${podeEditar?
-`<input type="number" min="0" max="100" step="1" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','mai')">`
-:
-`<span class="td-mes-strong text-yellow-400">${mai}%</span>`
-}
+${podeEditar?`<input type="number" min="0" max="100" step="1" class="input-mes" value="${mai}" onchange="salvar(this.value,'${i.id}','mai')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}
 </td>
 <td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
 </tr>`
 }).join('')
 let pdfHTML=''
 let itensTotal=new Set(allData.map(x=>getItemKey(x))).size
-if(userP&&Number(userP.nivel_acesso)<=2){
+if(userP&&(Number(userP.nivel_acesso)<=2||userP.permissao_pdf===true)){
 if(document.getElementById('view-resumo')&&!document.getElementById('view-resumo').classList.contains('hidden')){
-pdfHTML=`
-<button onclick="gerarPDFResumo()" class="btn-pdf">
-PDF RESUMO
-</button>
-`
+pdfHTML=`<button onclick="gerarPDFResumo()" class="btn-pdf">PDF RESUMO</button>`
 }
 if(document.getElementById('view-mensal')&&!document.getElementById('view-mensal').classList.contains('hidden')){
-pdfHTML=`
-<button onclick="gerarPDFMonitoramento()" class="btn-pdf">
-PDF MONITORAMENTO
-</button>
-`
+pdfHTML=`<button onclick="gerarPDFMonitoramento()" class="btn-pdf">PDF MONITORAMENTO</button>`
 }
 if(document.getElementById('view-analise')&&!document.getElementById('view-analise').classList.contains('hidden')){
-pdfHTML=`
-<button onclick="gerarPDFGraficos()" class="btn-pdf">
-PDF GRÁFICOS
-</button>
-`
+pdfHTML=`<button onclick="gerarPDFGraficos()" class="btn-pdf">PDF GRÁFICOS</button>`
 }
 if(document.getElementById('view-concluidos')&&!document.getElementById('view-concluidos').classList.contains('hidden')){
-pdfHTML=`
-<button onclick="gerarPDFCumpridos()" class="btn-pdf">
-PDF 100%
-</button>
-`
+pdfHTML=`<button onclick="gerarPDFCumpridos()" class="btn-pdf">PDF 100%</button>`
 }
 }
 document.getElementById('pdf-container').innerHTML=`
 <div class="flex gap-2 items-center flex-wrap">
 ${pdfHTML}
-<span class="text-xs text-emerald-400 font-black ml-2">
-${itensTotal}
-</span>
-<span class="text-[9px] text-slate-500">
-ITENS
-</span>
-<span class="text-xs text-emerald-400 font-black ml-2">
-${totalRegistros}
-</span>
-<span class="text-[9px] text-slate-500">
-SUBITENS
-</span>
+<span class="text-xs text-emerald-400 font-black ml-2">${itensTotal}</span>
+<span class="text-[9px] text-slate-500">ITENS</span>
+<span class="text-xs text-emerald-400 font-black ml-2">${totalRegistros}</span>
+<span class="text-[9px] text-slate-500">SUBITENS</span>
 </div>
 `
 }
