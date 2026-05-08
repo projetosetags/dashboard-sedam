@@ -742,22 +742,23 @@ carregarDados()
   
 async function init(uid){
 document.body.classList.remove("login-bg")
-let {data,error}=await client
-.from('perfis')
-.select('*')
-.eq('id',uid)
-.single()
-
+let tabelaLogin='perfis'
+let {data,error}=await client.from('perfis').select('*').eq('id',uid).single()
+if(error||!data){
+let r2=await client.from('perfistce').select('*').eq('id',uid).single()
+data=r2.data
+error=r2.error
+tabelaLogin='perfistce'
+}
 if(error||!data){
 alert("Erro perfil")
 return
 }
-
 userP=data
-userP && Number(userP.nivel_acesso)=Number(userP && Number(userP.nivel_acesso)||0)
-
+window.userP=data
+userP.nivel_acesso=Number(userP.nivel_acesso||0)
 /* 🔓 LIBERA ABA PERFIS */
-if(userP && Number(userP.nivel_acesso)==1){
+if(userP.nivel_acesso===1){
 let adminsTCERO=['manoel','vagner','gleidi']
 if(adminsTCERO.includes((userP.username||'').toLowerCase())){
 let tabTCERO=document.getElementById('tab-tcero')
@@ -768,51 +769,33 @@ tabTCERO.classList.remove('hidden')
 let btn=document.getElementById('tab-perfis')
 if(btn)btn.classList.remove('hidden')
 }
-
 /* 🔄 CARREGA LISTA DE PERFIS */
-let {data:pList}=await client
-.from('perfis')
-.select('*')
-.order('nome_completo')
-
+let {data:pList}=await client.from('perfis').select('*').order('nome_completo')
 window.perfis=pList||[]
-
 /* 🔥 UI */
 document.getElementById('login-screen').classList.add('hidden')
 document.getElementById('dashboard').classList.remove('hidden')
-
 document.getElementById('dataInicio').value='2025-01-01'
 document.getElementById('dataFim').value='2028-01-01'
-
 filtroDataInicio='2025-01-01'
 filtroDataFim='2028-01-01'
-
 /* 🔁 VOLTA PARA ÚLTIMA ABA */
 const lastTab=localStorage.getItem('activeTab')||'resumo'
 switchTab(lastTab)
-
 /* 👤 INFO USUÁRIO */
-document.getElementById('user-info').innerText=
-data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
-
+document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
 /* 🔥 CONTAINER PDF */
 let pdfBox=document.getElementById('pdf-container')
-
 if(pdfBox){
-
 pdfBox.innerHTML=''
-
 /* 📄 BOTÃO PDF */
-if(data.nivel_acesso<=2){
+if(data.nivel_acesso<=2||data.permissao_pdf===true){
 }
-
 /* 💾 BOTÃO BACKUP (APENAS ADMIN) */
 let backupBox=document.getElementById('backup-container')
-
 if(backupBox){
 backupBox.innerHTML=''
-
-if(data.nivel_acesso==1){
+if(data.nivel_acesso===1){
 let btnBackup=document.createElement('button')
 btnBackup.id='btnBackup'
 btnBackup.innerText='BACKUP'
@@ -826,57 +809,36 @@ alert('Backup ainda não carregado.')
 }
 backupBox.appendChild(btnBackup)
 }
-
 }
 }
-
 /* 🔥 CARREGA PERFIS */
-if(userP && Number(userP.nivel_acesso)==1){
+if(userP.nivel_acesso===1){
 carregarPerfis()
 }
-if(Number(userP && Number(userP.nivel_acesso))===4){
-
+/* 🔒 PERFIL VISUALIZAÇÃO TCE */
+if(userP.nivel_acesso===4){
 document.querySelectorAll('input').forEach(x=>{
 x.disabled=true
 })
-
 document.querySelectorAll('textarea').forEach(x=>{
 x.disabled=true
 })
-
 document.querySelectorAll('select').forEach(x=>{
-if(
-x.id!=='filtroItem' &&
-x.id!=='filtroSubitem' &&
-x.id!=='tipoGrafico'
-){
+if(x.id!=='filtroItem'&&x.id!=='filtroSubitem'&&x.id!=='tipoGrafico'){
 x.disabled=true
 }
 })
-
 document.querySelectorAll('button').forEach(b=>{
-
 let txt=(b.innerText||'').toUpperCase()
-
-if(
-txt.includes('SALVAR')||
-txt.includes('EXCLUIR')||
-txt.includes('EDITAR')||
-txt.includes('ALTERAR')
-){
+if(txt.includes('SALVAR')||txt.includes('EXCLUIR')||txt.includes('EDITAR')||txt.includes('ALTERAR')){
 b.style.display='none'
 }
-
 })
-
 if(!userP.permissao_pdf){
-
 document.querySelectorAll('.btn-pdf').forEach(b=>{
 b.style.display='none'
 })
-
 }
-
 }
 /* 🔄 CARREGA DADOS */
 carregarDados()
