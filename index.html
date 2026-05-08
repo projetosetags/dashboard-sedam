@@ -1454,6 +1454,48 @@ let marTotal=mediaMesGlobal('mar')
 let abrTotal=mediaMesGlobal('abr')
 let maiTotal=mediaMesGlobal('mai')
 
+function mediaMesCarry(lista,mes){
+
+if(!lista||!lista.length)return 0
+
+let ordem=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+
+let idx=ordem.indexOf(mes)
+
+let total=0
+
+lista.forEach(i=>{
+
+let valor=0
+
+for(let x=idx;x>=0;x--){
+
+let k=ordem[x]
+
+if(Number(i[k]||0)>0){
+
+valor=Number(i[k]||0)
+
+break
+
+}
+
+}
+
+total+=valor
+
+})
+
+return Math.round(total/(lista.length||1))
+
+}
+
+let janTotal=mediaMesCarry(allData,'jan')
+let fevTotal=mediaMesCarry(allData,'fev')
+let marTotal=mediaMesCarry(allData,'mar')
+let abrTotal=mediaMesCarry(allData,'abr')
+let maiTotal=mediaMesCarry(allData,'mai')
+
 sel.innerHTML=
 `<option value="todos">
 TOTAL GERAL (${janTotal}% • ${fevTotal}% • ${marTotal}% • ${abrTotal}% • ${maiTotal}%)
