@@ -408,7 +408,7 @@ return
 let lista=data||[]
 
 /* 🔒 REGRA DE VISUALIZAÇÃO */
-if(userP.nivel_acesso==3){
+if(userP && Number(userP.nivel_acesso)===3){
 lista=lista.filter(u=>
 (u.username||'').toLowerCase()===(userP.username||'').toLowerCase()
 )
@@ -433,7 +433,7 @@ document.getElementById('listaUsuarios').innerHTML=html
 }
 
 async function carregarPerfis(){
-if(userP.nivel_acesso!=1)return
+if(userP && Number(userP.nivel_acesso)!=1)return
 let {data,error}=await client.from('perfis').select('*').order('nome_completo')
 if(error){console.error(error);return}
 window.perfis=data||[]
@@ -474,7 +474,7 @@ document.getElementById('listaPerfis').innerHTML=html
 
 let editPerfilId=null
 async function salvarPerfil(){
-if(userP.nivel_acesso!=1)return
+if(userP && Number(userP.nivel_acesso)!=1)return
 
 let nome=document.getElementById('p_nome').value.trim()
 let user=document.getElementById('p_user').value.trim().toLowerCase()
@@ -536,7 +536,7 @@ window.scrollTo({top:0,behavior:'smooth'})
 }
 
 async function excluirPerfil(id){
-if(userP.nivel_acesso!=1)return
+if(userP && Number(userP.nivel_acesso)!=1)return
 let p=window.perfis.find(x=>x.id==id)
 if(!p)return
 if(!confirm(`Excluir ${p.nome_completo}?`))return
@@ -723,7 +723,8 @@ document.getElementById('tab-perfis').style.display='none'
 document.getElementById('tab-usuarios').style.display='none'
 
 }
-
+userP=perfil
+window.userP=perfil
 switchTab(
 localStorage.getItem('activeTab')||'resumo'
 )
@@ -746,10 +747,10 @@ return
 }
 
 userP=data
-userP.nivel_acesso=Number(userP.nivel_acesso||0)
+userP && Number(userP.nivel_acesso)=Number(userP && Number(userP.nivel_acesso)||0)
 
 /* 🔓 LIBERA ABA PERFIS */
-if(userP.nivel_acesso==1){
+if(userP && Number(userP.nivel_acesso)==1){
 let adminsTCERO=['manoel','vagner','gleidi']
 if(adminsTCERO.includes((userP.username||'').toLowerCase())){
 let tabTCERO=document.getElementById('tab-tcero')
@@ -823,10 +824,10 @@ backupBox.appendChild(btnBackup)
 }
 
 /* 🔥 CARREGA PERFIS */
-if(userP.nivel_acesso==1){
+if(userP && Number(userP.nivel_acesso)==1){
 carregarPerfis()
 }
-if(Number(userP.nivel_acesso)===4){
+if(Number(userP && Number(userP.nivel_acesso))===4){
 
 document.querySelectorAll('input').forEach(x=>{
 x.disabled=true
@@ -888,6 +889,7 @@ let query=client
 /* 🔒 CONTROLE POR RESPONSÁVEL */
 
 if(
+userP &&
 Number(userP.nivel_acesso)!==1 &&
 Number(userP.nivel_acesso)!==4
 ){
@@ -1059,13 +1061,13 @@ let dataFormatada=i.data_inicio?formatarDataBR(i.data_inicio):(i.prazo_texto||'-
 let jan=Number(i.jan||0),fev=Number(i.fev||0),mar=Number(i.mar||0),abr=Number(i.abr||0),mai=Number(i.mai||0)
 let total=getTotal(i)
 let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/20'
-let podeEditar=userP.nivel_acesso==1||(userP.nivel_acesso!=1&&i.responsavel_id==userP.id)
+let podeEditar=userP && Number(userP.nivel_acesso)==1||(userP && Number(userP.nivel_acesso)!=1&&i.responsavel_id==userP.id)
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.subitem}</td>
 <td class="p-2 td-desc">${i.descricao||'-'}</td>
 <td class="p-2 td-desc text-[10px] text-slate-700">${i.produto||'-'}</td>
 <td class="text-xs">
-${userP.nivel_acesso===1?
+${userP && Number(userP.nivel_acesso)===1?
 `<select onchange="salvarResponsavel('${i.id}',this.value)" class="bg-slate-800 text-xs p-1 rounded w-full">
 <option value="">-</option>
 ${(window.perfis||[]).map(p=>`<option value="${p.id}" ${p.nome_completo===i.responsavel?'selected':''}>${p.nome_completo}</option>`).join('')}
@@ -1088,7 +1090,7 @@ let pdfHTML=''
 
 let itensTotal=new Set(allData.map(x=>getItemKey(x))).size
 
-if(userP&&userP.nivel_acesso<=2){
+if(userP&&userP && Number(userP.nivel_acesso)<=2){
 
 if(document.getElementById('view-resumo')&&!document.getElementById('view-resumo').classList.contains('hidden')){
 pdfHTML=`
@@ -1301,7 +1303,7 @@ function logout(){localStorage.clear();location.reload()}
 function getMesAtualIndex(){return new Date().getMonth()}
 async function salvarResponsavel(id,novoId){
 if(!novoId)return
-if(userP.nivel_acesso!=1){alert("Sem permissão");return}
+if(userP && Number(userP.nivel_acesso)!=1){alert("Sem permissão");return}
 let p=(window.perfis||[]).find(x=>String(x.id)===String(novoId))
 if(!p){alert("Perfil não encontrado");return}
 let {error}=await client.from('deliberacoes').update({responsavel:p.nome_completo,responsavel_id:p.id}).eq('id',id)
@@ -1336,7 +1338,7 @@ let query=client
 .from('deliberacoes')
 .select('*')
 
-if(userP.nivel_acesso!=1){
+if(userP && Number(userP.nivel_acesso)!=1){
 query=query.eq('responsavel_id',userP.id)
 }
 
@@ -1406,7 +1408,7 @@ doc.setFontSize(14)
 doc.setTextColor(0,0,0)
 
 doc.text(
-userP.nivel_acesso==1
+userP && Number(userP.nivel_acesso)==1
 ?"RELATÓRIO GERAL - TAG SEDAM 2026"
 :"RELATÓRIO INDIVIDUAL - "+(userP.nome_completo||''),
 10,
@@ -1594,7 +1596,7 @@ doc.text(
 }
 
 doc.save(
-userP.nivel_acesso==1
+userP && Number(userP.nivel_acesso)==1
 ?'relatorio_geral_tag_sedam.pdf'
 :'relatorio_'+(userP.username||'usuario')+'.pdf'
 )
@@ -1605,7 +1607,7 @@ function mesFromData(data){return['jan','fev','mar','abr','mai','jun','jul','ago
 async function salvar(valor,id,campo){
 let v=parseFloat(String(valor).replace(',','.'));if(isNaN(v))v=0
 if(v<0||v>100){alert("Informe 0 a 100");return}
-let podeEditar=(userP.nivel_acesso==1||userP.nivel_acesso==2||userP.nivel_acesso==3)
+let podeEditar=(userP && Number(userP.nivel_acesso)==1||userP && Number(userP.nivel_acesso)==2||userP && Number(userP.nivel_acesso)==3)
 if(!podeEditar){alert("Sem permissão");return}
 let {error}=await client.from('deliberacoes').update({[campo]:v}).eq('id',id)
 if(error){console.error(error);alert("Erro ao salvar");return}
