@@ -701,11 +701,17 @@ let btnBackup=document.createElement('button')
 btnBackup.id='btnBackup'
 btnBackup.innerText='BACKUP'
 btnBackup.className='bg-purple-600 px-3 py-1 rounded'
-btnBackup.onclick=backupCompleto
+btnBackup.onclick=function(){
+if(typeof backupCompleto==='function'){
+backupCompleto()
+}else{
+alert('Backup ainda não carregado.')
+}
+}
 backupBox.appendChild(btnBackup)
 }
-}
 
+}
 }
 
 /* 🔥 CARREGA PERFIS */
