@@ -627,20 +627,109 @@ let userP=null
 let allData=[]
 let myChart=null
 
-  function login(){
-let u=document.getElementById('u').value.trim().toLowerCase()
-let s=document.getElementById('p')?document.getElementById('p').value.trim():''
-if(!u){alert("Informe o usuário");return}
-client.from('perfis').select('*').eq('username',u).single().then(({data,error})=>{
-if(error||!data){alert("Usuário não encontrado");return}
-if(s&&s!=="123456"){alert("Senha inválida");return}
-localStorage.setItem("uid",data.id)
-localStorage.setItem("login_time",Date.now())
-init(data.id)
-}).catch(e=>{
-console.error(e)
-alert("Erro na conexão")
-})
+async function login(){
+
+let usuario=document.getElementById('u').value.trim().toLowerCase()
+let senha=document.getElementById('p').value.trim()
+
+if(!usuario||!senha){
+alert('Informe usuário e senha')
+return
+}
+
+let perfil=null
+
+let {data:p1}=await client
+.from('perfistce')
+.select('*')
+.eq('username',usuario)
+.eq('senha',senha)
+.limit(1)
+
+if(p1&&p1.length){
+perfil=p1[0]
+perfil.origem='TCERO'
+}else{
+
+let {data:p2}=await client
+.from('perfis')
+.select('*')
+.eq('username',usuario)
+.limit(1)
+
+if(p2&&p2.length){
+
+perfil=p2[0]
+perfil.origem='SEDAM'
+
+if(
+perfil.senha &&
+String(perfil.senha)!==String(senha)
+){
+alert('Senha inválida')
+return
+}
+
+}
+
+}
+
+if(!perfil){
+alert('Usuário não encontrado')
+return
+}
+
+window.userP=perfil
+
+localStorage.setItem('user',JSON.stringify(perfil))
+
+document.body.classList.remove('login-bg')
+
+document.getElementById('login-screen').classList.add('hidden')
+
+document.getElementById('dashboard').classList.remove('hidden')
+
+document.getElementById('user-info').innerHTML=
+(perfil.nome_completo||'-')+
+' • '+
+(perfil.cargo||'-')+
+' • '+
+(perfil.origem||'-')
+
+if(
+perfil.origem==='TCERO' &&
+(
+perfil.username==='manoel'||
+perfil.username==='vagner'||
+perfil.username==='gleidi'||
+perfil.username==='charles'
+)
+){
+
+let tab=document.getElementById('tab-tcero')
+
+if(tab){
+tab.classList.remove('hidden')
+}
+
+}
+
+if(
+perfil.origem==='TCERO' &&
+Number(perfil.nivel_acesso)===4
+){
+
+document.getElementById('tab-perfis').style.display='none'
+document.getElementById('tab-usuarios').style.display='none'
+
+}
+
+switchTab(
+localStorage.getItem('activeTab')||'resumo'
+)
+
+carregarDados()
+
 }
   
 async function init(uid){
