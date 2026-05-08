@@ -266,6 +266,7 @@ SAIR
 <button onclick="switchTab('analise')" id="tab-analise" class="tab-btn">Gráficos</button>
 <button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Cumpridos</button>
 <button id="tab-perfis" onclick="switchTab('perfis')" class="tab-btn hidden">PERFIS</button>
+<button id="tab-tcero" onclick="switchTab('tcero')" class="tab-btn hidden">TCE-RO</button>
 <button id="tab-usuarios" onclick="switchTab('usuarios')" class="tab-btn">USUÁRIOS</button>
 </nav>
 
@@ -369,6 +370,17 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 <button onclick="salvarPerfil()" class="bg-emerald-600 px-3 py-2 rounded text-xs">SALVAR</button>
 </div>
 <div id="listaPerfis" class="text-xs"></div>
+</div>
+
+<div id="view-tcero" class="tab-view hidden">
+<div class="flex gap-2 mb-3" id="boxCadastroTCERO">
+<input id="t_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-1/4">
+<input id="t_user" placeholder="Usuário" class="bg-slate-800 p-2 rounded text-xs w-1/6">
+<input id="t_senha" placeholder="Senha" class="bg-slate-800 p-2 rounded text-xs w-1/6">
+<input id="t_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-1/4">
+<button onclick="salvarPerfilTCERO()" class="bg-blue-700 px-3 py-2 rounded text-xs">SALVAR</button>
+</div>
+<div id="listaTCERO" class="text-xs"></div>
 </div>
 
 <div id="view-usuarios" class="tab-view hidden">
@@ -649,6 +661,13 @@ userP.nivel_acesso=Number(userP.nivel_acesso||0)
 
 /* 🔓 LIBERA ABA PERFIS */
 if(userP.nivel_acesso==1){
+let adminsTCERO=['manoel','vagner','gleidi']
+if(adminsTCERO.includes((userP.username||'').toLowerCase())){
+let tabTCERO=document.getElementById('tab-tcero')
+if(tabTCERO){
+tabTCERO.classList.remove('hidden')
+}
+}
 let btn=document.getElementById('tab-perfis')
 if(btn)btn.classList.remove('hidden')
 }
@@ -718,7 +737,50 @@ backupBox.appendChild(btnBackup)
 if(userP.nivel_acesso==1){
 carregarPerfis()
 }
+if(Number(userP.nivel_acesso)===4){
 
+document.querySelectorAll('input').forEach(x=>{
+x.disabled=true
+})
+
+document.querySelectorAll('textarea').forEach(x=>{
+x.disabled=true
+})
+
+document.querySelectorAll('select').forEach(x=>{
+if(
+x.id!=='filtroItem' &&
+x.id!=='filtroSubitem' &&
+x.id!=='tipoGrafico'
+){
+x.disabled=true
+}
+})
+
+document.querySelectorAll('button').forEach(b=>{
+
+let txt=(b.innerText||'').toUpperCase()
+
+if(
+txt.includes('SALVAR')||
+txt.includes('EXCLUIR')||
+txt.includes('EDITAR')||
+txt.includes('ALTERAR')
+){
+b.style.display='none'
+}
+
+})
+
+if(!userP.permissao_pdf){
+
+document.querySelectorAll('.btn-pdf').forEach(b=>{
+b.style.display='none'
+})
+
+}
+
+}
 /* 🔄 CARREGA DADOS */
 carregarDados()
 }
@@ -1066,6 +1128,11 @@ carregarPerfis()
 if(t==='usuarios'){
 setTimeout(()=>{
 carregarUsuarios()
+},200)
+}
+if(t==='tcero'){
+setTimeout(()=>{
+carregarTCERO()
 },200)
 }
 setTimeout(()=>{
@@ -1977,6 +2044,108 @@ doc.text('O painel de subitens concluídos evidencia as ações estratégicas in
 doc.save('pdf_100_cumpridos_tag_sedam.pdf')
 }
 
+async function carregarTCERO(){
+
+let {data,error}=await client
+.from('perfis')
+.select('*')
+.eq('orgao','TCERO')
+.order('nome_completo')
+
+if(error)return
+
+let html=''
+
+data.forEach(p=>{
+
+html+=`
+<div class="grid grid-cols-6 gap-2 mb-2 bg-slate-900/30 p-2 rounded">
+<div>${p.nome_completo||'-'}</div>
+<div>${p.username||'-'}</div>
+<div>${p.senha||'-'}</div>
+<div>${p.cargo||'-'}</div>
+<div>Nível ${p.nivel_acesso||'-'}</div>
+<div class="flex gap-1">
+${
+['manoel','vagner'].includes((userP.username||'').toLowerCase())
+?
+`
+<button onclick="excluirTCERO('${p.id}')" class="bg-red-700 px-2 py-1 rounded text-[10px]">
+EXCLUIR
+</button>
+`
+:
+''
+}
+</div>
+</div>
+`
+
+})
+
+document.getElementById('listaTCERO').innerHTML=html
+
+}
+
+async function salvarPerfilTCERO(){
+
+if(!['manoel','vagner'].includes((userP.username||'').toLowerCase())){
+alert('Sem permissão')
+return
+}
+
+let nome=t_nome.value.trim()
+let user=t_user.value.trim().toLowerCase()
+let senha=t_senha.value.trim()
+let cargo=t_cargo.value.trim()
+
+if(!nome||!user||!senha){
+alert('Preencha os campos')
+return
+}
+
+let payload={
+nome_completo:nome,
+username:user,
+senha:senha,
+cargo:cargo,
+orgao:'TCERO',
+nivel_acesso:'4',
+somente_visualizacao:true,
+permissao_pdf:false
+}
+
+await client
+.from('perfis')
+.insert(payload)
+
+carregarTCERO()
+
+t_nome.value=''
+t_user.value=''
+t_senha.value=''
+t_cargo.value=''
+
+}
+
+async function excluirTCERO(id){
+
+if(!['manoel','vagner'].includes((userP.username||'').toLowerCase())){
+alert('Sem permissão')
+return
+}
+
+if(!confirm('Excluir perfil?'))return
+
+await client
+.from('perfis')
+.delete()
+.eq('id',id)
+
+carregarTCERO()
+
+}
+  
 </script>
   
   
