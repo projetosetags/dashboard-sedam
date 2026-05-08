@@ -1529,9 +1529,41 @@ let mesAtual=getMesAtualIndex()
 let labels=meses.slice(0,mesAtual+1)
 let cores=['#22c55e','#3b82f6','#f59e0b','#facc15','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899']
 let datasets=[]
+
 function mediaMes(lista,mes){
+
 if(!lista||!lista.length)return 0
-return Math.round(lista.reduce((acc,c)=>acc+Number(c[mes]||0),0)/(lista.length||1))
+
+let ordem=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+
+let idx=ordem.indexOf(mes)
+
+let total=0
+
+lista.forEach(i=>{
+
+let valor=0
+
+for(let x=idx;x>=0;x--){
+
+let k=ordem[x]
+
+if(Number(i[k]||0)>0){
+
+valor=Number(i[k]||0)
+
+break
+
+}
+
+}
+
+total+=valor
+
+})
+
+return Math.round(total/(lista.length||1))
+
 }
 if(tipo==='subitem'){
 if(selSub==='TOTAL'){
