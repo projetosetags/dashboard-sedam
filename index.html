@@ -903,6 +903,10 @@ b.style.display='none'
 })
 }
 }
+/* 🔁 VOLTA PARA ÚLTIMA ABA */
+const lastTab=localStorage.getItem('activeTab')||'resumo'
+switchTab(lastTab)
+
 /* 🔄 CARREGA DADOS */
 carregarDados()
 }
@@ -1199,11 +1203,43 @@ let dados=[...allData]
 .filter(i=>getTotal(i)>=100)
 .sort(compareSubitem)
 
+/* 🔥 CARD TOTAL */
+
+let total=document.createElement('div')
+
+total.className='rounded-2xl shadow-2xl border border-cyan-300/20 flex items-center justify-center p-3'
+total.style.background='linear-gradient(135deg,#082f49,#0f172a,#1d4ed8)'
+total.style.minHeight='120px'
+
+total.innerHTML=`
+<div class="text-center leading-tight w-full">
+
+<div class="text-[10px] font-black uppercase tracking-widest text-cyan-100 mb-2">
+TOTAL GERAL
+</div>
+
+<div style="font-size:42px;font-weight:900;color:#ffffff;line-height:1;">
+${dados.length}
+</div>
+
+<div style="font-size:13px;font-weight:800;color:#bfdbfe;margin-top:6px;">
+SUBITENS 100%
+</div>
+
+</div>
+`
+
+box.appendChild(total)
+
+/* 🔥 CARDS */
+
 dados.forEach(i=>{
 
 let card=document.createElement('div')
 
-card.className='card-micro bg-status-green hover:scale-105 transition'
+card.className='card-micro shadow-lg border border-white/10 hover:scale-105 transition'
+
+card.style.background='linear-gradient(135deg,#d9f99d,#bbf7d0,#dcfce7)'
 
 let item=i.item||'-'
 let sub=i.subitem||'-'
@@ -1212,15 +1248,19 @@ if(modoGrupo==='item'){
 
 card.innerHTML=`
 <div class="text-center leading-tight w-full">
-<div class="text-[8px] font-black text-slate-700 uppercase mb-1">
+
+<div class="text-[9px] font-black text-slate-700 uppercase mb-1">
 ITEM
 </div>
-<div style="font-size:26px;font-weight:900;line-height:1;color:#2f5130;">
+
+<div style="font-size:28px;font-weight:900;line-height:1;color:#14532d;">
 ${item}
 </div>
-<div style="font-size:10px;font-weight:700;opacity:.8;margin-top:2px;">
+
+<div style="font-size:12px;font-weight:800;color:#334155;margin-top:4px;">
 ${sub}
 </div>
+
 </div>
 `
 
@@ -1228,15 +1268,19 @@ ${sub}
 
 card.innerHTML=`
 <div class="text-center leading-tight w-full">
-<div class="text-[8px] font-black text-slate-700 uppercase mb-1">
+
+<div class="text-[9px] font-black text-slate-700 uppercase mb-1">
 SUBITEM
 </div>
-<div style="font-size:22px;font-weight:900;line-height:1;color:#2f5130;">
+
+<div style="font-size:24px;font-weight:900;line-height:1;color:#14532d;">
 ${sub}
 </div>
-<div style="font-size:10px;font-weight:700;opacity:.8;margin-top:2px;">
+
+<div style="font-size:11px;font-weight:800;color:#334155;margin-top:4px;">
 ITEM ${item}
 </div>
+
 </div>
 `
 
@@ -1244,80 +1288,90 @@ ITEM ${item}
 
 box.appendChild(card)
 
+/* 🔥 DESCRIÇÕES */
+
 let div=document.createElement('div')
 
-div.className='border-b border-white/10 pb-2'
+div.className='border-b border-white/10 pb-4 mb-4'
 
 div.innerHTML=`
-<div class="font-bold text-emerald-400">
+
+<div class="text-[15px] md:text-[16px] font-black text-emerald-400 break-words">
 ${sub}
 </div>
-<div class="text-slate-300 mt-1">
+
+<div class="text-[14px] leading-relaxed text-slate-200 mt-2 break-words whitespace-normal">
 ${i.descricao||'-'}
 </div>
-<div class="text-[10px] text-yellow-300 mt-1">
+
+<div class="text-[13px] leading-relaxed text-yellow-300 mt-2 break-words whitespace-normal">
 <b>Produto:</b> ${i.produto||'-'}
 </div>
-<div class="text-[10px] text-slate-500 mt-1">
+
+<div class="text-[12px] leading-relaxed text-slate-400 mt-2 break-words whitespace-normal">
 <b>Responsável:</b> ${i.responsavel||'-'}
 </div>
+
 `
 
 lista.appendChild(div)
 
 })
 
-let total=document.createElement('div')
-
-total.className='card-micro bg-status-green'
-
-total.innerHTML=`
-<div class="text-center leading-tight w-full">
-<div class="text-[8px] font-black uppercase text-slate-700 mb-1">
-TOTAL
-</div>
-<div style="font-size:34px;font-weight:900;color:#2f5130;">
-${dados.length}
-</div>
-<div style="font-size:10px;font-weight:700;">
-100%
-</div>
-</div>
-`
-
-box.prepend(total)
-
 }
 
 function switchTab(t){
+
 localStorage.setItem('activeTab',t)
-document.querySelectorAll('.tab-view').forEach(v=>v.classList.add('hidden'))
-document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('tab-active'))
-document.getElementById('view-'+t).classList.remove('hidden')
-document.getElementById('tab-'+t).classList.add('tab-active')
+
+document.querySelectorAll('.tab-view').forEach(v=>{
+v.classList.add('hidden')
+})
+
+document.querySelectorAll('.tab-btn').forEach(b=>{
+b.classList.remove('tab-active')
+})
+
+let view=document.getElementById('view-'+t)
+
+if(view){
+view.classList.remove('hidden')
+}
+
+let tab=document.getElementById('tab-'+t)
+
+if(tab){
+tab.classList.add('tab-active')
+}
+
 if(t==='analise'){
 setTimeout(()=>{
 initPainelGrafico()
 },300)
 }
+
 if(t==='perfis'){
 setTimeout(()=>{
 carregarPerfis()
 },200)
 }
+
 if(t==='usuarios'){
 setTimeout(()=>{
 carregarUsuarios()
 },200)
 }
+
 if(t==='tcero'){
 setTimeout(()=>{
 carregarTCERO()
 },200)
 }
+
 setTimeout(()=>{
 renderTable()
 },100)
+
 }
 
 function fecharDrill(){filtroItemAtivo=null;renderResumo();document.getElementById('btn-voltar').style.display='none'}
