@@ -875,32 +875,76 @@ carregarDados()
 }
 
 async function carregarDados(){
-let query = client.from('deliberacoes').select('*')
-// 🔒 CONTROLE POR RESPONSÁVEL
-if(userP.nivel_acesso != 1){
-query = query.eq('responsavel_id', userP.id)
-}
-let { data } = await query
-if(!data){
-allData = []
+
+if(!window.userP){
+console.log('userP não carregado')
 return
 }
+
+let query=client
+.from('deliberacoes')
+.select('*')
+
+/* 🔒 CONTROLE POR RESPONSÁVEL */
+
+if(
+Number(userP.nivel_acesso)!==1 &&
+Number(userP.nivel_acesso)!==4
+){
+
+query=query.eq('responsavel_id',userP.id)
+
+}
+
+let {data,error}=await query
+
+if(error){
+console.log(error)
+allData=[]
+return
+}
+
+if(!data){
+allData=[]
+return
+}
+
 allData=(data||[])
 .filter(d=>d&&d.subitem&&d.descricao)
 .sort(compareSubitem)
+
 /* 🔥 REMOVE RESPONSÁVEIS OCULTOS */
+
 let ocultos=['neto','gleidi','vagner']
+
+if(
+!['manoel','gleidi','vagner','charles'].includes(
+(userP.username||'').toLowerCase()
+)
+){
+
 allData=allData.filter(i=>{
+
 let resp=(i.responsavel||'').toLowerCase()
+
 return !ocultos.some(o=>resp.includes(o))
+
 })
+
+}
+
 /* 🔥 ORDENAÇÃO FINAL */
+
 allData=allData.sort(compareSubitem)
-  // 🔥 CÁLCULO DA MÉDIA (PEGANDO O MAIOR VALOR DOS MESES)
-let media = allData.length
-? Math.round(
+
+/* 🔥 MÉDIA GERAL */
+
+let media=allData.length
+?
+Math.round(
 allData.reduce((acc,c)=>{
-let totalItem = Math.max(
+
+let totalItem=Math.max(
 Number(c.jan||0),
 Number(c.fev||0),
 Number(c.mar||0),
@@ -914,17 +958,30 @@ Number(c.out||0),
 Number(c.nov||0),
 Number(c.dez||0)
 )
-return acc + totalItem
-},0) / allData.length
+
+return acc+totalItem
+
+},0)/(allData.length||1)
 )
-: 0
-// 🔥 ATUALIZA MÉDIA GERAL
-document.getElementById('total-geral').innerText = media + "%"
-// 🔥 RENDERIZAÇÕES
+:
+0
+
+let box=document.getElementById('total-geral')
+
+if(box){
+box.innerText=media+'%'
+}
+
+/* 🔥 RENDER */
+
 renderResumo()
 renderTable()
 renderConcluidos()
-if(typeof atualizarLista3==="function")atualizarLista3()
+
+if(typeof atualizarLista3==='function'){
+atualizarLista3()
+}
+
 }
 
 function renderResumo(){
