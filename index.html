@@ -827,27 +827,54 @@ await carregarDados()
 
 }
 async function init(uid){
+
 document.body.classList.remove("login-bg")
+
 let tabelaLogin='perfis'
-let {data,error}=await client.from('perfis').select('*').eq('id',uid).single()
+
+let {data,error}=await client
+.from('perfis')
+.select('*')
+.eq('id',uid)
+.single()
+
 if(error||!data){
-let r2=await client.from('perfistce').select('*').eq('id',uid).single()
+
+let r2=await client
+.from('perfistce')
+.select('*')
+.eq('id',uid)
+.single()
+
 data=r2.data
 error=r2.error
 tabelaLogin='perfistce'
+
 }
+
 if(error||!data){
 alert("Erro perfil")
 return
 }
+
 userP=data
 window.userP=data
+
 userP.nivel_acesso=Number(userP.nivel_acesso||0)
-let adminsTCERO=['manoel','vagner','gleidi']
+
+let adminsTCERO=[
+'manoel',
+'vagner',
+'gleidi'
+]
+
+/* 🔥 PERFIS */
 
 if(
 Number(userP.nivel_acesso)===1 ||
-adminsTCERO.includes((userP.username||'').toLowerCase())
+adminsTCERO.includes(
+(userP.username||'').toLowerCase()
+)
 ){
 
 let btn=document.getElementById('tab-perfis')
@@ -866,35 +893,85 @@ btn.style.display='none'
 }
 
 }
-if(adminsTCERO.includes((userP.username||'').toLowerCase())){
+
+/* 🔥 TCERO */
+
+if(
+adminsTCERO.includes(
+(userP.username||'').toLowerCase()
+)
+){
+
 let tabTCERO=document.getElementById('tab-tcero')
+
 if(tabTCERO){
 tabTCERO.classList.remove('hidden')
 tabTCERO.style.display='inline-flex'
 }
+
 }
-let {data:pList}=await client.from('perfis').select('*').order('nome_completo')
+
+/* 🔥 CARREGA PERFIS */
+
+let {data:pList}=await client
+.from('perfis')
+.select('*')
+.order('nome_completo')
+
 window.perfis=pList||[]
-let {data:tList}=await client.from('perfistce').select('*').order('nome_completo')
+
+let {data:tList}=await client
+.from('perfistce')
+.select('*')
+.order('nome_completo')
+
 window.perfisTCERO=tList||[]
-document.getElementById('login-screen').classList.add('hidden')
-document.getElementById('dashboard').classList.remove('hidden')
+
+/* 🔥 DASHBOARD */
+
+document.getElementById('login-screen')
+.classList.add('hidden')
+
+document.getElementById('dashboard')
+.classList.remove('hidden')
+
 document.getElementById('dataInicio').value='2025-01-01'
 document.getElementById('dataFim').value='2028-01-01'
+
 filtroDataInicio='2025-01-01'
 filtroDataFim='2028-01-01'
-document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
+
+document.getElementById('user-info').innerText=
+data.nome_completo+
+" | "+
+(data.cargo||'-')+
+" (Nível "+
+data.nivel_acesso+
+")"
+
+/* 🔥 BACKUP */
+
+setTimeout(()=>{
+
 let backupBox=document.getElementById('backup-container')
 
-if(backupBox){
+if(!backupBox)return
 
 backupBox.innerHTML=''
 
-let podeBackup=
-Number(data.nivel_acesso)===1 &&
-(data.username||'').toLowerCase()!=='hueriqui'
+let bloqueadosBackup=[
+'hueriqui',
+'vagner',
+'gleidi'
+]
 
-if(podeBackup){
+let podeBackup=
+Number(userP.nivel_acesso)===1 &&
+!bloqueadosBackup.includes(
+(userP.username||'').toLowerCase()
+)
+
+if(!podeBackup)return
 
 let btnBackup=document.createElement('button')
 
@@ -902,21 +979,24 @@ btnBackup.id='btnBackup'
 
 btnBackup.innerText='BACKUP'
 
-btnBackup.className='bg-purple-700 hover:bg-purple-800 text-white font-black px-4 py-2 rounded-xl shadow-lg'
+btnBackup.style.background='#6d28d9'
+btnBackup.style.color='#ffffff'
+btnBackup.style.fontWeight='900'
+btnBackup.style.padding='10px 18px'
+btnBackup.style.borderRadius='14px'
+btnBackup.style.border='none'
+btnBackup.style.cursor='pointer'
+btnBackup.style.marginLeft='8px'
 
 btnBackup.onclick=function(){
 
-if(typeof backupCompleto==='function'){
+if(typeof gerarPDFBackup==='function'){
 
-backupCompleto()
-
-}else if(typeof gerarJSON==='function'){
-
-gerarJSON(allData||[])
+gerarPDFBackup(allData||[])
 
 }else{
 
-alert('Função de backup não encontrada.')
+alert('Função BACKUP não encontrada.')
 
 }
 
@@ -924,38 +1004,77 @@ alert('Função de backup não encontrada.')
 
 backupBox.appendChild(btnBackup)
 
-}
+},500)
 
-}
-if(userP.nivel_acesso===1||adminsTCERO.includes((userP.username||'').toLowerCase())){
+/* 🔥 CARREGA PERFIS */
+
+if(
+userP.nivel_acesso===1 ||
+adminsTCERO.includes(
+(userP.username||'').toLowerCase()
+)
+){
 carregarPerfis()
 }
+
+/* 🔥 SOMENTE LEITURA */
+
 if(userP.nivel_acesso===4){
+
 document.querySelectorAll('input').forEach(x=>{
 x.disabled=true
 })
+
 document.querySelectorAll('textarea').forEach(x=>{
 x.disabled=true
 })
+
 document.querySelectorAll('select').forEach(x=>{
-if(x.id!=='filtroItem'&&x.id!=='filtroSubitem'&&x.id!=='tipoGrafico'){
+
+if(
+x.id!=='filtroItem' &&
+x.id!=='filtroSubitem' &&
+x.id!=='tipoGrafico'
+){
 x.disabled=true
 }
+
 })
+
 document.querySelectorAll('button').forEach(b=>{
+
 let txt=(b.innerText||'').toUpperCase()
-if(txt.includes('SALVAR')||txt.includes('EXCLUIR')||txt.includes('ALTERAR')){
+
+if(
+txt.includes('SALVAR')||
+txt.includes('EXCLUIR')||
+txt.includes('ALTERAR')
+){
 b.style.display='none'
 }
+
 })
+
 if(!userP.permissao_pdf){
-document.querySelectorAll('.btn-pdf').forEach(b=>{
+
+document.querySelectorAll('.btn-pdf')
+.forEach(b=>{
 b.style.display='none'
 })
+
 }
+
 }
-switchTab(localStorage.getItem('activeTab')||'resumo')
+
+/* 🔥 ÚLTIMA ABA */
+
+switchTab(
+localStorage.getItem('activeTab')||
+'resumo'
+)
+
 await carregarDados()
+
 }
 
 async function carregarDados(){
