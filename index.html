@@ -296,7 +296,7 @@ color:#000000!important;
 <span class="block text-[7px] text-slate-500 font-bold uppercase">Média Geral TAG</span>
 <span id="total-geral" class="text-2xl font-black text-emerald-400">0%</span>
 </div>
-<button onclick="logout()" class="text-[9px] bg-white/5 text-slate-400 px-2 py-1 rounded">
+<button onclick="logout()" class="text-[11px] bg-red-700 hover:bg-red-800 text-white font-black px-4 py-2 rounded-xl shadow-lg">
 SAIR
 </button>
 </div>
@@ -884,27 +884,52 @@ document.getElementById('dataFim').value='2028-01-01'
 filtroDataInicio='2025-01-01'
 filtroDataFim='2028-01-01'
 document.getElementById('user-info').innerText=data.nome_completo+" | "+(data.cargo||'-')+" (Nível "+data.nivel_acesso+")"
-let pdfBox=document.getElementById('pdf-container')
-if(pdfBox){
-pdfBox.innerHTML=''
 let backupBox=document.getElementById('backup-container')
+
 if(backupBox){
+
 backupBox.innerHTML=''
-if(data.nivel_acesso===1){
+
+let adminsBackup=['manoel','vagner','gleidi']
+
+let podeBackup=
+Number(data.nivel_acesso)===1||
+adminsBackup.includes(
+(data.username||'').toLowerCase()
+)
+
+if(podeBackup){
+
 let btnBackup=document.createElement('button')
+
 btnBackup.id='btnBackup'
+
 btnBackup.innerText='BACKUP'
-btnBackup.className='bg-purple-600 px-3 py-1 rounded'
+
+btnBackup.className='bg-purple-700 hover:bg-purple-800 text-white font-black px-4 py-2 rounded-xl shadow-lg'
+
 btnBackup.onclick=function(){
+
 if(typeof backupCompleto==='function'){
+
 backupCompleto()
+
+}else if(typeof gerarJSON==='function'){
+
+gerarJSON(allData||[])
+
 }else{
-alert('Backup ainda não carregado.')
+
+alert('Função de backup não encontrada.')
+
 }
+
 }
+
 backupBox.appendChild(btnBackup)
+
 }
-}
+
 }
 if(userP.nivel_acesso===1||adminsTCERO.includes((userP.username||'').toLowerCase())){
 carregarPerfis()
@@ -1816,7 +1841,7 @@ lista=lista.sort(compareSubitem)
 
 let html=''
 
-if(selItem==='todos'){
+if(itemSelecionado==='todos'){
 
 html+=`
 <option value="TOTAL">
