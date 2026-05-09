@@ -1814,7 +1814,19 @@ String(i.item||i.numitem||'')===String(itemSelecionado)
 
 lista=lista.sort(compareSubitem)
 
-sel.innerHTML=lista.map(i=>{
+let html=''
+
+if(selItem==='todos'){
+
+html+=`
+<option value="TOTAL">
+TODOS OS SUBITENS
+</option>
+`
+
+}
+
+html+=lista.map(i=>{
 
 let total=getTotal(i)
 
@@ -1825,6 +1837,8 @@ ${i.subitem} • ${total}% • ${truncarTexto(i.descricao,90)}
 `
 
 }).join('')
+
+sel.innerHTML=html
 
 }
 
