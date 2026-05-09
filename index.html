@@ -1116,9 +1116,21 @@ let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/2
 let podeEditar=userP&&(Number(userP.nivel_acesso)===1||Number(userP.nivel_acesso)===2||String(i.responsavel_id)===String(userP.id))
 let responsavelTexto=i.responsavel||'-'
 let listaPerfis=[...(window.perfis||[]),...(window.perfisTCERO||[])]
-let perfilResponsavel=listaPerfis.find(p=>String(p.id)===String(i.responsavel_id))
+let perfilResponsavel=listaPerfis.find(p=>
+String(p.id)===String(i.responsavel_id)
+)
+
 if(perfilResponsavel){
+
 responsavelTexto=perfilResponsavel.nome_completo
+
+}else{
+
+responsavelTexto=
+i.responsavel||
+i.responsavel_manual||
+'Não informado'
+
 }
 return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="p-2 font-black text-blue-400">${i.subitem}</td>
@@ -1127,7 +1139,9 @@ return `<tr class="border-b border-white/5 tr-hover ${bg}">
 <td class="text-xs p-1">
 ${userP&&Number(userP.nivel_acesso)===1?
 `<select onchange="salvarResponsavel('${i.id}',this.value)" class="bg-slate-100 text-slate-900 font-semibold text-xs p-1 rounded w-full">
-<option value="">-</option>
+<option value="">
+${responsavelTexto||'-'}
+</option>
 ${listaPerfis.map(p=>`
 <option value="${p.id}" ${String(p.id)===String(i.responsavel_id)?'selected':''}>
 ${p.nome_completo}
