@@ -2500,56 +2500,141 @@ doc.save('pdf_graficos_tag_sedam.pdf')
 }
   
 async function gerarPDFCumpridos(){
+
 const {jsPDF}=window.jspdf
-let doc=new jsPDF('p','mm','a4')
-let lista=allData.filter(i=>getTotal(i)>=100).sort(compareSubitem)
-doc.setFontSize(14)
-doc.text('SUBITENS 100% CUMPRIDOS - TAG SEDAM 2026',10,12)
+
+let doc=new jsPDF('l','mm','a4')
+
+let lista=allData
+.filter(i=>getTotal(i)>=100)
+.sort(compareSubitem)
+
+doc.setFontSize(16)
+
+doc.text(
+'SUBITENS 100% CUMPRIDOS - TAG SEDAM 2026',
+10,
+12
+)
+
 doc.setFontSize(10)
-doc.text('TOTAL DE SUBITENS COM 100% DE EXECUÇÃO: '+lista.length,10,18)
+
+doc.text(
+'TOTAL DE SUBITENS COM 100% DE EXECUÇÃO: '+lista.length,
+10,
+19
+)
+
 let rows=lista.map(i=>[
 i.subitem||'-',
 i.descricao||'-',
 i.produto||'-',
 i.responsavel||'-'
 ])
+
 doc.autoTable({
-startY:20,
-head:[['Subitem','Descrição Completa','Produto','Responsável']],
+
+startY:24,
+
+head:[[
+'Subitem',
+'Descrição Completa',
+'Produto',
+'Responsável'
+]],
+
 body:rows,
+
+theme:'striped',
+
 styles:{
-fontSize:7,
-overflow:'linebreak'
+fontSize:5,
+overflow:'linebreak',
+cellPadding:1.2,
+valign:'top',
+textColor:[0,0,0]
 },
+
+headStyles:{
+fillColor:[37,99,235],
+textColor:[255,255,255],
+fontStyle:'bold',
+fontSize:6
+},
+
+alternateRowStyles:{
+fillColor:[245,245,245]
+},
+
 columnStyles:{
 0:{cellWidth:18},
-1:{cellWidth:92},
-2:{cellWidth:60},
-3:{cellWidth:30}
+1:{cellWidth:118},
+2:{cellWidth:78},
+3:{cellWidth:48}
 },
-didDrawPage:function(){
-doc.setTextColor(90,90,90)
+
+margin:{
+top:20,
+left:8,
+right:8,
+bottom:22
+},
+
+didDrawPage:function(data){
+
 let p=doc.internal.getCurrentPageInfo().pageNumber
 let t=doc.internal.getNumberOfPages()
-doc.setFontSize(6)
+
+doc.setTextColor(90,90,90)
+
 doc.setFontSize(4)
 
 doc.text(
 NOTA_TECNICA_PDF,
 10,
-258,
+188,
 {
-maxWidth:150,
+maxWidth:235,
 align:'left'
 }
 )
-doc.text('Página '+p+' de '+t,195,290,{align:'right'})
+
+doc.setFontSize(7)
+
+doc.text(
+'Página '+p+' de '+t,
+288,
+196,
+{
+align:'right'
 }
+)
+
+}
+
 })
-let finalY=doc.lastAutoTable.finalY+10
-doc.setFontSize(10)
-doc.text('O painel de subitens concluídos evidencia as ações estratégicas integralmente executadas, refletindo maturidade operacional, capacidade de entrega institucional e aderência às metas pactuadas no TAG SEDAM 2026.',10,finalY,{maxWidth:185})
+
+let finalY=doc.lastAutoTable.finalY+6
+
+if(finalY<170){
+
+doc.setFontSize(8)
+
+doc.setTextColor(0,0,0)
+
+doc.text(
+'O painel de subitens concluídos evidencia as ações estratégicas integralmente executadas, refletindo maturidade operacional, capacidade de entrega institucional e aderência às metas pactuadas no TAG SEDAM 2026.',
+10,
+finalY,
+{
+maxWidth:260
+}
+)
+
+}
+
 doc.save('pdf_100_cumpridos_tag_sedam.pdf')
+
 }
 
 async function carregarTCERO(){
