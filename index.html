@@ -420,25 +420,34 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 
 <div class="flex flex-wrap gap-2 mb-4" id="boxCadastroTCERO">
 
-<input id="t_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-[240px]">
+<input id="tc_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-[240px]">
 
-<input id="t_user" placeholder="Usuário" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
+<input id="tc_user" placeholder="Usuário" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
 
-<input id="t_senha" placeholder="Senha" class="bg-slate-800 p-2 rounded text-xs w-[90px]">
+<input id="tc_senha" placeholder="Senha" class="bg-slate-800 p-2 rounded text-xs w-[90px]">
 
-<input id="t_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-[220px]">
+<input id="tc_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-[220px]">
 
-<select id="t_pdf" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
-<option value="false">SEM PDF</option>
-<option value="true">COM PDF</option>
+<select id="tc_pdf" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
+<option value="NÃO">SEM PDF</option>
+<option value="SIM">COM PDF</option>
 </select>
 
-<select id="t_nivel" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
+<select id="tc_nivel" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
 <option value="4">Visualização</option>
 <option value="1">Administrador</option>
 </select>
 
-<button onclick="salvarPerfilTCERO()" class="bg-blue-700 px-3 py-2 rounded text-xs">
+<select id="tc_visualizacao" class="bg-slate-800 p-2 rounded text-xs w-[140px]">
+<option value="SUBITEM">SUBITEM</option>
+<option value="ITEM">ITEM</option>
+</select>
+
+<button onclick="novoTCERO()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2 rounded-xl">
+NOVO
+</button>
+
+<button id="btnSalvarTCERO" onclick="salvarPerfilTCERO()" class="bg-blue-700 px-3 py-2 rounded text-xs font-black">
 SALVAR
 </button>
 
@@ -2801,6 +2810,42 @@ behavior:'smooth'
 })
 
 }
+
+function novoTCERO(){
+
+window.editTCEROId=null
+
+let nome=document.getElementById('tc_nome')
+let user=document.getElementById('tc_user')
+let senha=document.getElementById('tc_senha')
+let cargo=document.getElementById('tc_cargo')
+let nivel=document.getElementById('tc_nivel')
+let pdf=document.getElementById('tc_pdf')
+let visual=document.getElementById('tc_visualizacao')
+
+if(nome)nome.value=''
+if(user)user.value=''
+if(senha)senha.value=''
+if(cargo)cargo.value=''
+if(nivel)nivel.value='4'
+if(pdf)pdf.value='NÃO'
+if(visual)visual.value='SUBITEM'
+
+let btn=document.getElementById('btnSalvarTCERO')
+
+if(btn){
+btn.innerText='INSERIR'
+btn.classList.remove('bg-amber-600')
+btn.classList.add('bg-blue-600')
+}
+
+window.scrollTo({
+top:0,
+behavior:'smooth'
+})
+
+}
+
 async function carregarTCERO(){
 
 let {data,error}=await client
