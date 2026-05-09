@@ -843,40 +843,31 @@ let allData=[]
 let myChart=null
 
 async function login(){
-
 let usuario=document.getElementById('u').value.trim().toLowerCase()
 let senha=document.getElementById('p').value.trim()
-
 if(!usuario||!senha){
 alert('Informe usuário e senha')
 return
 }
-
 let perfil=null
-
 let {data:p1}=await client
 .from('perfistce')
 .select('*')
 .eq('username',usuario)
 .eq('senha',senha)
 .limit(1)
-
 if(p1&&p1.length){
 perfil=p1[0]
 perfil.origem='TCERO'
 }else{
-
 let {data:p2}=await client
 .from('perfis')
 .select('*')
 .eq('username',usuario)
 .limit(1)
-
 if(p2&&p2.length){
-
 perfil=p2[0]
 perfil.origem='SEDAM'
-
 if(
 perfil.senha &&
 String(perfil.senha)!==String(senha)
@@ -884,35 +875,27 @@ String(perfil.senha)!==String(senha)
 alert('Senha inválida')
 return
 }
-
 }
-
 }
-
 if(!perfil){
 alert('Usuário não encontrado')
 return
 }
-
 window.userP=perfil
 userP=perfil
-
-localStorage.setItem('user',JSON.stringify(perfil))
+if(perfil.id){
 localStorage.setItem('uid',perfil.id)
-
+}
+localStorage.setItem('user',JSON.stringify(perfil))
 document.body.classList.remove('login-bg')
-
 document.getElementById('login-screen').classList.add('hidden')
-
 document.getElementById('dashboard').classList.remove('hidden')
-
 document.getElementById('user-info').innerHTML=
 (perfil.nome_completo||'-')+
 ' • '+
 (perfil.cargo||'-')+
 ' • '+
 (perfil.origem||'-')
-
 if(
 perfil.origem==='TCERO' &&
 (
@@ -921,33 +904,51 @@ perfil.username==='vagner'||
 perfil.username==='gleidi'
 )
 ){
-
 let tab=document.getElementById('tab-tcero')
-
 if(tab){
 tab.classList.remove('hidden')
 }
-
 }
-
 if(
 perfil.origem==='TCERO' &&
 Number(perfil.nivel_acesso)===4
 ){
-
 document.getElementById('tab-perfis').style.display='none'
 document.getElementById('tab-usuarios').style.display='none'
-
 }
-userP=perfil
-window.userP=perfil
+/* 🔥 BACKUP */
+let backupBox=document.getElementById('backup-container')
+if(backupBox){
+backupBox.innerHTML=''
+let adminsBackup=['manoel','vagner','gleidi']
+let usernameAtual=(perfil.username||'').toLowerCase()
+let podeBackup=
+Number(perfil.nivel_acesso)===1 &&
+adminsBackup.includes(usernameAtual)
+if(podeBackup){
+let btnBackup=document.createElement('button')
+btnBackup.id='btnBackup'
+btnBackup.innerText='BACKUP'
+btnBackup.className='bg-purple-700 hover:bg-purple-800 text-white font-black px-4 py-2 rounded-xl shadow-lg'
+btnBackup.onclick=function(){
+if(typeof backupCompleto==='function'){
+backupCompleto()
+}else if(typeof gerarJSON==='function'){
+gerarJSON(allData||[])
+}else{
+alert('Função de backup não encontrada.')
+}
+}
+backupBox.appendChild(btnBackup)
+}
+}
 switchTab(
 localStorage.getItem('activeTab')||'resumo'
 )
 await sincronizarResponsaveis()
 await carregarDados()
-
 }
+
 async function init(uid){
 document.body.classList.remove("login-bg")
 
