@@ -429,8 +429,8 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 <input id="tc_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-[220px]">
 
 <select id="tc_pdf" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
-<option value="NÃO">SEM PDF</option>
-<option value="SIM">COM PDF</option>
+<option value="false">SEM PDF</option>
+<option value="true">COM PDF</option>
 </select>
 
 <select id="tc_nivel" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
@@ -2793,7 +2793,7 @@ if(user)user.value=p.username||''
 if(senha)senha.value=p.senha||''
 if(cargo)cargo.value=p.cargo||''
 if(nivel)nivel.value=p.nivel_acesso||4
-if(pdf)pdf.value=p.permissao_pdf?'SIM':'NÃO'
+if(pdf)pdf.value=p.permissao_pdf?'true':'false'
 if(visual)visual.value=p.visualizacao||'SUBITEM'
 
 let btn=document.getElementById('btnSalvarTCERO')
@@ -2929,7 +2929,7 @@ let senha=document.getElementById('tc_senha').value.trim()
 let cargo=document.getElementById('tc_cargo').value.trim()
 
 let permissao_pdf=
-document.getElementById('tc_pdf').value==='SIM'
+document.getElementById('tc_pdf').value==='true'
 
 let nivel=Number(
 document.getElementById('tc_nivel').value||4
