@@ -287,83 +287,158 @@ color:#000000!important;
 </div>
 
 <div id="dashboard" class="hidden">
+
 <header class="flex justify-between items-center mb-4 px-2">
-<div><h2 class="text-lg font-black text-blue-400 leading-none tracking-tighter uppercase">Painel de Auditoria TAG 2026</h2><p id="user-info" class="text-[9px] text-slate-500 mt-1 uppercase italic"></p></div>
-<div class="flex items-center gap-4">
-<div id="pdf-container" class="flex items-center gap-2"></div>
-<div id="backup-container" class="flex items-center gap-2 min-w-[140px]"></div>
-<div class="text-right border-l border-white/10 pl-4">
-<span class="block text-[7px] text-slate-500 font-bold uppercase">Média Geral TAG</span>
-<span id="total-geral" class="text-2xl font-black text-emerald-400">0%</span>
+
+<div>
+<h2 class="text-lg font-black text-blue-400 leading-none tracking-tighter uppercase">
+Painel de Auditoria TAG 2026
+</h2>
+
+<p id="user-info" class="text-[9px] text-slate-500 mt-1 uppercase italic"></p>
 </div>
+
+<div class="flex items-center gap-4">
+
+<div id="pdf-container" class="flex items-center gap-2"></div>
+
+<div id="backup-container" class="flex items-center gap-2 min-w-[140px]"></div>
+
+<div class="text-right border-l border-white/10 pl-4">
+<span class="block text-[7px] text-slate-500 font-bold uppercase">
+Média Geral TAG
+</span>
+<span id="total-geral" class="text-2xl font-black text-emerald-400">
+0%
+</span>
+</div>
+
 <button onclick="logout()" class="text-[11px] bg-red-700 hover:bg-red-800 text-white font-black px-4 py-2 rounded-xl shadow-lg">
 SAIR
 </button>
+
 </div>
 
 </header>
 
 <nav class="flex gap-1 mb-4 border-b border-white/5 overflow-x-auto">
-<button onclick="switchTab('resumo')" id="tab-resumo" class="tab-btn tab-active">Resumo</button>
-<button onclick="switchTab('mensal')" id="tab-mensal" class="tab-btn">Monitoramento</button>
-<button onclick="switchTab('analise')" id="tab-analise" class="tab-btn">Gráficos</button>
-<button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">100% Cumpridos</button>
-<button id="tab-perfis" onclick="switchTab('perfis')" class="tab-btn hidden">PERFIS Sedam</button>
-<button id="tab-tcero" onclick="switchTab('tcero')" class="tab-btn hidden">PERFIS TCE-RO</button>
-<button id="tab-usuarios" onclick="switchTab('usuarios')" class="tab-btn">USUÁRIOS</button>
+
+<button onclick="switchTab('resumo')" id="tab-resumo" class="tab-btn tab-active">
+Resumo
+</button>
+
+<button onclick="switchTab('mensal')" id="tab-mensal" class="tab-btn">
+Monitoramento
+</button>
+
+<button onclick="switchTab('analise')" id="tab-analise" class="tab-btn">
+Gráficos
+</button>
+
+<button onclick="switchTab('concluidos')" id="tab-concluidos" class="tab-btn">
+100% Cumpridos
+</button>
+
+<button id="tab-perfis" onclick="switchTab('perfis')" class="tab-btn hidden">
+PERFIS Sedam
+</button>
+
+<button id="tab-tcero" onclick="switchTab('tcero')" class="tab-btn hidden">
+PERFIS TCE-RO
+</button>
+
+<button id="tab-usuarios" onclick="switchTab('usuarios')" class="tab-btn">
+USUÁRIOS
+</button>
+
 </nav>
 
 <div class="flex gap-2 mb-3 items-center justify-between">
+
 <div class="flex gap-2">
-<button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-blue-600 px-2 py-1 rounded">SUBITEM</button>
+<button onclick="modoResumo='subitem';renderResumo()" class="text-xs bg-blue-600 px-2 py-1 rounded">
+SUBITEM
+</button>
 </div>
+
 <div class="flex gap-2 items-center">
+
 <input id="dataInicio" type="date" onchange="aplicarFiltroData()" class="text-xs bg-slate-800 px-2 py-1 rounded">
+
 <input id="dataFim" type="date" onchange="aplicarFiltroData()" class="text-xs bg-slate-800 px-2 py-1 rounded">
-<button onclick="limparFiltroData()" class="text-xs bg-slate-600 px-2 py-1 rounded">LIMPAR</button>
-<button onclick="toggleOcultarConcluidos()" id="btn-ocultar" class="text-xs bg-slate-700 px-2 py-1 rounded">OCULTAR 100%</button>
-</div>
+
+<button onclick="limparFiltroData()" class="text-xs bg-slate-600 px-2 py-1 rounded">
+LIMPAR
+</button>
+
+<button onclick="toggleOcultarConcluidos()" id="btn-ocultar" class="text-xs bg-slate-700 px-2 py-1 rounded">
+OCULTAR 100%
+</button>
+
 </div>
 
-  
-<!-- ABA 1: RESUMO (CARDS SEMAFÓRICOS) -->
-<div id="view-resumo" class="tab-view"><div id="cards-container" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 2xl:grid-cols-28 gap-1"></div></div>
+</div>
 
-<button id="btn-voltar" onclick="fecharDrill()" 
-style="display:none"
-class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
+<!-- RESUMO -->
+
+<div id="view-resumo" class="tab-view">
+<div id="cards-container" class="grid grid-cols-6 sm:grid-cols-12 md:grid-cols-16 lg:grid-cols-20 2xl:grid-cols-28 gap-1"></div>
+</div>
+
+<button id="btn-voltar" onclick="fecharDrill()" style="display:none" class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 ← VOLTAR
 </button>
 
-<!-- ABA 2: MONITORAMENTO (TABELA COMPLETA) -->
+<!-- MONITORAMENTO -->
+
 <div id="view-mensal" class="tab-view hidden">
+
 <div class="bg-slate-900/40 rounded-xl border border-white/5 overflow-x-auto">
+
 <table class="w-full text-left border-collapse min-w-[1400px]">
+
 <thead>
+
 <tr class="text-[8px] text-slate-500 uppercase border-b border-white/10">
+
 <th>Sub-Item</th>
+
 <th>Descrição</th>
+
 <th>Produtos</th>
+
 <th>Responsável(is)</th>
+
 <th>Setor</th>
+
 <th>Data Início</th>
 
 <th class="opacity-40">JAN</th>
+
 <th class="opacity-40">FEV</th>
+
 <th class="opacity-40">MAR</th>
+
 <th class="text-blue-400">ABR</th>
+
 <th class="text-yellow-400">MAI</th>
 
 <th>Total</th>
+
 </tr>
+
 </thead>
 
 <tbody id="table-body" class="text-[10px]"></tbody>
+
 </table>
-</div>
+
 </div>
 
-<!-- ABA 3: ANÁLISE GRÁFICA -->
+</div>
+
+<!-- GRÁFICOS -->
+
 <div id="view-analise" class="tab-view hidden">
 
 <select id="tipoGrafico" class="hidden">
@@ -390,33 +465,61 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 
 </div>
 
-<!-- ABA 4: 100% CUMPRIDOS (LISTA DESCRITIVA) -->
+<!-- 100% -->
+
 <div id="view-concluidos" class="tab-view hidden">
+
 <div id="concluidos-container" class="grid grid-cols-6 sm:grid-cols-12 lg:grid-cols-18 gap-1 mb-8"></div>
+
 <div class="bg-slate-900/40 p-6 rounded-xl border border-emerald-500/20">
-<h3 style="font-size:22px;font-weight:900;color:#000000;margin-bottom:18px;text-transform:uppercase;">Descrição das Ações Cumpridas (100%)</h3>
+
+<h3 style="font-size:22px;font-weight:900;color:#000000;margin-bottom:18px;text-transform:uppercase;">
+Descrição das Ações Cumpridas (100%)
+</h3>
+
 <div id="concluidos-list" class="space-y-2 text-[10px] text-slate-400"></div>
-</div>
+
 </div>
 
+</div>
+
+<!-- PERFIS SEDAM -->
+
 <div id="view-perfis" class="tab-view hidden">
-<div class="flex gap-2 mb-3">
-<input id="p_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-1/4">
-<input id="p_user" placeholder="Username" class="bg-slate-800 p-2 rounded text-xs w-1/5">
-<input id="p_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-1/5">
-<input id="p_setor" placeholder="Setor" class="bg-slate-800 p-2 rounded text-xs w-1/5">
-<select id="p_nivel" class="bg-slate-800 p-2 rounded text-xs w-1/6">
+
+<div class="flex flex-wrap gap-2 mb-3">
+
+<input id="p_nome" placeholder="Nome completo" class="bg-slate-800 p-2 rounded text-xs w-[240px]">
+
+<input id="p_user" placeholder="Username" class="bg-slate-800 p-2 rounded text-xs w-[140px]">
+
+<input id="p_cargo" placeholder="Cargo" class="bg-slate-800 p-2 rounded text-xs w-[180px]">
+
+<input id="p_setor" placeholder="Setor" class="bg-slate-800 p-2 rounded text-xs w-[160px]">
+
+<select id="p_nivel" class="bg-slate-800 p-2 rounded text-xs w-[120px]">
 <option value="1">Nível 1</option>
 <option value="2">Nível 2</option>
 <option value="3">Nível 3</option>
 </select>
-<button onclick="salvarPerfil()" class="bg-emerald-600 px-3 py-2 rounded text-xs">SALVAR</button>
-</div>
-<div id="listaPerfis" class="text-xs"></div>
+
+<button onclick="salvarPerfil()" class="bg-emerald-600 px-3 py-2 rounded text-xs font-black">
+SALVAR
+</button>
+
 </div>
 
+<div id="listaPerfis" class="text-xs"></div>
+
+</div>
+
+<!-- PERFIS TCE -->
+
 <div id="view-tcero" class="tab-view hidden">
-<div class="text-xs text-slate-300 mb-2 font-bold uppercase">SERVIDORES TCE-RO</div>
+
+<div class="text-xs text-slate-300 mb-2 font-bold uppercase">
+SERVIDORES TCE-RO
+</div>
 
 <div class="flex flex-wrap gap-2 mb-4" id="boxCadastroTCERO">
 
@@ -438,11 +541,6 @@ class="mb-2 text-xs bg-red-600 px-2 py-1 rounded">
 <option value="1">Administrador</option>
 </select>
 
-<select id="tc_visualizacao" class="bg-slate-800 p-2 rounded text-xs w-[140px]">
-<option value="SUBITEM">SUBITEM</option>
-<option value="ITEM">ITEM</option>
-</select>
-
 <button onclick="novoTCERO()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-4 py-2 rounded-xl">
 NOVO
 </button>
@@ -456,12 +554,19 @@ SALVAR
 <div class="overflow-x-auto">
 
 <div class="grid grid-cols-6 gap-2 text-[10px] font-black uppercase border-b border-white/20 pb-2 mb-2">
+
 <div>Nome</div>
+
 <div>Usuário</div>
+
 <div>Cargo</div>
+
 <div>Nível</div>
+
 <div>PDF</div>
+
 <div>Ações</div>
+
 </div>
 
 <div id="listaTCERO" class="text-xs"></div>
@@ -470,12 +575,18 @@ SALVAR
 
 </div>
 
+<!-- USUÁRIOS -->
+
 <div id="view-usuarios" class="tab-view hidden">
-<div class="text-xs text-slate-300 mb-2 font-bold">USUÁRIOS CADASTRADOS</div>
-<div id="listaUsuarios" class="text-xs"></div>
+
+<div class="text-xs text-slate-300 mb-2 font-bold">
+USUÁRIOS CADASTRADOS
 </div>
 
-  
+<div id="listaUsuarios" class="text-xs"></div>
+
+</div>
+
 </div>
 
 <script>
