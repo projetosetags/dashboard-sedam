@@ -2205,52 +2205,262 @@ doc.text('O monitoramento consolidado demonstra '+lista.length+' subitens estrat
 doc.save('pdf_monitoramento_tag_sedam.pdf')
 }
 async function gerarPDFGraficos(){
+
 const {jsPDF}=window.jspdf
+
 let doc=new jsPDF('p','mm','a4')
+
 doc.setFontSize(14)
+
+doc.setTextColor(0,0,0)
+
 doc.text('ANÁLISE GRÁFICA - TAG SEDAM 2026',10,12)
+
 let canvas=document.getElementById('chartMaster')
+
 if(!canvas){
 alert('Gráfico não encontrado')
 return
 }
-let img=canvas.toDataURL('image/png',1.0)
-doc.addImage(img,'PNG',10,20,190,90)
+
 let info=window.graficoAtualInfo||{}
+
+let itemGrafico='-'
+let subitemGrafico='-'
+let descricaoGrafico='-'
+let produtoGrafico='-'
+let responsavelGrafico='-'
+let setorGrafico='-'
+let vencimentoGrafico='-'
+
+if(info.tipo==='subitem'){
+
+let registro=allData.find(x=>
+String(x.id)===String(info.subitem)
+)
+
+if(registro){
+
+itemGrafico=
+registro.item||
+registro.numitem||
+'-'
+
+subitemGrafico=
+registro.subitem||
+'-'
+
+descricaoGrafico=
+registro.descricao||
+'-'
+
+produtoGrafico=
+registro.produto||
+'-'
+
+responsavelGrafico=
+registro.responsavel||
+registro.responsavel_manual||
+'-'
+
+setorGrafico=
+registro.setor||
+'-'
+
+vencimentoGrafico=
+registro.prazo_texto||
+registro.data_inicio||
+'-'
+
+}
+
+}
+
+doc.setFontSize(12)
+
+doc.setTextColor(0,0,0)
+
+doc.text(
+'DETALHAMENTO DO ITEM ANALISADO',
+10,
+22
+)
+
+doc.setFontSize(10)
+
+doc.text(
+'ITEM: '+itemGrafico,
+10,
+32
+)
+
+doc.text(
+'SUBITEM: '+subitemGrafico,
+10,
+39
+)
+
+doc.text(
+'RESPONSÁVEL: '+responsavelGrafico,
+10,
+46
+)
+
+doc.text(
+'SETOR: '+setorGrafico,
+10,
+53
+)
+
+doc.text(
+'DATA DE VENCIMENTO: '+vencimentoGrafico,
+10,
+60
+)
+
+doc.text(
+'PRODUTO:',
+10,
+70
+)
+
+doc.text(
+produtoGrafico,
+10,
+77,
+{
+maxWidth:185
+}
+)
+
+doc.text(
+'DESCRIÇÃO:',
+10,
+92
+)
+
+doc.text(
+descricaoGrafico,
+10,
+99,
+{
+maxWidth:185
+}
+)
+
+let img=canvas.toDataURL('image/png',1.0)
+
+doc.addImage(
+img,
+'PNG',
+10,
+125,
+190,
+90
+)
+
 let textoIA=''
+
 if(info.tipo==='todos'){
+
 let jan=info.jan||0
 let fev=info.fev||0
 let mar=info.mar||0
 let abr=info.abr||0
 let mai=info.mai||0
-textoIA='O gráfico apresentado demonstra a evolução consolidada do TOTAL GERAL dos itens e subitens monitorados no TAG SEDAM 2026. Os percentuais apurados indicam: JAN '+jan+'%, FEV '+fev+'%, MAR '+mar+'%, ABR '+abr+'% e MAI '+mai+'%. Observa-se comportamento evolutivo institucional das ações estratégicas monitoradas, permitindo análise consolidada da maturidade operacional, efetividade das entregas e desempenho progressivo das unidades responsáveis.'
+
+textoIA=
+'O gráfico apresentado demonstra a evolução consolidada do TOTAL GERAL dos itens e subitens monitorados no TAG SEDAM 2026. Os percentuais apurados indicam: JAN '+jan+'%, FEV '+fev+'%, MAR '+mar+'%, ABR '+abr+'% e MAI '+mai+'%. Observa-se comportamento evolutivo institucional das ações estratégicas monitoradas, permitindo análise consolidada da maturidade operacional, efetividade das entregas e desempenho progressivo das unidades responsáveis.'
+
 }else if(info.tipo==='item'){
+
 let itemAtual=info.item||'-'
-let lista=allData.filter(i=>(i.item||i.numitem||'').toString()===itemAtual.toString())
-let abr=Math.round(lista.reduce((acc,c)=>acc+Number(c.abr||0),0)/(lista.length||1))
-let mai=Math.round(lista.reduce((acc,c)=>acc+Number(c.mai||0),0)/(lista.length||1))
+
+let lista=allData.filter(i=>
+(i.item||i.numitem||'').toString()===
+itemAtual.toString()
+)
+
+let abr=Math.round(
+lista.reduce((acc,c)=>
+acc+Number(c.abr||0)
+,0)/(lista.length||1)
+)
+
+let mai=Math.round(
+lista.reduce((acc,c)=>
+acc+Number(c.mai||0)
+,0)/(lista.length||1)
+)
+
 let evolucao=mai-abr
-textoIA='O gráfico apresentado refere-se especificamente ao ITEM '+itemAtual+' do TAG SEDAM 2026. A análise consolidada demonstra média percentual de '+abr+'% no mês de abril e '+mai+'% no mês de maio, representando evolução de '+evolucao+' pontos percentuais. Os resultados evidenciam o comportamento operacional dos subitens vinculados ao referido item estratégico, permitindo avaliação comparativa da execução das ações, produtos entregues e desempenho institucional associado.'
+
+textoIA=
+'O gráfico apresentado refere-se especificamente ao ITEM '+itemAtual+' do TAG SEDAM 2026. A análise consolidada demonstra média percentual de '+abr+'% no mês de abril e '+mai+'% no mês de maio, representando evolução de '+evolucao+' pontos percentuais. Os resultados evidenciam o comportamento operacional dos subitens vinculados ao referido item estratégico, permitindo avaliação comparativa da execução das ações, produtos entregues e desempenho institucional associado.'
+
 }else if(info.tipo==='subitem'){
-let reg=allData.find(x=>String(x.id)===String(info.subitem))
+
+let reg=allData.find(x=>
+String(x.id)===String(info.subitem)
+)
+
 if(reg){
-textoIA='O gráfico apresentado refere-se ao SUBITEM '+reg.subitem+', vinculado ao ITEM '+(reg.item||'-')+'. O comportamento gráfico demonstra a evolução temporal da execução da ação estratégica monitorada, atualmente com percentual consolidado de '+getTotal(reg)+'%. A análise permite rastreamento individualizado da entrega institucional, produtos associados, desempenho mensal e evolução progressiva da execução vinculada à unidade responsável.'
+
+textoIA=
+'O gráfico apresentado refere-se ao SUBITEM '+reg.subitem+', vinculado ao ITEM '+(reg.item||'-')+'. O comportamento gráfico demonstra a evolução temporal da execução da ação estratégica monitorada, atualmente com percentual consolidado de '+getTotal(reg)+'%. A análise permite rastreamento individualizado da entrega institucional, produtos associados, desempenho mensal e evolução progressiva da execução vinculada à unidade responsável.'
+
 }else{
-textoIA='O gráfico apresenta análise evolutiva das metas monitoradas.'
+
+textoIA=
+'O gráfico apresenta análise evolutiva das metas monitoradas.'
+
 }
+
 }
+
 doc.setFontSize(10)
-doc.text(textoIA,10,125,{maxWidth:190})
+
+doc.text(
+textoIA,
+10,
+223,
+{
+maxWidth:190
+}
+)
+
 let totalPages=doc.internal.getNumberOfPages()
+
 for(let i=1;i<=totalPages;i++){
+
 doc.setPage(i)
+
 doc.setFontSize(6)
-doc.text(NOTA_TECNICA_PDF,10,282,{maxWidth:190})
-doc.text('Página '+i+' de '+totalPages,195,290,{align:'right'})
+
+doc.text(
+NOTA_TECNICA_PDF,
+10,
+282,
+{
+maxWidth:190
 }
+)
+
+doc.text(
+'Página '+i+' de '+totalPages,
+195,
+290,
+{
+align:'right'
+}
+)
+
+}
+
 doc.save('pdf_graficos_tag_sedam.pdf')
+
 }
+  
 async function gerarPDFCumpridos(){
 const {jsPDF}=window.jspdf
 let doc=new jsPDF('p','mm','a4')
