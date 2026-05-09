@@ -821,15 +821,33 @@ const descItens={"1":"Planejamento Estratégico e Governança","2":"Análise e R
 let modoResumo='subitem'
 let modoGrupo='subitem'
 document.addEventListener("DOMContentLoaded",()=>{
-let uid=localStorage.getItem("uid")
+
+let userLocal=localStorage.getItem("user")
+
+let uid=null
+
+try{
+
+let u=JSON.parse(userLocal||'{}')
+
+if(u&&u.id){
+uid=u.id
+}
+
+}catch(e){
+uid=null
+}
+
 document.getElementById('dataInicio').value='2025-01-01'
 document.getElementById('dataFim').value='2028-01-01'
 document.body.classList.add("login-bg")
 filtroDataInicio='2025-01-01'
 filtroDataFim='2028-01-01'
-if(uid){
+if(uid&&String(uid)!=='undefined'&&String(uid)!=='null'){
 init(uid)
 }else{
+localStorage.removeItem('uid')
+localStorage.removeItem('user')
 const lastTab=localStorage.getItem('activeTab')
 if(lastTab)switchTab(lastTab)
 }
