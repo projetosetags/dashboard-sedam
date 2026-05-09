@@ -890,13 +890,9 @@ if(backupBox){
 
 backupBox.innerHTML=''
 
-let adminsBackup=['manoel','vagner','gleidi']
-
 let podeBackup=
-Number(data.nivel_acesso)===1||
-adminsBackup.includes(
-(data.username||'').toLowerCase()
-)
+Number(data.nivel_acesso)===1 &&
+(data.username||'').toLowerCase()!=='hueriqui'
 
 if(podeBackup){
 
