@@ -340,7 +340,7 @@ Gráficos
 </button>
 
 <button id="tab-perfis" onclick="switchTab('perfis')" class="tab-btn hidden">
-PERFIS Sedam
+PERFIS SEDAM
 </button>
 
 <button id="tab-tcero" onclick="switchTab('tcero')" class="tab-btn hidden">
@@ -642,16 +642,47 @@ document.getElementById('listaUsuarios').innerHTML=html
 }
 
 async function carregarPerfis(){
+
+if(!userP)return
+
+let isAdminSedam=
+Number(userP.nivel_acesso)===1
+
+let isTCERO=
+(userP.origem||'')==='TCERO'
+
+let isUsuarioSedam=
+(userP.origem||'')==='SEDAM'
+
 if(
-userP &&
-Number(userP.nivel_acesso)!==1 &&
-!['manoel','vagner','gleidi','charles'].includes(
+isTCERO &&
+!['manoel','vagner','gleidi'].includes(
 (userP.username||'').toLowerCase()
 )
-)return
-let {data,error}=await client.from('perfis').select('*').order('nome_completo')
-if(error){console.error(error);return}
+){
+return
+}
+
+let query=client
+.from('perfis')
+.select('*')
+.order('nome_completo')
+
+if(!isAdminSedam){
+
+query=query.eq('id',userP.id)
+
+}
+
+let {data,error}=await query
+
+if(error){
+console.error(error)
+return
+}
+
 window.perfis=data||[]
+
 let html=`
 <table class="w-full text-xs">
 <thead>
@@ -666,7 +697,14 @@ let html=`
 </thead>
 <tbody>
 ${window.perfis.map(p=>{
-let isOculto=USUARIOS_OCULTOS.includes((p.username||'').toLowerCase())
+
+let isOculto=USUARIOS_OCULTOS.includes(
+(p.username||'').toLowerCase()
+)
+
+let podeEditar=
+isAdminSedam
+
 return `
 <tr class="border-b border-white/10 hover:bg-white/5">
 <td class="p-2">${p.nome_completo||'-'}</td>
@@ -675,21 +713,36 @@ return `
 <td class="p-2">${p.setor||'-'}</td>
 <td class="p-2">N${p.nivel_acesso||'-'}</td>
 <td class="p-2 text-right">
-<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''} onclick="editarPerfil('${p.id}')" class="bg-blue-600 px-2 py-1 rounded mr-1">Editar</button>
-<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''} onclick="excluirPerfil('${p.id}')" class="bg-red-600 px-2 py-1 rounded">Excluir</button>
+${podeEditar?`
+<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''} onclick="editarPerfil('${p.id}')" class="bg-blue-600 px-2 py-1 rounded mr-1">
+Editar
+</button>
+<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''} onclick="excluirPerfil('${p.id}')" class="bg-red-600 px-2 py-1 rounded">
+Excluir
+</button>
+`:`<span class="text-slate-500 font-black">VISUALIZAÇÃO</span>`}
 </td>
 </tr>
 `
+
 }).join('')}
 </tbody>
 </table>
 `
+
 document.getElementById('listaPerfis').innerHTML=html
+
 }
 
 let editPerfilId=null
 async function salvarPerfil(){
-if(userP && Number(userP.nivel_acesso)!=1)return
+
+if(!userP)return
+
+if(Number(userP.nivel_acesso)!==1){
+alert("Sem permissão")
+return
+}
 
 let nome=document.getElementById('p_nome').value.trim()
 let user=document.getElementById('p_user').value.trim().toLowerCase()
@@ -710,12 +763,21 @@ setor:setor,
 nivel_acesso:nivel
 }
 
-let res
+let res=null
 
 if(editPerfilId){
-res=await client.from('perfis').update(payload).eq('id',editPerfilId)
+
+res=await client
+.from('perfis')
+.update(payload)
+.eq('id',editPerfilId)
+
 }else{
-res=await client.from('perfis').insert(payload)
+
+res=await client
+.from('perfis')
+.insert(payload)
+
 }
 
 if(res.error){
@@ -724,8 +786,8 @@ alert("Erro ao salvar")
 return
 }
 
-/* 🔥 LIMPA ESTADO */
 editPerfilId=null
+
 document.getElementById('p_nome').value=''
 document.getElementById('p_user').value=''
 document.getElementById('p_cargo').value=''
@@ -733,9 +795,11 @@ document.getElementById('p_setor').value=''
 document.getElementById('p_nivel').value='3'
 
 await carregarPerfis()
+
 await atualizarResponsaveis?.()
 
-alert("Salvo com sucesso")
+alert("Perfil Sedam salvo com sucesso")
+
 }
 
 function editarPerfil(id){
@@ -870,6 +934,7 @@ window.S_KEY
 let userP=null
 let allData=[]
 let myChart=null
+  
 async function login(){
 let usuario=document.getElementById('u').value.trim().toLowerCase()
 let senha=document.getElementById('p').value.trim()
@@ -921,25 +986,81 @@ document.getElementById('user-info').innerHTML=
 (perfil.cargo||'-')+
 ' • '+
 (perfil.origem||'-')
-if(
-perfil.origem==='TCERO'&&
-(
-perfil.username==='manoel'||
-perfil.username==='vagner'||
-perfil.username==='gleidi'
-)
-){
-let tab=document.getElementById('tab-tcero')
-if(tab){
-tab.classList.remove('hidden')
+let tabPerfis=document.getElementById('tab-perfis')
+let tabTCERO=document.getElementById('tab-tcero')
+
+if(tabPerfis){
+tabPerfis.classList.add('hidden')
 }
+
+if(tabTCERO){
+tabTCERO.classList.add('hidden')
 }
+
+let usernameAtual=(perfil.username||'').toLowerCase()
+
+let adminsTCERO=[
+'manoel',
+'vagner',
+'gleidi'
+]
+
 if(
-perfil.origem==='TCERO'&&
-Number(perfil.nivel_acesso)===4
+perfil.origem==='SEDAM'
 ){
-document.getElementById('tab-perfis').style.display='none'
-document.getElementById('tab-usuarios').style.display='none'
+
+if(tabPerfis){
+tabPerfis.classList.remove('hidden')
+tabPerfis.innerText='PERFIS SEDAM'
+}
+
+if(tabTCERO){
+tabTCERO.style.display='none'
+}
+
+}
+
+if(
+perfil.origem==='TCERO' &&
+adminsTCERO.includes(usernameAtual)
+){
+
+if(tabPerfis){
+tabPerfis.classList.remove('hidden')
+tabPerfis.innerText='PERFIS SEDAM'
+}
+
+if(tabTCERO){
+tabTCERO.classList.remove('hidden')
+tabTCERO.style.display='inline-block'
+}
+
+}
+
+if(
+perfil.origem==='TCERO' &&
+!adminsTCERO.includes(usernameAtual)
+){
+
+if(tabPerfis){
+tabPerfis.style.display='none'
+}
+
+if(tabTCERO){
+tabTCERO.style.display='none'
+}
+
+}
+
+if(
+perfil.origem==='SEDAM' &&
+usernameAtual==='hueriqui'
+){
+
+if(tabTCERO){
+tabTCERO.style.display='none'
+}
+
 }
 let backupBox=document.getElementById('backup-container')
 if(backupBox){
