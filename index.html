@@ -2731,47 +2731,107 @@ behavior:'smooth'
 }
 
 async function carregarTCERO(){
+
 let lista=document.getElementById('listaTCERO')
+
 if(!lista)return
+
 lista.innerHTML='<div class="p-4 font-bold">Carregando Perfis TCE-RO...</div>'
+
 let {data,error}=await client
 .from('perfistce')
 .select('*')
 .order('nome_completo',{ascending:true})
+
 if(error){
 console.error(error)
 lista.innerHTML='<div class="p-4 text-red-700 font-bold">Erro ao carregar.</div>'
 return
 }
+
 window.perfisTCERO=data||[]
+
 let podeEditar=
 ['manoel','vagner','gleidi']
 .includes(
 ((window.userP&&window.userP.username)||'').toLowerCase()
 )
+
 document.getElementById('boxCadastroTCERO').style.display=
 podeEditar?'flex':'none'
+
 if(!data||!data.length){
 lista.innerHTML='<div class="p-4 font-bold">Nenhum perfil encontrado.</div>'
 return
 }
-lista.innerHTML=`<div class="overflow-x-auto"><table class="w-full border-separate border-spacing-y-2"><thead><tr class="text-[11px] uppercase font-black text-slate-700"><th class="text-left px-3 py-2">Nome</th><th class="text-left px-3 py-2">Usuário</th><th class="text-left px-3 py-2">Cargo</th><th class="text-center px-3 py-2">Nível</th><th class="text-center px-3 py-2">PDF</th><th class="text-center px-3 py-2">Ações</th></tr></thead><tbody>
+
+lista.innerHTML=`<div class="overflow-x-auto rounded-3xl bg-white/60 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,.06)]"><table class="w-full min-w-[1100px] border-separate border-spacing-y-2">
+<thead>
+<tr class="text-[11px] uppercase font-black text-slate-700">
+<th class="text-left px-4 py-3">Nome</th>
+<th class="text-left px-4 py-3">Usuário</th>
+<th class="text-left px-4 py-3">Cargo</th>
+<th class="text-center px-4 py-3">Nível</th>
+<th class="text-center px-4 py-3">PDF</th>
+<th class="text-center px-4 py-3">Ações</th>
+</tr>
+</thead>
+<tbody>
 ${data.map(p=>`
-<tr class="bg-white/88 shadow-[0_4px_18px_rgba(0,0,0,0.06)]">
-<td class="px-4 py-3 font-black text-[14px] text-slate-800 rounded-l-2xl">${p.nome_completo||'-'}</td>
-<td class="px-4 py-3 text-[12px] font-bold text-slate-600">${p.username||'-'}</td>
-<td class="px-4 py-3 text-[12px] font-semibold text-slate-600">${p.cargo||'-'}</td>
-<td class="px-4 py-3 text-center"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl text-[11px] font-black">Nível ${p.nivel_acesso||'-'}</span></td>
-<td class="px-4 py-3 text-center"><button onclick="gerarPDFPerfil('${p.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">PDF</button></td>
-<td class="px-4 py-3 text-center rounded-r-2xl">
+<tr class="bg-white/92 hover:bg-amber-50 transition shadow-[0_4px_18px_rgba(0,0,0,0.05)]">
+<td class="px-3 py-2 rounded-l-2xl">
+<input id="nome_${p.id}" value="${p.nome_completo||''}" class="w-full bg-transparent text-[13px] font-black outline-none border-none">
+</td>
+<td class="px-3 py-2">
+<input id="user_${p.id}" value="${p.username||''}" class="w-full bg-transparent text-[12px] font-bold outline-none border-none text-blue-900">
+</td>
+<td class="px-3 py-2">
+<input id="cargo_${p.id}" value="${p.cargo||''}" class="w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+</td>
+<td class="px-3 py-2 text-center">
+<select id="nivel_${p.id}" class="bg-blue-100 text-blue-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none">
+<option value="1" ${Number(p.nivel_acesso)===1?'selected':''}>Nível 1</option>
+<option value="2" ${Number(p.nivel_acesso)===2?'selected':''}>Nível 2</option>
+<option value="3" ${Number(p.nivel_acesso)===3?'selected':''}>Nível 3</option>
+<option value="4" ${Number(p.nivel_acesso)===4?'selected':''}>Nível 4</option>
+</select>
+</td>
+<td class="px-3 py-2 text-center">
+${Number(p.nivel_acesso)===1?`<button onclick="gerarPDFPerfil('${p.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">PDF</button>`:`<span class="text-[10px] font-black opacity-40">SEM PDF</span>`}
+</td>
+<td class="px-3 py-2 text-center rounded-r-2xl">
 <div class="flex gap-2 justify-center">
-${podeEditar?`<button onclick="editarPerfilTCERO('${p.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">EDITAR</button>`:''}
+${podeEditar?`<button onclick="salvarLinhaTCERO('${p.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">SALVAR</button>`:''}
 ${podeEditar?`<button onclick="excluirTCERO('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">EXCLUIR</button>`:''}
 </div>
 </td>
 </tr>
 `).join('')}
-</tbody></table></div>`
+</tbody>
+</table></div>`
+
+}
+
+window.salvarLinhaTCERO=async function(id){
+let nome=document.getElementById('nome_'+id)?.value||''
+let username=document.getElementById('user_'+id)?.value||''
+let cargo=document.getElementById('cargo_'+id)?.value||''
+let nivel=document.getElementById('nivel_'+id)?.value||1
+let {error}=await client
+.from('perfistce')
+.update({
+nome_completo:nome,
+username:username,
+cargo:cargo,
+nivel_acesso:Number(nivel)
+})
+.eq('id',id)
+if(error){
+console.error(error)
+alert('Erro ao salvar')
+return
+}
+await carregarTCERO()
 }
 
 async function salvarPerfilTCERO(){
