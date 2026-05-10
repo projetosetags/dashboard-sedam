@@ -14,10 +14,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <style>
 body{
+<img src="bandeira-ro.png" id="bandeiraFlutuante">
 background:#f5f0e6;
 color:#000000;
 font-family:'Inter',sans-serif;
 margin:0;
+}
+body{
+background:url('portovelho.png') center center/cover no-repeat fixed;
 }
 .card-micro{
 padding:0.15rem;
@@ -260,6 +264,25 @@ color:#000000!important;
 color:#000000!important;
 }
 nav{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:10px!important;overflow-x:auto!important}.tab-btn{min-height:78px!important;padding:.7rem!important;font-size:.72rem!important;border-radius:22px!important;gap:4px!important}.tab-btn div:first-child{font-size:26px!important;margin-bottom:2px!important}.tab-btn div:last-child{font-size:11px!important;line-height:1.1!important}
+#bandeiraFlutuante{
+position:fixed;
+top:18px;
+right:18px;
+width:180px;
+z-index:999;
+pointer-events:none;
+animation:flamular 5s ease-in-out infinite;
+filter:drop-shadow(0 8px 20px rgba(0,0,0,.25));
+transform-origin:left center;
+opacity:.95;
+}
+@keyframes flamular{
+0%{transform:perspective(900px) rotateY(0deg) translateY(0px)}
+25%{transform:perspective(900px) rotateY(-6deg) translateY(-2px)}
+50%{transform:perspective(900px) rotateY(4deg) translateY(1px)}
+75%{transform:perspective(900px) rotateY(-5deg) translateY(-1px)}
+100%{transform:perspective(900px) rotateY(0deg) translateY(0px)}
+}
   
 </style>
 
