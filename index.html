@@ -1690,8 +1690,8 @@ right:5
 didDrawPage:function(data){
 let pageHeight=doc.internal.pageSize.height
 let pageWidth=doc.internal.pageSize.width
-let p=data.pageNumber
-let t=data.pageCount
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.pages.length-1
 doc.setFillColor(255,255,255)
 doc.rect(0,pageHeight-34,pageWidth,34,'F')
 doc.setTextColor(90,90,90)
@@ -2216,8 +2216,8 @@ right:5
 didDrawPage:function(data){
 let pageHeight=doc.internal.pageSize.height
 let pageWidth=doc.internal.pageSize.width
-let p=data.pageNumber
-let t=data.pageCount
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.pages.length-1
 doc.setFillColor(255,255,255)
 doc.rect(0,pageHeight-34,pageWidth,34,'F')
 doc.setTextColor(90,90,90)
@@ -2269,8 +2269,8 @@ right:5
 didDrawPage:function(data){
 let pageHeight=doc.internal.pageSize.height
 let pageWidth=doc.internal.pageSize.width
-let p=data.pageNumber
-let t=data.pageCount
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.pages.length-1
 doc.setFillColor(255,255,255)
 doc.rect(0,pageHeight-34,pageWidth,34,'F')
 doc.setTextColor(90,90,90)
@@ -2342,8 +2342,8 @@ right:5
 didDrawPage:function(data){
 let pageHeight=doc.internal.pageSize.height
 let pageWidth=doc.internal.pageSize.width
-let p=data.pageNumber
-let t=data.pageCount
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.pages.length-1
 doc.setFillColor(255,255,255)
 doc.rect(0,pageHeight-34,pageWidth,34,'F')
 doc.setTextColor(90,90,90)
@@ -2695,8 +2695,8 @@ bottom:38
 didDrawPage:function(data){
 let pageHeight=doc.internal.pageSize.height
 let pageWidth=doc.internal.pageSize.width
-let p=data.pageNumber
-let t=data.pageCount
+let p=doc.internal.getCurrentPageInfo().pageNumber
+let t=doc.internal.pages.length-1
 doc.setFillColor(255,255,255)
 doc.rect(0,pageHeight-34,pageWidth,34,'F')
 doc.setTextColor(90,90,90)
