@@ -204,15 +204,106 @@ return
 }
 window.perfisTCERO=data||[]
 let podeEditar=['manoel','vagner','gleidi'].includes(((window.userP&&window.userP.username)||'').toLowerCase())
-
 let boxCadastro=document.getElementById('boxCadastroTCERO')
 if(boxCadastro){
 boxCadastro.style.display=podeEditar?'flex':'none'
 }
-
 if(!data||!data.length){
 lista.innerHTML='<div class="p-4 font-bold">Nenhum perfil encontrado.</div>'
 return
 }
-lista.innerHTML=`<div class="flex justify-end items-center gap-2 mb-3">${podeEditar?`<button id="btnEditarTCERO" onclick="ativarEdicaoTCERO()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">EDITAR</button>`:''}${podeEditar?`<button id="btnSalvarTCERO" onclick="salvarEdicaoTCERO()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]" hidden>SALVAR</button>`:''}</div><div class="overflow-x-auto rounded-3xl bg-white/60 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,.06)]"><table class="w-full min-w-[1100px] border-separate border-spacing-y-2"><thead><tr class="text-[11px] uppercase font-black text-slate-700"><th class="text-left px-4 py-3">Nome</th><th class="text-left px-4 py-3">Usuário</th><th class="text-left px-4 py-3">Cargo</th><th class="text-center px-4 py-3">Nível</th><th class="text-center px-4 py-3">PDF</th><th class="text-center px-4 py-3">Ações</th></tr></thead><tbody>${data.map(p=>`<tr class="linha-tcero bg-white/92 hover:bg-amber-50 transition shadow-[0_4px_18px_rgba(0,0,0,0.05)]" data-id="${p.id}"><td class="px-3 py-2 rounded-l-2xl"><input id="nome_${p.id}" value="${p.nome_completo||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[13px] font-black outline-none border-none"></td><td class="px-3 py-2"><input id="user_${p.id}" value="${p.username||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[12px] font-bold outline-none border-none text-blue-900"></td><td class="px-3 py-2"><input id="cargo_${p.id}" value="${p.cargo||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none"></td><td class="px-3 py-2 text-center"><select id="nivel_${p.id}" disabled class="campo-editavel-tcero opacity-70 bg-blue-100 text-blue-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none"><option value="1" ${Number(p.nivel_acesso)===1?'selected':''}>Nível 1</option><option value="2" ${Number(p.nivel_acesso)===2?'selected':''}>Nível 2</option><option value="3" ${Number(p.nivel_acesso)===3?'selected':''}>Nível 3</option><option value="4" ${Number(p.nivel_acesso)===4?'selected':''}>Nível 4</option></select></td><td class="px-3 py-2 text-center"><select id="pdf_${p.id}" ${Number(p.nivel_acesso)!==1?'disabled':''} class="campo-editavel-tcero opacity-70 bg-amber-100 text-amber-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none"><option value="SIM" ${p.permissao_pdf?'selected':''}>COM PDF</option><option value="NAO" ${!p.permissao_pdf?'selected':''}>SEM PDF</option></select></td><td class="px-3 py-2 text-center rounded-r-2xl">${podeEditar?`<button onclick="excluirTCERO('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">EXCLUIR</button>`:''}</td></tr>`).join('')}</tbody></table></div>`
+lista.innerHTML=`
+<div class="flex justify-end items-center gap-2 mb-3">
+
+${podeEditar?`
+<button onclick="novoTCERO()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+INSERIR
+</button>
+`:''}
+
+${podeEditar?`
+<button id="btnEditarTCERO" onclick="ativarEdicaoTCERO()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+EDITAR
+</button>
+`:''}
+
+${podeEditar?`
+<button id="btnSalvarTCERO" onclick="salvarEdicaoTCERO()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]" hidden>
+SALVAR
+</button>
+`:''}
+
+</div>
+
+<div class="overflow-x-auto rounded-3xl bg-white/60 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,.06)]">
+
+<table class="w-full min-w-[1100px] border-separate border-spacing-y-2">
+
+<thead>
+
+<tr class="text-[11px] uppercase font-black text-slate-700">
+
+<th class="text-left px-4 py-3">Nome</th>
+<th class="text-left px-4 py-3">Usuário</th>
+<th class="text-left px-4 py-3">Cargo</th>
+<th class="text-center px-4 py-3">Nível</th>
+<th class="text-center px-4 py-3">PDF</th>
+<th class="text-center px-4 py-3">Ações</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${data.map(p=>`
+
+<tr class="linha-tcero bg-white/92 hover:bg-amber-50 transition shadow-[0_4px_18px_rgba(0,0,0,0.05)]" data-id="${p.id}">
+
+<td class="px-3 py-2 rounded-l-2xl">
+<input id="nome_${p.id}" value="${p.nome_completo||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[13px] font-black outline-none border-none">
+</td>
+
+<td class="px-3 py-2">
+<input id="user_${p.id}" value="${p.username||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[12px] font-bold outline-none border-none text-blue-900">
+</td>
+
+<td class="px-3 py-2">
+<input id="cargo_${p.id}" value="${p.cargo||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+</td>
+
+<td class="px-3 py-2 text-center">
+<select id="nivel_${p.id}" disabled class="campo-editavel-tcero opacity-70 bg-blue-100 text-blue-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none">
+<option value="1" ${Number(p.nivel_acesso)===1?'selected':''}>Nível 1</option>
+<option value="2" ${Number(p.nivel_acesso)===2?'selected':''}>Nível 2</option>
+<option value="3" ${Number(p.nivel_acesso)===3?'selected':''}>Nível 3</option>
+<option value="4" ${Number(p.nivel_acesso)===4?'selected':''}>Nível 4</option>
+</select>
+</td>
+
+<td class="px-3 py-2 text-center">
+<select id="pdf_${p.id}" ${Number(p.nivel_acesso)!==1?'disabled':''} class="campo-editavel-tcero opacity-70 bg-amber-100 text-amber-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none">
+<option value="SIM" ${p.permissao_pdf?'selected':''}>COM PDF</option>
+<option value="NAO" ${!p.permissao_pdf?'selected':''}>SEM PDF</option>
+</select>
+</td>
+
+<td class="px-3 py-2 text-center rounded-r-2xl">
+${podeEditar?`
+<button onclick="excluirTCERO('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">
+EXCLUIR
+</button>
+`:''}
+</td>
+
+</tr>
+
+`).join('')}
+
+</tbody>
+
+</table>
+
+</div>
+`
 }
