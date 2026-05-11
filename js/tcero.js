@@ -212,47 +212,55 @@ alert('Alterações salvas com sucesso')
 async function carregarTCERO(){
 let lista=document.getElementById('listaTCERO')
 if(!lista)return
+
 lista.innerHTML='<div class="p-4 font-bold">Carregando Perfis TCE-RO...</div>'
-let {data,error}=await client.from('perfistce').select('*').order('nome_completo',{ascending:true})
+
+let {data,error}=await client
+.from('perfistce')
+.select('*')
+.order('nome_completo',{ascending:true})
+
 if(error){
 console.error(error)
 lista.innerHTML='<div class="p-4 text-red-700 font-bold">Erro ao carregar.</div>'
 return
 }
+
 window.perfisTCERO=data||[]
-let podeEditar=['manoel','vagner','gleidi'].includes(((window.userP&&window.userP.username)||'').toLowerCase())
+
+let podeEditar=['manoel','vagner','gleidi']
+.includes(
+((window.userP&&window.userP.username)||'')
+.toLowerCase()
+)
+
 let boxCadastro=document.getElementById('boxCadastroTCERO')
-if(boxCadastro){
+
 if(boxCadastro){
 boxCadastro.style.display='flex'
+
 if(!podeEditar){
 boxCadastro.classList.add('opacity-50','pointer-events-none')
 }else{
 boxCadastro.classList.remove('opacity-50','pointer-events-none')
 }
 }
-}
+
 if(!data||!data.length){
 lista.innerHTML='<div class="p-4 font-bold">Nenhum perfil encontrado.</div>'
 return
 }
-lista.innerHTML=`
-<div class="flex justify-end items-center gap-2 mb-3">
 
-${podeEditar?`
-<button onclick="novoTCERO()" id="btnNovoTCERO" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
-INSERIR
-</button>
-`:''}
+lista.innerHTML=`
+
+<div class="flex justify-end items-center gap-2 mb-3">
 
 ${podeEditar?`
 <button id="btnEditarTCERO" onclick="ativarEdicaoTCERO()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
 EDITAR
 </button>
 `:''}
-<button id="btnInserirTCERO" onclick="salvarNovoTCERO()" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow">
-INSERIR
-</button>
+
 ${podeEditar?`
 <button id="btnSalvarTCERO" onclick="salvarEdicaoTCERO()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]" hidden>
 SALVAR
@@ -263,7 +271,7 @@ SALVAR
 
 <div class="overflow-x-auto rounded-3xl bg-white/60 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,.06)]">
 
-<table class="w-full min-w-[1100px] border-separate border-spacing-y-2">
+<table class="w-full min-w-[1200px] border-separate border-spacing-y-2">
 
 <thead>
 
@@ -320,11 +328,13 @@ ${data.map(p=>`
 </td>
 
 <td class="px-3 py-2 text-center rounded-r-2xl">
-${podeEditar?`
+
+${podeEditar&&Number(p.nivel_acesso)!==1?`
 <button onclick="excluirTCERO('${p.id}')" class="btn-excluir-tcero hidden bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">
 EXCLUIR
 </button>
 `:''}
+
 </td>
 
 </tr>
