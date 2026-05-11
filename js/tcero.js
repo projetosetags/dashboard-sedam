@@ -31,7 +31,7 @@ window.scrollTo({top:0,behavior:'smooth'})
 /*=========================================================
 002 TCERO FUNCTION NOVOTCERO
 =========================================================*/
-function novoTCERO(){
+window.novoTCERO=function(){
 window.editTCEROId=null
 let nome=document.getElementById('tc_nome')
 let user=document.getElementById('tc_user')
@@ -50,6 +50,7 @@ if(btn){
 btn.innerText='INSERIR'
 btn.classList.remove('bg-amber-600')
 btn.classList.add('bg-blue-600')
+btn.classList.remove('hidden')
 }
 window.scrollTo({top:0,behavior:'smooth'})
 }
