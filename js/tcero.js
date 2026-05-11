@@ -245,6 +245,12 @@ lista.innerHTML=`
 <div class="flex justify-end items-center gap-2 mb-3">
 
 ${podeEditar?`
+<button onclick="novoTCERO()" id="btnNovoTCERO" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+INSERIR
+</button>
+`:''}
+
+${podeEditar?`
 <button id="btnEditarTCERO" onclick="ativarEdicaoTCERO()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
 EDITAR
 </button>
