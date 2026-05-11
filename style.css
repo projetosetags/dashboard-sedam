@@ -1,0 +1,54 @@
+/* =========================================================
+001 BODY
+========================================================= */
+body{background:#f5f0e6;color:#000;font-family:'Inter',sans-serif;margin:0;overflow-x:hidden}
+
+/* =========================================================
+002 LOGIN BACKGROUND
+========================================================= */
+body.login-bg{background:url('../img/portovelho.png') center center/cover no-repeat fixed!important}
+
+/* =========================================================
+003 BANDEIRA
+========================================================= */
+#bandeiraFlutuante{position:fixed;top:145px;left:50%;transform:translateX(-50%);width:320px;z-index:0;pointer-events:none;opacity:.28}
+
+/* =========================================================
+004 TAB BUTTON
+========================================================= */
+.tab-btn{padding:.7rem;border-radius:22px;background:rgba(255,255,255,.82);font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* =========================================================
+005 TAB ACTIVE
+========================================================= */
+.tab-active{background:linear-gradient(180deg,rgba(255,248,238,.98),rgba(239,223,198,.94))!important}
+
+/* =========================================================
+006 CARD MICRO
+========================================================= */
+.card-micro{padding:.15rem;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:4px}
+
+/* =========================================================
+007 STATUS
+========================================================= */
+.bg-status-red{background-color:#d6b7a7!important}
+.bg-status-yellow{background-color:#dcc9a3!important}
+.bg-status-green{background-color:#b9c9b1!important}
+
+/* =========================================================
+008 CHART
+========================================================= */
+canvas{width:100%!important;height:420px!important}
+
+/* =========================================================
+009 DESC SUBITEM
+========================================================= */
+#descSubitem{background:#dbeafe;border:2px solid #1e3a8a;color:#000;font-size:18px;font-weight:800;padding:18px;border-radius:14px;line-height:1.8}
+
+/* =========================================================
+010 RESPONSIVO
+========================================================= */
+@media(max-width:768px){
+.tab-btn{min-height:68px;font-size:.62rem}
+canvas{height:auto!important}
+}
