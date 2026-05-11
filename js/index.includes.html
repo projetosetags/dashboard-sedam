@@ -1,0 +1,55 @@
+<!--=========================================================
+001 INDEX.HTML HEAD IMPORTS
+=========================================================-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="icon" href="data:,">
+<title>Monitoramento TAG Sedam 2026</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<link rel="stylesheet" href="001-style.css">
+</head>
+<!--=========================================================
+002 INDEX.HTML BODY
+=========================================================-->
+<body class="p-2 md:p-4">
+<img src="bandeira-ro.png" id="bandeiraFlutuante">
+<!--=========================================================
+003 INDEX.HTML LOGIN
+=========================================================-->
+<div id="login-screen" class="min-h-screen flex items-center justify-center">
+<div class="bg-slate-900/70 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl w-full max-w-xs text-center">
+<h1 class="text-xl font-black text-blue-400 mb-6 uppercase">TAG Sedam-RO</h1>
+<input type="text" id="u" placeholder="Usuário" class="w-full p-3 mb-3 bg-slate-800 rounded-lg text-white text-sm">
+<input type="password" id="p" placeholder="Senha" class="w-full p-3 mb-4 bg-slate-800 rounded-lg text-white text-sm">
+<button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold text-sm">ACESSAR PAINEL</button>
+</div>
+</div>
+<!--=========================================================
+004 INDEX.HTML DASHBOARD
+=========================================================-->
+<div id="dashboard" class="hidden">
+<!-- TODO: INSERIR TODO O HTML DOS PAINÉIS -->
+</div>
+<!--=========================================================
+005 INDEX.HTML IMPORTS JS
+=========================================================-->
+<script src="002-js/globals.js"></script>
+<script src="002-js/utils.js"></script>
+<script src="002-js/login.js"></script>
+<script src="002-js/sedam-core.js"></script>
+<script src="002-js/sedam-render.js"></script>
+<script src="002-js/sedam-graficos.js"></script>
+<script src="002-js/sedam-pdf.js"></script>
+<script src="002-js/sedam-relatorios.js"></script>
+<script src="002-js/tcero.js"></script>
+</body>
+</html>
