@@ -250,7 +250,9 @@ ${podeEditar?`
 EDITAR
 </button>
 `:''}
-
+<button id="btnInserirTCERO" onclick="salvarNovoTCERO()" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow">
+INSERIR
+</button>
 ${podeEditar?`
 <button id="btnSalvarTCERO" onclick="salvarEdicaoTCERO()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]" hidden>
 SALVAR
@@ -335,4 +337,42 @@ EXCLUIR
 
 </div>
 `
+}
+window.salvarNovoTCERO=async function(){
+
+let nome=document.getElementById('tc_nome')?.value||''
+let username=document.getElementById('tc_user')?.value||''
+let senha=document.getElementById('tc_senha')?.value||''
+let cargo=document.getElementById('tc_cargo')?.value||''
+let nivel=document.getElementById('tc_nivel')?.value||4
+let permissao=document.getElementById('tc_pdf')?.value==='true'
+
+if(!nome||!username){
+alert('Preencha nome e usuário')
+return
+}
+
+let {error}=await client
+.from('perfistce')
+.insert({
+nome_completo:nome,
+username:username,
+senha:senha,
+cargo:cargo,
+nivel_acesso:Number(nivel),
+permissao_pdf:permissao
+})
+
+if(error){
+console.error(error)
+alert('Erro ao inserir')
+return
+}
+
+alert('Usuário inserido com sucesso')
+
+await carregarTCERO()
+
+novoTCERO()
+
 }
