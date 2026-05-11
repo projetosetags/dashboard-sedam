@@ -45,13 +45,7 @@ if(senha)senha.value=''
 if(cargo)cargo.value=''
 if(nivel)nivel.value='4'
 if(pdf)pdf.value='false'
-let btn=document.getElementById('btnSalvarTCERO')
-if(btn){
-btn.innerText='INSERIR'
-btn.classList.remove('bg-amber-600')
-btn.classList.add('bg-blue-600')
-btn.classList.remove('hidden')
-}
+
 window.scrollTo({top:0,behavior:'smooth'})
 }
 /*=========================================================
