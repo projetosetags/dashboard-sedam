@@ -179,9 +179,17 @@ let id=l.dataset.id
 let nome=document.getElementById('nome_'+id)?.value||''
 let username=document.getElementById('user_'+id)?.value||''
 let cargo=document.getElementById('cargo_'+id)?.value||''
+let senha=document.getElementById('senha_'+id)?.value||''
 let nivel=document.getElementById('nivel_'+id)?.value||1
 let permissao=document.getElementById('pdf_'+id)?.value==='SIM'
-let {error}=await client.from('perfistce').update({nome_completo:nome,username:username,cargo:cargo,nivel_acesso:Number(nivel),permissao_pdf:permissao}).eq('id',id)
+let {error}=await client.from('perfistce').update({
+nome_completo:nome,
+username:username,
+cargo:cargo,
+senha:senha,
+nivel_acesso:Number(nivel),
+permissao_pdf:permissao
+}).eq('id',id)
 if(error){
 console.error(error)
 alert('Erro ao salvar alterações')
@@ -193,6 +201,14 @@ await carregarTCERO()
 document.querySelectorAll('.btn-excluir-tcero').forEach(b=>{
 b.classList.add('hidden')
 })
+let btnSalvar=document.getElementById('btnSalvarTCERO')
+if(btnSalvar){
+btnSalvar.classList.add('hidden')
+}
+let btnEditar=document.getElementById('btnEditarTCERO')
+if(btnEditar){
+btnEditar.classList.remove('hidden')
+}
 alert('Alterações salvas com sucesso')
 }
 /*=========================================================
