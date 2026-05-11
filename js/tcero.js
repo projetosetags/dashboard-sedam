@@ -240,6 +240,7 @@ SALVAR
 <th class="text-left px-4 py-3">Nome</th>
 <th class="text-left px-4 py-3">Usuário</th>
 <th class="text-left px-4 py-3">Cargo</th>
+<th class="text-left px-4 py-3">Senha</th>
 <th class="text-center px-4 py-3">Nível</th>
 <th class="text-center px-4 py-3">PDF</th>
 <th class="text-center px-4 py-3">Ações</th>
@@ -264,6 +265,10 @@ ${data.map(p=>`
 
 <td class="px-3 py-2">
 <input id="cargo_${p.id}" value="${p.cargo||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+</td>
+
+<td class="px-3 py-2">
+<input id="senha_${p.id}" value="${p.senha||''}" disabled class="campo-editavel-tcero opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none text-red-700">
 </td>
 
 <td class="px-3 py-2 text-center">
