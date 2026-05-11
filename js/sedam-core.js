@@ -319,11 +319,86 @@ console.error(error)
 return
 }
 window.perfis=data||[]
-let html=`<table class="w-full text-xs"><thead><tr class="text-slate-400 border-b border-white/20"><th class="text-left p-2">Nome</th><th class="text-left p-2">Username</th><th class="text-left p-2">Cargo</th><th class="text-left p-2">Setor</th><th class="text-left p-2">Nível</th><th class="text-right p-2">Ações</th></tr></thead><tbody>${window.perfis.map(p=>{let isOculto=USUARIOS_OCULTOS.includes((p.username||'').toLowerCase());let podeEditar=isAdminSedam;return`<tr class="border-b border-white/10 hover:bg-white/5"><td class="p-2">${p.nome_completo||'-'}</td><td class="p-2">${p.username||'-'}</td><td class="p-2">${p.cargo||'-'}</td><td class="p-2">${p.setor||'-'}</td><td class="p-2">N${p.nivel_acesso||'-'}</td><td class="p-2 text-right">${podeEditar?`<button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''} onclick="editarPerfil('${p.id}')" class="bg-blue-600 px-2 py-1 rounded mr-1">Editar</button><button ${isOculto?'disabled style="opacity:0.3;pointer-events:none"':''} onclick="excluirPerfil('${p.id}')" class="bg-red-600 px-2 py-1 rounded">Excluir</button>`:`<span class="text-slate-500 font-black">VISUALIZAÇÃO</span>`}</td></tr>`}).join('')}</tbody></table>`
+let podeEditar=isAdminSedam||['manoel','vagner','gleidi'].includes((userP.username||'').toLowerCase())
+let html=`
+<div class="flex justify-end items-center gap-2 mb-3">
+${podeEditar?`
+<button onclick="novoPerfil()" id="btnNovoPerfil" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+INSERIR
+</button>
+`:''}
+${podeEditar?`
+<button id="btnEditarPerfis" onclick="ativarEdicaoPerfis()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+EDITAR
+</button>
+`:''}
+${podeEditar?`
+<button id="btnSalvarPerfis" onclick="salvarEdicaoPerfis()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]" hidden>
+SALVAR
+</button>
+`:''}
+</div>
+<div class="overflow-x-auto rounded-3xl bg-white/60 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,.06)]">
+<table class="w-full min-w-[1200px] border-separate border-spacing-y-2">
+<thead>
+<tr class="text-[11px] uppercase font-black text-slate-700">
+<th class="text-left px-4 py-3">Nome</th>
+<th class="text-left px-4 py-3">Usuário</th>
+<th class="text-left px-4 py-3">Senha</th>
+<th class="text-left px-4 py-3">Cargo</th>
+<th class="text-left px-4 py-3">Setor</th>
+<th class="text-center px-4 py-3">Nível</th>
+<th class="text-center px-4 py-3">Ações</th>
+</tr>
+</thead>
+<tbody>
+${window.perfis.map(p=>{
+let isOculto=USUARIOS_OCULTOS.includes((p.username||'').toLowerCase())
+return`
+<tr class="linha-perfil bg-white/92 hover:bg-amber-50 transition shadow-[0_4px_18px_rgba(0,0,0,0.05)]" data-id="${p.id}">
+<td class="px-3 py-2 rounded-l-2xl">
+<input id="nome_pf_${p.id}" value="${p.nome_completo||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[13px] font-black outline-none border-none">
+</td>
+<td class="px-3 py-2">
+<input id="user_pf_${p.id}" value="${p.username||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-bold outline-none border-none text-blue-900">
+</td>
+<td class="px-3 py-2">
+<input id="senha_pf_${p.id}" value="${p.senha||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none text-red-700">
+</td>
+<td class="px-3 py-2">
+<input id="cargo_pf_${p.id}" value="${p.cargo||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+</td>
+<td class="px-3 py-2">
+<input id="setor_pf_${p.id}" value="${p.setor||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+</td>
+<td class="px-3 py-2 text-center">
+<select id="nivel_pf_${p.id}" disabled class="campo-editavel-perfil opacity-70 bg-blue-100 text-blue-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none">
+<option value="1" ${Number(p.nivel_acesso)===1?'selected':''}>Nível 1</option>
+<option value="2" ${Number(p.nivel_acesso)===2?'selected':''}>Nível 2</option>
+<option value="3" ${Number(p.nivel_acesso)===3?'selected':''}>Nível 3</option>
+<option value="4" ${Number(p.nivel_acesso)===4?'selected':''}>Nível 4</option>
+</select>
+</td>
+<td class="px-3 py-2 text-center rounded-r-2xl">
+${podeEditar?`
+<button ${isOculto?'disabled style="opacity:.25;pointer-events:none"':''} onclick="excluirPerfil('${p.id}')" class="btn-excluir-perfil hidden bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">
+EXCLUIR
+</button>
+`:''}
+</td>
+</tr>
+`
+}).join('')}
+</tbody>
+</table>
+</div>
+`
 document.getElementById('listaPerfis').innerHTML=html
 }
 
-
+/*=========================================================
+007 DASHBOARD
+=========================================================*/
 
 let dashLinha=null
 let dashPizza=null
