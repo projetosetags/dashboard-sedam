@@ -81,7 +81,7 @@ let adminsTCERO=['manoel','vagner','gleidi']
 if(perfil.origem==='SEDAM'){
 if(tabPerfis){
 tabPerfis.classList.remove('hidden')
-tabPerfis.innerText='PERFIS SEDAM'
+tabPerfis.innerHTML='<div>👥</div><div>Perfis Sedam</div>'
 }
 if(tabTCERO){
 tabTCERO.style.display='none'
