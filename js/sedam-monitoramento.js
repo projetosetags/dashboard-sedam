@@ -73,10 +73,10 @@ SUBITEM ${subitemNumero}
 ${media}%
 </div>
 </div>
-<div style="font-size:10px;font-weight:800;color:#000000;margin-top:3px;padding:2px;text-align:center;line-height:1.15;">
+<div style="font-size:11px;font-weight:800;color:#000000;margin-top:6px;padding:4px;text-align:center;line-height:1.25;max-width:100%;">
 ${descricao||'SEM DESCRIÇÃO'}
 </div>
-<div style="font-size:9px;font-weight:900;color:#0f172a;text-align:center;line-height:1.1;margin-top:2px;">
+<div style="font-size:10px;font-weight:900;color:#0f172a;text-align:center;line-height:1.2;margin-top:4px;padding-bottom:4px;">
 ${responsavel}
 </div>
 </div>
