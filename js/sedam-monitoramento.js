@@ -28,11 +28,28 @@ if(!key)return
 if(!mapa[key])mapa[key]=[]
 mapa[key].push(i)
 })
-let keys=Object.keys(mapa).filter(k=>k).sort((a,b)=>{
-let pa=parseSubitemParts(a.includes('.')?a:(a+'.0'))
-let pb=parseSubitemParts(b.includes('.')?b:(b+'.0'))
+let keys=Object.keys(mapa)
+.filter(k=>k)
+.sort((a,b)=>{
+
+function ordem(v){
+
+let p=String(v).split('.')
+
+return{
+n1:parseInt(p[0]||0),
+n2:parseInt(p[1]||0)
+}
+
+}
+
+let pa=ordem(a)
+let pb=ordem(b)
+
 if(pa.n1!==pb.n1)return pa.n1-pb.n1
+
 return pa.n2-pb.n2
+
 })
 let html=''
 keys.forEach(k=>{
@@ -43,24 +60,15 @@ let cor=media<=30?'bg-status-red':media>=100?'bg-status-green':'bg-status-yellow
 let itemBase=lista[0]||{}
 
 let descricao=''
+
 if(modoResumo==='item'){
-let itemPai=String(itemBase.item||'').split('.')[0]
-let registrosItem=(window.allData||[])
-.filter(x=>String(x.item||'').split('.')[0]===itemPai)
-let mapaDesc={}
-registrosItem.forEach(r=>{
-let chave=String(r.subitem||r.item||'')
-if(
-r.descricaoitem&&
-r.descricaoitem.trim()&&
-!mapaDesc[chave]
-){
-mapaDesc[chave]=r.descricaoitem.trim()
-}
-})
-descricao=Object.entries(mapaDesc)
-.map(([k,v])=>`<div style="margin-top:3px;"><b>${k}</b> - ${v}</div>`)
-.join('')
+
+descricao=
+lista.find(x=>
+x.descricaoitem&&
+x.descricaoitem.trim()
+)?.descricaoitem||''
+
 }else{
 descricao=
 lista.find(x=>x.descricao&&x.descricao.trim())?.descricao||
@@ -76,7 +84,7 @@ html+=`
 <div class="flex flex-col">
 <div class="card-micro ${cor}" onclick="abrirDetalhesResumo('${itemClick}')" style="padding:10px;min-height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
 <div style="font-size:13px;font-weight:900;color:#000000;line-height:1;">
-ITEM ${itemNumero}
+ITEM ${String(itemNumero)}
 </div>
 <div style="font-size:11px;font-weight:900;color:#0f172a;line-height:1;margin-top:2px;">
 SUBITEM ${subitemNumero}
