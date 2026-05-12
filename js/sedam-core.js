@@ -324,29 +324,64 @@ console.error(error)
 return
 }
 window.perfis=data||[]
-let podeEditar=isAdminSedam||['manoel','vagner','gleidi'].includes((userP.username||'').toLowerCase())
 let html=`
-<div class="flex justify-end items-center gap-2 mb-3">
-${podeEditar?`
-<button onclick="novoPerfil()" id="btnNovoPerfil" class="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+<div class="flex justify-end items-center gap-3 mb-4">
+
+${isAdminSedam?`
+<button id="btnNovoPerfilSedam" onclick="novoPerfilSedam()" class="bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded-2xl text-[12px] font-black shadow-xl min-w-[130px]">
 INSERIR
 </button>
 `:''}
-${podeEditar?`
-<button id="btnEditarPerfis" onclick="ativarEdicaoPerfis()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]">
+
+${isAdminSedam?`
+<button id="btnEditarPerfilSedam" onclick="ativarEdicaoPerfisSedam()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-[12px] font-black shadow-xl min-w-[130px]">
 EDITAR
 </button>
 `:''}
-${podeEditar?`
-<button id="btnSalvarPerfis" onclick="salvarEdicaoPerfis()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-2xl text-[11px] font-black shadow flex items-center justify-center min-w-[110px]" hidden>
+
+${isAdminSedam?`
+<button id="btnSalvarPerfilSedam" onclick="salvarEdicaoPerfisSedam()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-2xl text-[12px] font-black shadow-xl min-w-[130px]" hidden>
 SALVAR
 </button>
 `:''}
+
 </div>
+
+<div id="boxCadastroPerfilSedam" class="hidden bg-white/80 backdrop-blur-sm rounded-3xl p-5 mb-5 shadow-[0_8px_30px_rgba(0,0,0,.08)]">
+
+<div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+
+<input id="novo_nome_sedam" placeholder="Nome Completo" class="bg-white rounded-2xl px-4 py-3 font-black outline-none border border-slate-200">
+
+<input id="novo_user_sedam" placeholder="Usuário" class="bg-white rounded-2xl px-4 py-3 font-black outline-none border border-slate-200">
+
+<input id="novo_senha_sedam" placeholder="Senha" class="bg-white rounded-2xl px-4 py-3 font-black outline-none border border-slate-200">
+
+<input id="novo_cargo_sedam" placeholder="Cargo" class="bg-white rounded-2xl px-4 py-3 font-black outline-none border border-slate-200">
+
+<select id="novo_nivel_sedam" class="bg-white rounded-2xl px-4 py-3 font-black outline-none border border-slate-200">
+<option value="1">Nível 1</option>
+<option value="2">Nível 2</option>
+<option value="3">Nível 3</option>
+<option value="4" selected>Nível 4</option>
+</select>
+
+<button onclick="salvarNovoPerfilSedam()" class="bg-violet-600 hover:bg-violet-700 text-white rounded-2xl px-5 py-3 font-black shadow-xl">
+INSERIR
+</button>
+
+</div>
+
+</div>
+
 <div class="overflow-x-auto rounded-3xl bg-white/60 backdrop-blur-sm shadow-[0_8px_30px_rgba(0,0,0,.06)]">
-<table class="w-full min-w-[1200px] border-separate border-spacing-y-2">
+
+<table class="w-full min-w-[1100px] border-separate border-spacing-y-2">
+
 <thead>
+
 <tr class="text-[11px] uppercase font-black text-slate-700">
+
 <th class="text-left px-4 py-3">Nome</th>
 <th class="text-left px-4 py-3">Usuário</th>
 <th class="text-left px-4 py-3">Senha</th>
@@ -354,51 +389,162 @@ SALVAR
 <th class="text-left px-4 py-3">Setor</th>
 <th class="text-center px-4 py-3">Nível</th>
 <th class="text-center px-4 py-3">Ações</th>
+
 </tr>
+
 </thead>
+
 <tbody>
-${window.perfis.map(p=>{
-let isOculto=USUARIOS_OCULTOS.includes((p.username||'').toLowerCase())
-return`
-<tr class="linha-perfil bg-white/92 hover:bg-amber-50 transition shadow-[0_4px_18px_rgba(0,0,0,0.05)]" data-id="${p.id}">
+
+${window.perfis.map(p=>`
+
+<tr class="linha-perfil-sedam bg-white/92 hover:bg-amber-50 transition shadow-[0_4px_18px_rgba(0,0,0,0.05)]" data-id="${p.id}">
+
 <td class="px-3 py-2 rounded-l-2xl">
-<input id="nome_pf_${p.id}" value="${p.nome_completo||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[13px] font-black outline-none border-none">
+<input id="nome_sedam_${p.id}" value="${p.nome_completo||''}" disabled class="campo-editavel-sedam opacity-70 w-full bg-transparent text-[13px] font-black outline-none border-none">
 </td>
+
 <td class="px-3 py-2">
-<input id="user_pf_${p.id}" value="${p.username||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-bold outline-none border-none text-blue-900">
+<input id="user_sedam_${p.id}" value="${p.username||''}" disabled class="campo-editavel-sedam opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none">
 </td>
+
 <td class="px-3 py-2">
-<input id="senha_pf_${p.id}" value="${p.senha||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none text-red-700">
+<input id="senha_sedam_${p.id}" value="${p.senha||''}" disabled class="campo-editavel-sedam opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none text-red-700">
 </td>
+
 <td class="px-3 py-2">
-<input id="cargo_pf_${p.id}" value="${p.cargo||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+<input id="cargo_sedam_${p.id}" value="${p.cargo||''}" disabled class="campo-editavel-sedam opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none">
 </td>
+
 <td class="px-3 py-2">
-<input id="setor_pf_${p.id}" value="${p.setor||''}" disabled class="campo-editavel-perfil opacity-70 w-full bg-transparent text-[12px] font-semibold outline-none border-none">
+<input id="setor_sedam_${p.id}" value="${p.setor||''}" disabled class="campo-editavel-sedam opacity-70 w-full bg-transparent text-[12px] font-black outline-none border-none">
 </td>
+
 <td class="px-3 py-2 text-center">
-<select id="nivel_pf_${p.id}" disabled class="campo-editavel-perfil opacity-70 bg-blue-100 text-blue-700 px-2 py-1 rounded-xl text-[11px] font-black border-none outline-none">
+<select id="nivel_sedam_${p.id}" disabled class="campo-editavel-sedam opacity-70 bg-blue-100 text-blue-700 px-3 py-2 rounded-xl text-[11px] font-black border-none outline-none">
 <option value="1" ${Number(p.nivel_acesso)===1?'selected':''}>Nível 1</option>
 <option value="2" ${Number(p.nivel_acesso)===2?'selected':''}>Nível 2</option>
 <option value="3" ${Number(p.nivel_acesso)===3?'selected':''}>Nível 3</option>
 <option value="4" ${Number(p.nivel_acesso)===4?'selected':''}>Nível 4</option>
 </select>
 </td>
+
 <td class="px-3 py-2 text-center rounded-r-2xl">
-${podeEditar?`
-<button ${isOculto?'disabled style="opacity:.25;pointer-events:none"':''} onclick="excluirPerfil('${p.id}')" class="btn-excluir-perfil hidden bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">
+${isAdminSedam?`
+<button onclick="excluirPerfil('${p.id}')" class="btn-excluir-sedam hidden bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-[10px] font-black shadow">
 EXCLUIR
 </button>
 `:''}
 </td>
+
 </tr>
-`
-}).join('')}
+
+`).join('')}
+
 </tbody>
+
 </table>
+
 </div>
 `
 document.getElementById('listaPerfis').innerHTML=html
+}
+/*=========================================================
+006A SEDAM FUNCTION NOVOPERFILSEDAM
+=========================================================*/
+function novoPerfilSedam(){
+let box=document.getElementById('boxCadastroPerfilSedam')
+if(box){
+box.classList.remove('hidden')
+}
+}
+
+/*=========================================================
+006B SEDAM FUNCTION ATIVAREDICAOPERFISSEDAM
+=========================================================*/
+function ativarEdicaoPerfisSedam(){
+window.modoEdicaoPerfisSedam=true
+document.querySelectorAll('.campo-editavel-sedam').forEach(c=>{
+c.disabled=false
+c.classList.remove('opacity-70')
+})
+document.querySelectorAll('.btn-excluir-sedam').forEach(b=>{
+b.classList.remove('hidden')
+})
+let btnSalvar=document.getElementById('btnSalvarPerfilSedam')
+if(btnSalvar){
+btnSalvar.hidden=false
+}
+}
+
+/*=========================================================
+006C SEDAM FUNCTION SALVAREDICAOPERFISSEDAM
+=========================================================*/
+async function salvarEdicaoPerfisSedam(){
+let linhas=[...document.querySelectorAll('.linha-perfil-sedam')]
+for(let l of linhas){
+let id=l.dataset.id
+let nome=document.getElementById('nome_sedam_'+id)?.value||''
+let username=document.getElementById('user_sedam_'+id)?.value||''
+let senha=document.getElementById('senha_sedam_'+id)?.value||''
+let cargo=document.getElementById('cargo_sedam_'+id)?.value||''
+let setor=document.getElementById('setor_sedam_'+id)?.value||''
+let nivel=document.getElementById('nivel_sedam_'+id)?.value||4
+let {error}=await client.from('perfis').update({
+nome_completo:nome,
+username:username,
+senha:senha,
+cargo:cargo,
+setor:setor,
+nivel_acesso:Number(nivel)
+}).eq('id',id)
+if(error){
+console.error(error)
+alert('Erro ao salvar')
+return
+}
+}
+document.querySelectorAll('.campo-editavel-sedam').forEach(c=>{
+c.disabled=true
+c.classList.add('opacity-70')
+})
+document.querySelectorAll('.btn-excluir-sedam').forEach(b=>{
+b.classList.add('hidden')
+})
+let btnSalvar=document.getElementById('btnSalvarPerfilSedam')
+if(btnSalvar){
+btnSalvar.hidden=true
+}
+alert('Perfis SEDAM salvos com sucesso')
+await carregarPerfis()
+}
+/*=========================================================
+006D SEDAM FUNCTION SALVARNOVOPERFILSEDAM
+=========================================================*/
+async function salvarNovoPerfilSedam(){
+let nome=document.getElementById('novo_nome_sedam').value.trim()
+let usuario=document.getElementById('novo_user_sedam').value.trim().toLowerCase()
+let senha=document.getElementById('novo_senha_sedam').value.trim()
+let cargo=document.getElementById('novo_cargo_sedam').value.trim()
+let nivel=document.getElementById('novo_nivel_sedam').value
+if(!nome||!usuario||!senha){
+alert('Preencha nome, usuário e senha')
+return
+}
+let {error}=await client.from('perfis').insert([{
+nome_completo:nome,
+username:usuario,
+senha:senha,
+cargo:cargo,
+nivel_acesso:Number(nivel)
+}])
+if(error){
+console.error(error)
+alert('Erro ao inserir perfil')
+return
+}
+alert('Perfil inserido com sucesso')
+await carregarPerfis()
 }
 
 /*=========================================================
