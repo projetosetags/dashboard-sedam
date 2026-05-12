@@ -144,79 +144,130 @@ OCULTAR 100%
 </button>
 
 <!-- DASHBOARD -->
-<div id="view-dashboard" class="tab-view hidden">
-
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-3">
-
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<div class="text-[11px] font-black uppercase text-slate-500">Média Geral TAG</div>
-<div id="dashMedia" class="text-[46px] font-black text-emerald-600 leading-none mt-2">0%</div>
-<div class="text-[12px] font-semibold text-slate-500 mt-2">Desempenho médio geral</div>
+<div id="view-dashboard" class="tab-content active">
+<div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+<div class="card-kpi">
+<div>
+<div class="titulo">MÉDIA GERAL TAG</div>
+<div class="valor text-green-600">${mediaGeral}%</div>
+<div class="sub">Desempenho médio geral</div>
+</div>
+<div class="icone bg-green-100 text-green-600">📈</div>
+</div>
+<div class="card-kpi">
+<div>
+<div class="titulo">TOTAL DE ITENS</div>
+<div class="valor text-blue-600">${totalItens}</div>
+<div class="sub">Itens avaliados</div>
+</div>
+<div class="icone bg-blue-100 text-blue-600">☰</div>
+</div>
+<div class="card-kpi">
+<div>
+<div class="titulo">TOTAL DE SUBITENS</div>
+<div class="valor text-violet-600">${totalSubitens}</div>
+<div class="sub">Subitens cadastrados</div>
+</div>
+<div class="icone bg-violet-100 text-violet-600">⌘</div>
+</div>
+<div class="card-kpi">
+<div>
+<div class="titulo">100% CUMPRIDOS</div>
+<div class="valor text-green-500">${cumpridos}</div>
+<div class="sub">Subitens concluídos</div>
+</div>
+<div class="icone bg-green-100 text-green-500">✓</div>
+</div>
+<div class="card-kpi">
+<div>
+<div class="titulo">ABAIXO DE 30%</div>
+<div class="valor text-red-500">${criticos}</div>
+<div class="sub">Itens críticos</div>
+</div>
+<div class="icone bg-red-100 text-red-500">📉</div>
+</div>
+<div class="card-kpi">
+<div>
+<div class="titulo">EM ANDAMENTO</div>
+<div class="valor text-orange-500">${andamento}</div>
+<div class="sub">Subitens em progresso</div>
+</div>
+<div class="icone bg-orange-100 text-orange-500">◔</div>
+</div>
 </div>
 
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<div class="text-[11px] font-black uppercase text-slate-500">Total de Itens</div>
-<div id="dashItens" class="text-[46px] font-black text-blue-600 leading-none mt-2">0</div>
-<div class="text-[12px] font-semibold text-slate-500 mt-2">Itens avaliados</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+<div class="bg-white/90 rounded-3xl p-5 shadow">
+<h3>DESEMPENHO POR ITEM</h3>
+<div class="chart-container">
+<canvas id="graficoDashboardItens"></canvas>
+</div>
 </div>
 
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<div class="text-[11px] font-black uppercase text-slate-500">Subitens</div>
-<div id="dashSubitens" class="text-[46px] font-black text-violet-600 leading-none mt-2">0</div>
-<div class="text-[12px] font-semibold text-slate-500 mt-2">Subitens monitorados</div>
-</div>
-
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<div class="text-[11px] font-black uppercase text-slate-500">100% Cumpridos</div>
-<div id="dashConcluidos" class="text-[46px] font-black text-emerald-500 leading-none mt-2">0</div>
-<div class="text-[12px] font-semibold text-slate-500 mt-2">Itens concluídos</div>
-</div>
-
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<div class="text-[11px] font-black uppercase text-slate-500">Em Andamento</div>
-<div id="dashAndamento" class="text-[46px] font-black text-amber-500 leading-none mt-2">0</div>
-<div class="text-[12px] font-semibold text-slate-500 mt-2">Execução parcial</div>
-</div>
-
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<div class="text-[11px] font-black uppercase text-slate-500">Não Cumpridos</div>
-<div id="dashPendentes" class="text-[46px] font-black text-red-500 leading-none mt-2">0</div>
-<div class="text-[12px] font-semibold text-slate-500 mt-2">Pendentes</div>
-</div>
-
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<h3 class="font-black text-[18px] uppercase text-slate-700 mb-4">
-Desempenho Geral
-</h3>
+<div class="bg-white/90 rounded-3xl p-5 shadow">
+<h3>EVOLUÇÃO MENSAL (MÉDIA GERAL)</h3>
+<div class="chart-container">
 <canvas id="graficoDashboardLinha"></canvas>
 </div>
+</div>
 
-<div class="bg-white/80 rounded-3xl p-5 shadow">
-<h3 class="font-black text-[18px] uppercase text-slate-700 mb-4">
-Distribuição Geral
-</h3>
+<div class="bg-white/90 rounded-3xl p-5 shadow">
+<h3>DISTRIBUIÇÃO DOS SUBITENS</h3>
+<div class="chart-container">
 <canvas id="graficoDashboardPizza"></canvas>
 </div>
-
+</div>
 </div>
 
-<div class="bg-white/80 rounded-3xl p-3 shadow mb-3">
-<h3 class="font-black text-[18px] uppercase text-slate-700 mb-4">
-Evolução por Item Estratégico
-</h3>
-
-<canvas id="graficoDashboardBarras"></canvas>
-
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="bg-white/90 rounded-3xl p-5 shadow">
+<h3>ÚLTIMOS LANÇAMENTOS</h3>
+<div class="overflow-auto">
+<table class="w-full">
+<thead>
+<tr>
+<th>SUBITEM</th>
+<th>ITEM</th>
+<th>DESCRIÇÃO</th>
+<th>RESPONSÁVEL</th>
+<th>DATA</th>
+<th>MAI (%)</th>
+<th>TOTAL (%)</th>
+</tr>
+</thead>
+<tbody id="tbodyDashboardLancamentos"></tbody>
+</table>
+</div>
+<div class="flex justify-center mt-4">
+<button class="btn-dashboard">VER TODOS</button>
+</div>
 </div>
 
-<div class="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 text-[13px] text-slate-700 font-semibold">
-Os dados apresentados refletem o desempenho consolidado do Projeto TAG Sedam 2026 com base nas informações registradas no sistema.
+<div class="bg-white/90 rounded-3xl p-5 shadow">
+<h3>RESUMO POR RESPONSÁVEL</h3>
+<div class="overflow-auto">
+<table class="w-full">
+<thead>
+<tr>
+<th>RESPONSÁVEL</th>
+<th>SUBITENS</th>
+<th>MÉDIA (%)</th>
+<th>100%</th>
+<th>ABAIXO 30%</th>
+</tr>
+</thead>
+<tbody id="tbodyDashboardResponsavel"></tbody>
+</table>
+</div>
+<div class="flex justify-center mt-4">
+<button class="btn-dashboard">VER TODOS</button>
+</div>
+</div>
 </div>
 
+<div class="mt-4 bg-blue-50 border border-blue-200 rounded-2xl p-4 text-[12px] font-semibold text-slate-700">
+As informações constantes neste painel possuem caráter preliminar e informativo, baseadas nos dados declarados até o momento pelos jurisdicionados.
+</div>
 </div>
 
 <!-- 007 MONITORAMENTO -->
