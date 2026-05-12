@@ -110,7 +110,17 @@ window.graficoAtualInfo={tipo:'todos',jan:valores[0]||0,fev:valores[1]||0,mar:va
 datasets=[{
 label:'TOTAL GERAL TAG SEDAM',
 data:valores,
-backgroundColor:cores.slice(0,mesAtual+1),
+backgroundColor:valores.slice(0,mesAtual+1).map(v=>{
+if(v>=70)return '#22c55e'
+if(v>=31)return '#facc15'
+return '#ef4444'
+}),
+borderColor:valores.slice(0,mesAtual+1).map(v=>{
+if(v>=70)return '#16a34a'
+if(v>=31)return '#eab308'
+return '#dc2626'
+}),
+borderWidth:2,
 borderRadius:12,
 borderSkipped:false,
 maxBarThickness:42
@@ -124,7 +134,17 @@ window.graficoAtualInfo={tipo:'subitem',item:i.item||'',subitem:i.subitem||'',ja
 datasets=[{
 label:'SUBITEM '+i.subitem,
 data:valores.slice(0,mesAtual+1),
-backgroundColor:cores.slice(0,mesAtual+1),
+backgroundColor:valores.slice(0,mesAtual+1).map(v=>{
+if(v>=70)return '#22c55e'
+if(v>=31)return '#facc15'
+return '#ef4444'
+}),
+borderColor:valores.slice(0,mesAtual+1).map(v=>{
+if(v>=70)return '#16a34a'
+if(v>=31)return '#eab308'
+return '#dc2626'
+}),
+borderWidth:2,
 borderRadius:12,
 borderSkipped:false,
 maxBarThickness:42
