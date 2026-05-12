@@ -307,25 +307,22 @@ window.userP.origem==='TCERO'&&
 Number(window.userP.nivel_acesso)===4&&
 !adminsTCERO.includes(usuarioAtual)
 
-if(isTCERONivel4){
-
 let tabPerfis=document.getElementById('tab-perfis')
 let tabTCERO=document.getElementById('tab-tcero')
 let tabUsuarios=document.getElementById('tab-usuarios')
 
+if(isTCERONivel4){
+
 if(tabPerfis){
-tabPerfis.style.display='none'
-tabPerfis.classList.add('hidden')
+tabPerfis.remove()
 }
 
 if(tabTCERO){
-tabTCERO.style.display='none'
-tabTCERO.classList.add('hidden')
+tabTCERO.remove()
 }
 
 if(tabUsuarios){
-tabUsuarios.style.display='none'
-tabUsuarios.classList.add('hidden')
+tabUsuarios.remove()
 }
 
 }
