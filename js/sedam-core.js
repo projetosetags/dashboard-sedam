@@ -1,36 +1,73 @@
 /*=========================================================
 001 SEDAM CORE DOMCONTENTLOADED
 =========================================================*/
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded",async ()=>{
+
 document.getElementById('dataInicio').value='2025-01-01'
 document.getElementById('dataFim').value='2028-01-01'
+
 document.body.classList.add("login-bg")
+
 localStorage.removeItem('uid')
+
 let userLocal=localStorage.getItem('user')
+
 if(userLocal){
+
 try{
+
 let perfil=JSON.parse(userLocal)
+
 if(perfil&&perfil.username){
+
 window.userP=perfil
 userP=perfil
+
 document.body.classList.remove('login-bg')
-document.getElementById('login-screen').classList.add('hidden')
-document.getElementById('dashboard').classList.remove('hidden')
-document.getElementById('user-info').innerHTML=(perfil.nome_completo||'-')+' • '+(perfil.cargo||'-')+' • '+(perfil.origem||'-')
+
+document.getElementById('login-screen')
+.classList.add('hidden')
+
+document.getElementById('dashboard')
+.classList.remove('hidden')
+
+document.getElementById('user-info').innerHTML=
+(perfil.nome_completo||'-')+
+' • '+
+(perfil.cargo||'-')+
+' • '+
+(perfil.origem||'-')
+
+await carregarDados()
+
+setTimeout(()=>{
+
 switchTab('dashboard')
-carregarDados()
+
+if(typeof renderDashboard==='function'){
+renderDashboard()
+}
+
+},500)
+
 return
+
 }
+
 }catch(e){
+
 console.log(e)
+
 localStorage.removeItem('user')
+
 }
+
 }
-const lastTab=localStorage.getItem('activeTab')
-if(lastTab){
-switchTab(lastTab)
-}
+
+switchTab('dashboard')
+
 })
+
 /*=========================================================
 002 SEDAM CORE FUNCTION LOGIN
 =========================================================*/
@@ -54,8 +91,10 @@ let {data:p1}=await client
 .limit(1)
 
 if(p1&&p1.length){
+
 perfil=p1[0]
 perfil.origem='TCERO'
+
 }else{
 
 let {data:p2}=await client
@@ -65,6 +104,7 @@ let {data:p2}=await client
 .limit(1)
 
 if(p2&&p2.length){
+
 perfil=p2[0]
 perfil.origem='SEDAM'
 
@@ -75,6 +115,7 @@ String(perfil.senha)!==String(senha)
 alert('Senha inválida')
 return
 }
+
 }
 
 }
@@ -172,41 +213,29 @@ tabTCERO.style.display='none'
 }
 
 await carregarPerfis()
+
 await carregarTCERO()
+
 await carregarDados()
 
-setTimeout(()=>{
+setTimeout(async ()=>{
+
+await carregarDados()
+
+switchTab('dashboard')
 
 if(typeof renderDashboard==='function'){
 renderDashboard()
 }
 
-switchTab('dashboard')
-
-setTimeout(()=>{
-carregarDados()
-},400)
-
-},300)
+},700)
 
 }
+
 /*=========================================================
 003 SEDAM CORE FUNCTION SWITCHTAB
 =========================================================*/
 function switchTab(t){
-
-if(t==='dashboard'){
-console.log('ABRINDO DASHBOARD')
-console.log(typeof renderDashboard)
-
-setTimeout(()=>{
-if(typeof renderDashboard==='function'){
-renderDashboard()
-}else{
-console.error('renderDashboard NÃO EXISTE')
-}
-},200)
-}
 
 localStorage.setItem('activeTab',t)
 
@@ -234,8 +263,22 @@ if(tab){
 tab.classList.add('tab-active')
 }
 
-if(t==='analise'){
+if(t==='dashboard'){
+
 setTimeout(()=>{
+
+if(typeof renderDashboard==='function'){
+renderDashboard()
+}
+
+},300)
+
+}
+
+if(t==='analise'){
+
+setTimeout(()=>{
+
 initPainelGrafico()
 
 if(window.graficoResumo&&typeof window.graficoResumo.resize==='function'){
@@ -257,28 +300,39 @@ c.style.opacity='1'
 })
 
 },350)
+
 }
 
 if(t==='perfis'){
+
 setTimeout(()=>{
 carregarPerfis()
 },200)
+
 }
 
 if(t==='usuarios'){
+
 setTimeout(()=>{
 carregarUsuarios()
 },200)
+
 }
 
 if(t==='tcero'){
+
 setTimeout(()=>{
 carregarTCERO()
 },200)
+
 }
 
 setTimeout(()=>{
+
+if(typeof renderTable==='function'){
 renderTable()
+}
+
 },100)
 
 }
@@ -699,7 +753,10 @@ document.getElementById('dashSubitens').innerText=totalSubitens
 document.getElementById('dashConcluidos').innerText=concluidos
 document.getElementById('dashAndamento').innerText=andamento
 document.getElementById('dashPendentes').innerText=pendentes
-
+let topo=document.getElementById('total-geral')
+if(topo){
+topo.innerText=media+'%'
+}
 let meses=['JAN','FEV','MAR','ABR','MAI']
 
 let mediasMeses=[
