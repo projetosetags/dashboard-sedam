@@ -282,54 +282,24 @@ renderTable()
 004 SEDAM CORE FUNCTION CARREGARDADOS
 =========================================================*/
 async function carregarDados(){
-
 if(!window.userP){
 console.log('userP não carregado')
 return
 }
-
-let query=client
-.from('deliberacoes')
-.select('*')
-
-let adminsTCERO=[
-'manoel',
-'vagner',
-'gleidi'
-]
-
-let isAdminTCERO=adminsTCERO.includes(
-(userP.username||'').toLowerCase()
-)
-
-if(
-Number(userP.nivel_acesso)!==1&&
-Number(userP.nivel_acesso)!==4&&
-!isAdminTCERO
-){
-query=query.eq('responsavel_id',userP.id)
-}
-
+let query=client.from('deliberacoes').select('*')
+let adminsTCERO=['manoel','vagner','gleidi']
+let isAdminTCERO=adminsTCERO.includes((userP.username||'').toLowerCase())
+console.log('USUÁRIO LOGADO:',userP.username,'NÍVEL:',userP.nivel_acesso,'ADMIN TCERO:',isAdminTCERO)
 let {data,error}=await query
-
 if(error){
 console.log(error)
 window.allData=[]
 renderDashboard()
 return
 }
-
 window.allData=(data||[]).map(i=>{
-
-let total=Number(
-i.total_cumprimento||
-i.percentual||
-i.percentual_execucao||
-0
-)
-
+let total=Number(i.total_cumprimento||i.percentual||i.percentual_execucao||0)
 if(total<=0){
-
 let meses=[
 Number(i.jan||0),
 Number(i.fev||0),
@@ -337,11 +307,8 @@ Number(i.mar||0),
 Number(i.abr||0),
 Number(i.mai||0)
 ]
-
 total=Math.max(...meses,0)
-
 }
-
 return{
 ...i,
 item:i.item||String(i.subitem||'').split('.')[0]||'0',
@@ -353,30 +320,23 @@ abr:Number(i.abr||0),
 mai:Number(i.mai||0),
 total_cumprimento:total
 }
-
 })
-
 console.log('TOTAL DELIBERAÇÕES:',window.allData.length)
 console.log('TOTAL CARREGADO:',window.allData.length)
-
+console.log('DADOS DASHBOARD:',window.allData)
 renderDashboard()
-
 if(typeof renderResumo==='function'){
 renderResumo()
 }
-
 if(typeof renderMonitoramento==='function'){
 renderMonitoramento()
 }
-
 if(typeof renderAnalise==='function'){
 renderAnalise()
 }
-
 if(typeof renderConcluidos==='function'){
 renderConcluidos()
 }
-
 }
 
 /*=========================================================
