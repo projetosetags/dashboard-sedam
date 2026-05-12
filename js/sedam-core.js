@@ -252,7 +252,6 @@ let query=client
 if(
 userP&&
 Number(userP.nivel_acesso)!==1&&
-Number(userP.nivel_acesso)!==4&&
 !['manoel','vagner','gleidi'].includes((userP.username||'').toLowerCase())
 ){
 query=query.eq('responsavel_id',userP.id)
@@ -262,14 +261,12 @@ let {data,error}=await query
 
 if(error){
 console.log(error)
-window.allData=[]
-renderDashboard()
+allData=[]
 return
 }
 
-if(!data||!data.length){
-window.allData=[]
-renderDashboard()
+if(!data){
+allData=[]
 return
 }
 
@@ -278,9 +275,7 @@ let listaPerfis=[
 ...(window.perfisTCERO||[])
 ]
 
-window.allData=(data||[])
-.filter(d=>d&&d.subitem&&d.descricao)
-.map(i=>{
+allData=(data||[]).map(i=>{
 
 let perfil=listaPerfis.find(
 p=>String(p.id)===String(i.responsavel_id)
@@ -300,7 +295,9 @@ return i
 
 })
 
-console.log('TOTAL DASHBOARD:',window.allData.length)
+window.allData=allData
+
+console.log('TOTAL REGISTROS:',allData.length)
 
 if(typeof renderDashboard==='function'){
 renderDashboard()
