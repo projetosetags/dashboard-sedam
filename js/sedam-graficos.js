@@ -79,7 +79,7 @@ let meses=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DE
 let mesesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
 let mesAtual=getMesAtualIndex()
 let labels=meses.slice(0,mesAtual+1)
-let cores=['#22c55e','#3b82f6','#f59e0b','#facc15','#a855f7','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899']
+let cores=['#22c55e','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#f97316','#eab308','#14b8a6','#6366f1','#ec4899']
 let datasets=[]
 function mediaMes(lista,mes){
 if(!lista||!lista.length)return 0
@@ -107,19 +107,134 @@ let mesKey=mesesKey[m]
 valores.push(mediaMes(dados,mesKey))
 }
 window.graficoAtualInfo={tipo:'todos',jan:valores[0]||0,fev:valores[1]||0,mar:valores[2]||0,abr:valores[3]||0,mai:valores[4]||0}
-datasets=[{label:'TOTAL GERAL TAG SEDAM',data:valores,backgroundColor:cores.slice(0,mesAtual+1),borderRadius:8}]
+datasets=[{
+label:'TOTAL GERAL TAG SEDAM',
+data:valores,
+backgroundColor:cores.slice(0,mesAtual+1),
+borderRadius:12,
+borderSkipped:false,
+maxBarThickness:42
+}]
 document.getElementById('descSubitem').innerHTML=`<div style="font-size:24px;font-weight:900;color:#000000;margin-bottom:12px;">TOTAL GERAL CONSOLIDADO DO TAG SEDAM 2026</div><div style="font-size:18px;line-height:1.8;color:#000000;font-weight:700;">O gráfico demonstra a evolução média consolidada de todos os itens e subitens monitorados no Plano de Ação do TAG SEDAM 2026.<br><br>JAN: <b>${valores[0]}%</b> | FEV: <b>${valores[1]}%</b> | MAR: <b>${valores[2]}%</b> | ABR: <b>${valores[3]}%</b> | MAI: <b>${valores[4]}%</b></div>`
 }else{
 let i=dados.find(x=>String(x.id)===String(selSub))
 if(!i)return
 let valores=[Number(i.jan||0),Number(i.fev||0),Number(i.mar||0),Number(i.abr||0),Number(i.mai||0),Number(i.jun||0),Number(i.jul||0),Number(i.ago||0),Number(i.set||0),Number(i.out||0),Number(i.nov||0),Number(i.dez||0)]
 window.graficoAtualInfo={tipo:'subitem',item:i.item||'',subitem:i.subitem||'',jan:valores[0]||0,fev:valores[1]||0,mar:valores[2]||0,abr:valores[3]||0,mai:valores[4]||0}
-datasets=[{label:i.subitem,data:valores.slice(0,mesAtual+1),backgroundColor:cores.slice(0,mesAtual+1),borderRadius:6}]
-document.getElementById('descSubitem').innerHTML=`<div class="text-sm font-black text-emerald-400 mb-2">SUBITEM ${i.subitem}</div><div class="text-xs leading-relaxed text-slate-300">${i.descricao||'-'}<br><br><b>Produto:</b> ${i.produto||'-'}<br><br><b>Responsável:</b> ${i.responsavel||'-'}</div>`
+datasets=[{
+label:'SUBITEM '+i.subitem,
+data:valores.slice(0,mesAtual+1),
+backgroundColor:cores.slice(0,mesAtual+1),
+borderRadius:12,
+borderSkipped:false,
+maxBarThickness:42
+}]
+document.getElementById('descSubitem').innerHTML=`<div style="font-size:22px;font-weight:900;color:#000000;margin-bottom:10px;">SUBITEM ${i.subitem}</div><div style="font-size:17px;line-height:1.7;color:#000000;font-weight:700;">${i.descricao||'-'}<br><br><b>Produto:</b> ${i.produto||'-'}</div>`
 }
 }
 if(!datasets.length)return
-chartMaster=new Chart(ctx,{type:'bar',data:{labels,datasets},options:{responsive:true,plugins:{legend:{display:true,labels:{color:'#000'}},tooltip:{callbacks:{label:(ctx)=>ctx.raw+'%'}},datalabels:{color:'#000',anchor:'end',align:'top',font:{weight:'bold',size:12},formatter:(v)=>v+'%'}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:(v)=>v+'%'}}}},plugins:[ChartDataLabels]})
+chartMaster=new Chart(ctx,{
+type:'bar',
+data:{
+labels,
+datasets
+},
+options:{
+responsive:true,
+maintainAspectRatio:false,
+layout:{
+padding:{
+top:20,
+right:20,
+bottom:10,
+left:10
+}
+},
+plugins:{
+legend:{
+display:true,
+position:'bottom',
+labels:{
+color:'#111827',
+font:{
+size:12,
+weight:'900'
+},
+padding:18,
+usePointStyle:true,
+pointStyle:'circle'
+}
+},
+tooltip:{
+backgroundColor:'#0f172a',
+titleColor:'#ffffff',
+bodyColor:'#ffffff',
+padding:12,
+cornerRadius:12,
+displayColors:true,
+callbacks:{
+label:(ctx)=>ctx.raw+'%'
+}
+},
+datalabels:{
+display:true,
+color:'#111827',
+anchor:'end',
+align:'top',
+offset:4,
+backgroundColor:'rgba(255,255,255,.88)',
+borderRadius:8,
+padding:{
+top:4,
+bottom:4,
+left:8,
+right:8
+},
+borderWidth:1,
+borderColor:'rgba(0,0,0,.08)',
+font:{
+weight:'900',
+size:11
+},
+formatter:(v)=>v+'%'
+}
+},
+scales:{
+y:{
+beginAtZero:true,
+max:100,
+grid:{
+color:'rgba(0,0,0,.06)'
+},
+ticks:{
+color:'#374151',
+font:{
+weight:'800',
+size:11
+},
+callback:(v)=>v+'%'
+}
+},
+x:{
+grid:{
+display:false
+},
+ticks:{
+color:'#111827',
+font:{
+weight:'900',
+size:11
+}
+}
+}
+},
+animation:{
+duration:1200,
+easing:'easeOutQuart'
+}
+},
+plugins:[ChartDataLabels]
+})
 }
 /*=========================================================
 005 GRAFICOS FUNCTION RENDERSELECTS
