@@ -55,7 +55,6 @@ lista.find(x=>x.descricaoitem&&x.descricaoitem.trim())?.descricaoitem||
 'SEM DESCRIÇÃO'
 
 }
-let responsavel=itemBase.responsavel||'Não informado'
 let itemClick=(modoResumo==='item'?k:k)
 let itemNumero=getItemKey(itemBase)
 let subitemNumero=itemBase.subitem||'-'
