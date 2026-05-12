@@ -145,129 +145,113 @@ OCULTAR 100%
 
 <!-- DASHBOARD -->
 <div id="view-dashboard" class="tab-content active">
-<div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mb-4">
+
 <div class="card-kpi">
-<div>
-<div class="titulo">MÉDIA GERAL TAG</div>
+<div class="titulo">MÉDIA GERAL</div>
 <div class="valor text-green-600">${mediaGeral}%</div>
-<div class="sub">Desempenho médio geral</div>
+<div class="sub">Desempenho TAG</div>
 </div>
-<div class="icone bg-green-100 text-green-600">📈</div>
-</div>
+
 <div class="card-kpi">
-<div>
-<div class="titulo">TOTAL DE ITENS</div>
+<div class="titulo">ITENS</div>
 <div class="valor text-blue-600">${totalItens}</div>
-<div class="sub">Itens avaliados</div>
+<div class="sub">Itens monitorados</div>
 </div>
-<div class="icone bg-blue-100 text-blue-600">☰</div>
-</div>
+
 <div class="card-kpi">
-<div>
-<div class="titulo">TOTAL DE SUBITENS</div>
+<div class="titulo">SUBITENS</div>
 <div class="valor text-violet-600">${totalSubitens}</div>
-<div class="sub">Subitens cadastrados</div>
+<div class="sub">Subitens ativos</div>
 </div>
-<div class="icone bg-violet-100 text-violet-600">⌘</div>
-</div>
+
 <div class="card-kpi">
-<div>
-<div class="titulo">100% CUMPRIDOS</div>
+<div class="titulo">100%</div>
 <div class="valor text-green-500">${cumpridos}</div>
-<div class="sub">Subitens concluídos</div>
+<div class="sub">Concluídos</div>
 </div>
-<div class="icone bg-green-100 text-green-500">✓</div>
-</div>
+
 <div class="card-kpi">
-<div>
-<div class="titulo">ABAIXO DE 30%</div>
+<div class="titulo">CRÍTICOS</div>
 <div class="valor text-red-500">${criticos}</div>
-<div class="sub">Itens críticos</div>
+<div class="sub">Abaixo 30%</div>
 </div>
-<div class="icone bg-red-100 text-red-500">📉</div>
-</div>
+
 <div class="card-kpi">
-<div>
-<div class="titulo">EM ANDAMENTO</div>
+<div class="titulo">EM EXECUÇÃO</div>
 <div class="valor text-orange-500">${andamento}</div>
-<div class="sub">Subitens em progresso</div>
+<div class="sub">Em andamento</div>
 </div>
-<div class="icone bg-orange-100 text-orange-500">◔</div>
-</div>
+
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-<div class="bg-white/90 rounded-3xl p-5 shadow">
+
+<div class="bg-white/90 rounded-3xl p-4 shadow">
+
+<div class="flex items-center justify-between mb-3">
 <h3>DESEMPENHO POR ITEM</h3>
+<div class="text-[10px] font-black text-slate-500">ATUALIZADO</div>
+</div>
+
 <div class="chart-container">
 <canvas id="graficoDashboardItens"></canvas>
 </div>
+
+<div class="flex flex-wrap justify-center gap-4 mt-3 text-[10px] font-black">
+
+<div class="flex items-center gap-2">
+<span style="width:12px;height:12px;border-radius:4px;background:#22c55e;display:inline-block;"></span>
+<span>ACIMA 70%</span>
 </div>
 
-<div class="bg-white/90 rounded-3xl p-5 shadow">
-<h3>EVOLUÇÃO MENSAL (MÉDIA GERAL)</h3>
+<div class="flex items-center gap-2">
+<span style="width:12px;height:12px;border-radius:4px;background:#eab308;display:inline-block;"></span>
+<span>31% A 70%</span>
+</div>
+
+<div class="flex items-center gap-2">
+<span style="width:12px;height:12px;border-radius:4px;background:#ef4444;display:inline-block;"></span>
+<span>ABAIXO 30%</span>
+</div>
+
+</div>
+
+</div>
+
+<div class="bg-white/90 rounded-3xl p-4 shadow">
+
+<div class="flex items-center justify-between mb-3">
+<h3>EVOLUÇÃO MENSAL</h3>
+<div class="text-[10px] font-black text-slate-500">MÉDIA GERAL</div>
+</div>
+
 <div class="chart-container">
 <canvas id="graficoDashboardLinha"></canvas>
 </div>
+
 </div>
 
-<div class="bg-white/90 rounded-3xl p-5 shadow">
-<h3>DISTRIBUIÇÃO DOS SUBITENS</h3>
+<div class="bg-white/90 rounded-3xl p-4 shadow">
+
+<div class="flex items-center justify-between mb-3">
+<h3>DISTRIBUIÇÃO</h3>
+<div class="text-[10px] font-black text-slate-500">SUBITENS</div>
+</div>
+
 <div class="chart-container">
 <canvas id="graficoDashboardPizza"></canvas>
 </div>
-</div>
+
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-<div class="bg-white/90 rounded-3xl p-5 shadow">
-<h3>ÚLTIMOS LANÇAMENTOS</h3>
-<div class="overflow-auto">
-<table class="w-full">
-<thead>
-<tr>
-<th>SUBITEM</th>
-<th>ITEM</th>
-<th>DESCRIÇÃO</th>
-<th>RESPONSÁVEL</th>
-<th>DATA</th>
-<th>MAI (%)</th>
-<th>TOTAL (%)</th>
-</tr>
-</thead>
-<tbody id="tbodyDashboardLancamentos"></tbody>
-</table>
-</div>
-<div class="flex justify-center mt-4">
-<button class="btn-dashboard">VER TODOS</button>
-</div>
 </div>
 
-<div class="bg-white/90 rounded-3xl p-5 shadow">
-<h3>RESUMO POR RESPONSÁVEL</h3>
-<div class="overflow-auto">
-<table class="w-full">
-<thead>
-<tr>
-<th>RESPONSÁVEL</th>
-<th>SUBITENS</th>
-<th>MÉDIA (%)</th>
-<th>100%</th>
-<th>ABAIXO 30%</th>
-</tr>
-</thead>
-<tbody id="tbodyDashboardResponsavel"></tbody>
-</table>
-</div>
-<div class="flex justify-center mt-4">
-<button class="btn-dashboard">VER TODOS</button>
-</div>
-</div>
-</div>
-
-<div class="mt-4 bg-blue-50 border border-blue-200 rounded-2xl p-4 text-[12px] font-semibold text-slate-700">
+<div class="mt-4 bg-blue-50 border border-blue-200 rounded-2xl p-3 text-[11px] font-semibold text-slate-700">
 As informações constantes neste painel possuem caráter preliminar e informativo, baseadas nos dados declarados até o momento pelos jurisdicionados.
 </div>
+
 </div>
 
 <!-- 007 MONITORAMENTO -->
