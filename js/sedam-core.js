@@ -83,12 +83,16 @@ return
 
 let perfil=null
 
-let {data:p1}=await client
+let {data:p1,error:e1}=await client
 .from('perfistce')
 .select('*')
 .eq('username',usuario)
 .eq('senha',senha)
 .limit(1)
+
+if(e1){
+console.log(e1)
+}
 
 if(p1&&p1.length){
 
@@ -97,11 +101,15 @@ perfil.origem='TCERO'
 
 }else{
 
-let {data:p2}=await client
+let {data:p2,error:e2}=await client
 .from('perfis')
 .select('*')
 .eq('username',usuario)
 .limit(1)
+
+if(e2){
+console.log(e2)
+}
 
 if(p2&&p2.length){
 
@@ -150,13 +158,21 @@ document.getElementById('user-info').innerHTML=
 
 let tabPerfis=document.getElementById('tab-perfis')
 let tabTCERO=document.getElementById('tab-tcero')
+let tabUsuarios=document.getElementById('tab-usuarios')
 
 if(tabPerfis){
 tabPerfis.classList.add('hidden')
+tabPerfis.style.display='none'
 }
 
 if(tabTCERO){
 tabTCERO.classList.add('hidden')
+tabTCERO.style.display='none'
+}
+
+if(tabUsuarios){
+tabUsuarios.classList.add('hidden')
+tabUsuarios.style.display='none'
 }
 
 let usernameAtual=(perfil.username||'').toLowerCase()
@@ -167,19 +183,27 @@ let adminsTCERO=[
 'gleidi'
 ]
 
+/*=========================================================
+SEDAM
+=========================================================*/
 if(perfil.origem==='SEDAM'){
 
 if(tabPerfis){
 tabPerfis.classList.remove('hidden')
+tabPerfis.style.display='inline-flex'
 tabPerfis.innerHTML='<div>👥</div><div>Perfis Sedam</div>'
 }
 
-if(tabTCERO){
-tabTCERO.style.display='none'
+if(tabUsuarios){
+tabUsuarios.classList.remove('hidden')
+tabUsuarios.style.display='inline-flex'
 }
 
 }
 
+/*=========================================================
+TCERO ADMIN
+=========================================================*/
 if(
 perfil.origem==='TCERO'&&
 adminsTCERO.includes(usernameAtual)
@@ -187,6 +211,7 @@ adminsTCERO.includes(usernameAtual)
 
 if(tabPerfis){
 tabPerfis.classList.remove('hidden')
+tabPerfis.style.display='inline-flex'
 tabPerfis.innerHTML='<div>👥</div><div>Perfis Sedam</div>'
 }
 
@@ -195,19 +220,34 @@ tabTCERO.classList.remove('hidden')
 tabTCERO.style.display='inline-flex'
 }
 
+if(tabUsuarios){
+tabUsuarios.classList.remove('hidden')
+tabUsuarios.style.display='inline-flex'
 }
 
+}
+
+/*=========================================================
+TCERO NIVEL 4
+=========================================================*/
 if(
 perfil.origem==='TCERO'&&
-!adminsTCERO.includes(usernameAtual)
+Number(perfil.nivel_acesso)===4
 ){
 
 if(tabPerfis){
+tabPerfis.classList.add('hidden')
 tabPerfis.style.display='none'
 }
 
 if(tabTCERO){
+tabTCERO.classList.add('hidden')
 tabTCERO.style.display='none'
+}
+
+if(tabUsuarios){
+tabUsuarios.classList.add('hidden')
+tabUsuarios.style.display='none'
 }
 
 }
@@ -226,6 +266,22 @@ switchTab('dashboard')
 
 if(typeof renderDashboard==='function'){
 renderDashboard()
+}
+
+if(typeof renderResumo==='function'){
+renderResumo()
+}
+
+if(typeof renderTable==='function'){
+renderTable()
+}
+
+if(typeof renderConcluidos==='function'){
+renderConcluidos()
+}
+
+if(typeof initPainelGrafico==='function'){
+initPainelGrafico()
 }
 
 },700)
