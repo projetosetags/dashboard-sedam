@@ -169,3 +169,23 @@ function logout(){
 localStorage.clear()
 location.reload()
 }
+/*=========================================================
+021 PODE EDITAR MÊS
+=========================================================*/
+function podeEditarMes(mes){
+
+if(!window.userP)return false
+
+let nivel=Number(window.userP.nivel_acesso||4)
+
+if(nivel===1)return true
+
+let meses=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+
+let atual=new Date().getMonth()
+
+let liberado=meses[atual]
+
+return mes===liberado
+
+}
