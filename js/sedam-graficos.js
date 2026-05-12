@@ -162,7 +162,7 @@ datasets
 options:{
 responsive:true,
 maintainAspectRatio:true,
-aspectRatio:2.4,
+aspectRatio:2.2,
 layout:{
 padding:{
 top:20,
