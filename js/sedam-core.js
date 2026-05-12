@@ -340,97 +340,82 @@ renderTable()
 004 SEDAM CORE FUNCTION CARREGARDADOS
 =========================================================*/
 async function carregarDados(){
+
 if(!window.userP){
 console.log('userP não carregado')
 return
 }
-try{
-let {data,error}=await client.from('deliberacoes').select('*').order('subitem',{ascending:true})
+
+let query=client
+.from('deliberacoes')
+.select('*')
+
+let {data,error}=await query
+
 if(error){
-console.log('ERRO DELIBERAÇÕES:',error)
+console.log(error)
 window.allData=[]
+window.dados=[]
+window.dadosFiltrados=[]
+window.lista=[]
+renderDashboard()
 return
 }
-console.log('TOTAL BRUTO:',data?.length||0)
+
 window.allData=(data||[]).map(i=>{
-let jan=Number(i.jan||0)
-let fev=Number(i.fev||0)
-let mar=Number(i.mar||0)
-let abr=Number(i.abr||0)
-let mai=Number(i.mai||0)
-let total=Number(i.total_cumprimento||i.percentual||i.percentual_execucao||0)
+
+let total=Number(
+i.total_cumprimento||
+i.percentual||
+i.percentual_execucao||
+0
+)
+
 if(total<=0){
-total=Math.max(jan,fev,mar,abr,mai,0)
+
+let meses=[
+Number(i.jan||0),
+Number(i.fev||0),
+Number(i.mar||0),
+Number(i.abr||0),
+Number(i.mai||0)
+]
+
+total=Math.max(...meses,0)
+
 }
+
 return{
 ...i,
-item:String(i.item||String(i.subitem||'0').split('.')[0]),
-subitem:String(i.subitem||'0.0'),
-jan:jan,
-fev:fev,
-mar:mar,
-abr:abr,
-mai:mai,
+item:i.item||String(i.subitem||'').split('.')[0]||'0',
+subitem:i.subitem||'0.0',
+jan:Number(i.jan||0),
+fev:Number(i.fev||0),
+mar:Number(i.mar||0),
+abr:Number(i.abr||0),
+mai:Number(i.mai||0),
 total_cumprimento:total
 }
+
 })
+
+window.dados=[...window.allData]
+window.dadosFiltrados=[...window.allData]
+window.lista=[...window.allData]
+window.listaDados=[...window.allData]
+window.resumoData=[...window.allData]
+
 console.log('TOTAL FINAL ALLDATA:',window.allData.length)
-console.log(window.allData)
-if(typeof renderResumo==='function'){
-renderResumo()
-}
-if(typeof renderMonitoramento==='function'){
-renderMonitoramento()
-}
-if(typeof renderAnalise==='function'){
-renderAnalise()
-}
-if(typeof renderConcluidos==='function'){
-renderConcluidos()
-}
-if(typeof renderDashboard==='function'){
-renderDashboard()
-}
-setTimeout(()=>{
-if(typeof renderResumo==='function'){
-renderResumo()
-}
-if(typeof renderMonitoramento==='function'){
-renderMonitoramento()
-}
-if(typeof renderAnalise==='function'){
-renderAnalise()
-}
-if(typeof renderConcluidos==='function'){
-renderConcluidos()
-}
-if(typeof renderDashboard==='function'){
-renderDashboard()
-}
-},600)
-}catch(e){
-console.log('ERRO GERAL:',e)
-window.allData=[]
-}
-window.dados=window.allData
-window.dadosFiltrados=window.allData
-window.listaDados=window.allData
-window.resumoData=window.allData
 
-let topoItens=document.getElementById('topTotalItens')
-let topoSubitens=document.getElementById('topTotalSubitens')
+let totalItens=[
+...new Set(
+window.allData.map(i=>
+String(i.item||'0')
+)
+)
+].length
 
-if(topoItens){
-topoItens.innerText=[...new Set(window.allData.map(i=>String(i.item||'0')))].length
-}
-
-if(topoSubitens){
-topoSubitens.innerText=window.allData.length
-}
-
-let totalGeral=document.getElementById('total-geral')
-
-if(totalGeral){
+let totalSubitens=window.allData.length
 
 let media=Math.round(
 window.allData.reduce((acc,c)=>{
@@ -438,12 +423,42 @@ return acc+Number(c.total_cumprimento||0)
 },0)/(window.allData.length||1)
 )
 
-totalGeral.innerText=media+'%'
+let topoItens=document.getElementById('topTotalItens')
+let topoSubitens=document.getElementById('topTotalSubitens')
+let totalGeral=document.getElementById('total-geral')
 
+if(topoItens){
+topoItens.innerText=totalItens
 }
 
-console.log('SINCRONIZAÇÃO FINAL OK')
-  
+if(topoSubitens){
+topoSubitens.innerText=totalSubitens
+}
+
+if(totalGeral){
+totalGeral.innerText=media+'%'
+}
+
+if(typeof renderDashboard==='function'){
+renderDashboard()
+}
+
+if(typeof renderResumo==='function'){
+renderResumo()
+}
+
+if(typeof renderMonitoramento==='function'){
+renderMonitoramento()
+}
+
+if(typeof renderAnalise==='function'){
+renderAnalise()
+}
+
+if(typeof renderConcluidos==='function'){
+renderConcluidos()
+}
+
 }
 /*=========================================================
 005 SEDAM CORE FUNCTION CARREGARUSUARIOS
