@@ -34,7 +34,7 @@ switchTab(lastTab)
 /*=========================================================
 002 SEDAM CORE FUNCTION LOGIN
 =========================================================*/
-async function login(){
+window.login=async function(){
 
 let usuario=document.getElementById('u').value.trim().toLowerCase()
 let senha=document.getElementById('p').value.trim()
@@ -357,6 +357,7 @@ total_cumprimento:total
 })
 
 console.log('TOTAL DELIBERAÇÕES:',window.allData.length)
+console.log('TOTAL CARREGADO:',window.allData.length)
 
 renderDashboard()
 
@@ -682,21 +683,34 @@ return Math.max(...meses,0)
 }
 
 function renderDashboard(){
-
+console.log(
+'DADOS DASHBOARD:',
+window.allData
+)
 let lista=(window.allData||[])
 
 console.log('RENDER DASHBOARD',lista)
 
 if(!lista.length){
 
-document.getElementById('dashMedia').innerText='0%'
-document.getElementById('dashItens').innerText='0'
-document.getElementById('dashSubitens').innerText='0'
-document.getElementById('dashConcluidos').innerText='0'
-document.getElementById('dashAndamento').innerText='0'
-document.getElementById('dashPendentes').innerText='0'
+console.log('Dashboard sem dados')
+
+let el1=document.getElementById('dashMedia')
+let el2=document.getElementById('dashItens')
+let el3=document.getElementById('dashSubitens')
+let el4=document.getElementById('dashConcluidos')
+let el5=document.getElementById('dashAndamento')
+let el6=document.getElementById('dashPendentes')
+
+if(el1)el1.innerText='0%'
+if(el2)el2.innerText='0'
+if(el3)el3.innerText='0'
+if(el4)el4.innerText='0'
+if(el5)el5.innerText='0'
+if(el6)el6.innerText='0'
 
 return
+
 }
 
 let totalSubitens=lista.length
