@@ -1200,18 +1200,21 @@ data:{
 labels:[
 '100% Cumpridos',
 'Em Andamento',
-'Abaixo de 30%'
+'Abaixo de 30%',
+'Pendentes'
 ],
 datasets:[{
 data:[
 concluidos,
 andamento,
-criticos
+criticos,
+pendentes
 ],
 backgroundColor:[
 '#22c55e',
 '#eab308',
-'#ef4444'
+'#ef4444',
+'#94a3b8'
 ],
 borderWidth:2,
 borderColor:'#ffffff'
