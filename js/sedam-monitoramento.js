@@ -108,6 +108,40 @@ document.getElementById('btn-voltar').style.display='block'
 003 MONITORAMENTO FUNCTION RENDERTABLE
 =========================================================*/
 function renderTable(){
+const mesesOrdem=[
+'jan',
+'fev',
+'mar',
+'abr',
+'mai',
+'jun',
+'jul',
+'ago',
+'set',
+'out',
+'nov',
+'dez'
+]
+
+const mesesLabel={
+jan:'JAN',
+fev:'FEV',
+mar:'MAR',
+abr:'ABR',
+mai:'MAI',
+jun:'JUN',
+jul:'JUL',
+ago:'AGO',
+set:'SET',
+out:'OUT',
+nov:'NOV',
+dez:'DEZ'
+}
+let hoje=new Date()
+let anoAtual=hoje.getFullYear()
+let mesAtual=hoje.getMonth()
+let mesesLiberados=mesesOrdem.slice(0,mesAtual+1)
+
 let lista=[...(window.allData||[])].sort(compareSubitem)
 lista=lista.filter(i=>{
 if(filtroItemAtivo){
@@ -127,14 +161,43 @@ let tbody=document.getElementById('table-body')
 if(!tbody)return
 tbody.innerHTML=lista.map(i=>{
 let dataFormatada=i.data_inicio?formatarDataBR(i.data_inicio):(i.prazo_texto||'-')
-let jan=Number(i.jan||0)
-let fev=Number(i.fev||0)
-let mar=Number(i.mar||0)
-let abr=Number(i.abr||0)
-let mai=Number(i.mai||0)
+let valoresMeses={
+jan:Number(i.jan||0),
+fev:Number(i.fev||0),
+mar:Number(i.mar||0),
+abr:Number(i.abr||0),
+mai:Number(i.mai||0),
+jun:Number(i.jun||0),
+jul:Number(i.jul||0),
+ago:Number(i.ago||0),
+set:Number(i.set||0),
+out:Number(i.out||0),
+nov:Number(i.nov||0),
+dez:Number(i.dez||0)
+}
 let total=getTotal(i)
 let bg=total<=30?'bg-red-900/20':total>=100?'bg-emerald-900/20':'bg-yellow-900/20'
-let podeEditar=userP&&(Number(userP.nivel_acesso)===1||Number(userP.nivel_acesso)===2||String(i.responsavel_id)===String(userP.id))
+let nivel=Number(userP?.nivel_acesso||0)
+let usernameAtual=String(userP?.username||'').toLowerCase()
+let origemUsuario=String(userP?.origem||'').toUpperCase()
+let mesEdicao=mesesLiberados[mesesLiberados.length-1]
+let valorAtual=Number(i[mesEdicao]||0)
+let isNivel1=nivel===1
+let isHueriqui=usernameAtual==='hueriqui'
+let isResponsavel=
+String(i.responsavel_id||'')===String(userP?.id||'')
+let podeEditar=false
+if(isNivel1&&!isHueriqui){
+podeEditar=true
+}else if(
+origemUsuario==='SEDAM'&&
+(nivel===2||nivel===3||nivel===4)&&
+isResponsavel&&
+valorAtual<=0
+){
+podeEditar=true
+}
+  
 let responsavelTexto=i.responsavel||'-'
 let listaPerfis=[...(window.perfis||[]),...(window.perfisSedam||[])]
 let perfilResponsavel=listaPerfis.find(p=>String(p.id)===String(i.responsavel_id))
@@ -143,7 +206,55 @@ responsavelTexto=perfilResponsavel.nome_completo
 }else{
 responsavelTexto=i.responsavel||i.responsavel_manual||'Não informado'
 }
-return `<tr class="border-b border-white/5 tr-hover ${bg}"><td class="p-2 font-black text-blue-400">${i.subitem}</td><td class="p-2 td-desc">${i.descricao||'-'}</td><td class="p-2 td-desc text-[10px] text-slate-700">${i.produto||'-'}</td><td class="text-xs p-1">${userP&&Number(userP.nivel_acesso)===1?`<select onchange="salvarResponsavel('${i.id}',this.value)" class="bg-slate-100 text-slate-900 font-semibold text-xs p-1 rounded w-full"><option value="">${responsavelTexto||'-'}</option>${listaPerfis.map(p=>`<option title="${p.nome_completo}" value="${p.id}" ${String(p.id)===String(i.responsavel_id)?'selected':''}>${p.nome_completo}</option>`).join('')}</select>`:`<span class="text-slate-800 font-semibold">${responsavelTexto}</span>`}</td><td class="text-xs">${i.setor||'-'}</td><td class="td-data">${dataFormatada}</td><td class="td-mes opacity-40">${jan}%</td><td class="td-mes opacity-40">${fev}%</td><td class="td-mes opacity-40">${mar}%</td><td class="td-mes-strong text-blue-400">${abr}%</td><td>${podeEditar?`<input type="number" min="0" max="100" step="1" class="input-mes" value="${mai}" ${podeEditarMes('mai')?'':'disabled'} onchange="salvar(this.value,'${i.id}','mai')">`:`<span class="td-mes-strong text-yellow-400">${mai}%</span>`}</td><td class="td-total text-emerald-400">${total.toFixed(2)}%</td></tr>`
+return `<tr class="border-b border-white/5 tr-hover ${bg}">
+<td class="p-2 font-black text-blue-400">${i.subitem}</td>
+<td class="p-2 td-desc">${i.descricao||'-'}</td>
+<td class="p-2 td-desc text-[10px] text-slate-700">${i.produto||'-'}</td>
+<td class="text-xs p-1">
+${userP&&Number(userP.nivel_acesso)===1?
+`<select onchange="salvarResponsavel('${i.id}',this.value)" class="bg-slate-100 text-slate-900 font-semibold text-xs p-1 rounded w-full">
+<option value="">${responsavelTexto||'-'}</option>
+${listaPerfis.map(p=>`<option title="${p.nome_completo}" value="${p.id}" ${String(p.id)===String(i.responsavel_id)?'selected':''}>${p.nome_completo}</option>`).join('')}
+</select>`
+:
+`<span class="text-slate-800 font-semibold">${responsavelTexto}</span>`
+}
+</td>
+<td class="text-xs">${i.setor||'-'}</td>
+<td class="td-data">${dataFormatada}</td>
+${
+mesesLiberados.map(m=>{
+let valor=Number(i[m]||0)
+let bloqueado=valor>0
+let liberarMes=
+m===mesEdicao
+let editar=false
+if(isNivel1&&!isHueriqui){
+editar=true
+}else if(
+origemUsuario==='SEDAM'&&
+(nivel===2||nivel===3||nivel===4)&&
+isResponsavel&&
+liberarMes&&
+!bloqueado
+){
+editar=true
+}
+return `
+<td class="td-mes-strong text-center">
+${
+editar
+?
+`<input type="number" min="0" max="100" step="1" class="input-mes" value="${valor}" onchange="salvar(this.value,'${i.id}','${m}')">`
+:
+`<span>${valor}%</span>`
+}
+</td>
+`
+}).join('')
+}
+<td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
+</tr>`
 }).join('')
 let itensTotal=new Set((window.allData||[]).map(x=>getItemKey(x))).size
 let pdfHTML=''
