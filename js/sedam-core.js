@@ -464,6 +464,13 @@ c.style.maxHeight='320px'
 
 if(t==='perfis'){
 
+if(
+String(userP?.origem||'').toUpperCase()==='SEDAM'&&
+Number(userP?.nivel_acesso||0)>1
+){
+return
+}
+
 setTimeout(()=>{
 carregarPerfis()
 },200)
@@ -472,6 +479,13 @@ carregarPerfis()
 
 if(t==='usuarios'){
 
+if(
+String(userP?.origem||'').toUpperCase()==='SEDAM'&&
+Number(userP?.nivel_acesso||0)>1
+){
+return
+}
+
 setTimeout(()=>{
 carregarUsuarios()
 },200)
@@ -479,6 +493,13 @@ carregarUsuarios()
 }
 
 if(t==='tcero'){
+
+if(
+String(userP?.origem||'').toUpperCase()==='SEDAM'&&
+Number(userP?.nivel_acesso||0)>1
+){
+return
+}
 
 setTimeout(()=>{
 carregarTCERO()
