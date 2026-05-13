@@ -321,15 +321,15 @@ let tabUsuarios=document.getElementById('tab-usuarios')
 if(isTCERONivel4){
 
 if(tabPerfis){
-tabPerfis.remove()
+tabPerfis.style.display='none'
 }
 
 if(tabTCERO){
-tabTCERO.remove()
+tabTCERO.style.display='none'
 }
 
 if(tabUsuarios){
-tabUsuarios.remove()
+tabUsuarios.style.display='none'
 }
 
 }
@@ -609,7 +609,10 @@ let adminsGerais=[
 let usernameAtual=String(userP?.username||'').toLowerCase()
 
 let isAdminGeral=
-nivelUsuario===1||
+(
+nivelUsuario===1&&
+usernameAtual!=='hueriqui'
+)||
 origemUsuario==='TCERO'||
 adminsGerais.includes(usernameAtual)
 
