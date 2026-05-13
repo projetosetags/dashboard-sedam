@@ -1158,7 +1158,7 @@ datalabels:{
 color:'#000000',
 font:{
 weight:'900',
-size:window.innerWidth<768?11:16
+size:window.innerWidth<768?6:8
 },
 formatter:(v,ctx)=>{
 let total=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0)
@@ -1249,7 +1249,7 @@ color:'#111827',
 anchor:'end',
 align:'top',
 font:{
-size:window.innerWidth<768?9:14,
+size:window.innerWidth<768?5:7,
 weight:'900'
 },
 formatter:(v)=>v+'%'
