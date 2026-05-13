@@ -1104,7 +1104,9 @@ plugins:[ChartDataLabels]
 if(dashPizza){
 dashPizza.destroy()
 }
-
+/*=========================================================
+007 DASHBOARD GRAFICO PIZZA
+=========================================================*/
 dashPizza=new Chart(
 document.getElementById('graficoDashboardPizza'),
 {
@@ -1113,7 +1115,7 @@ data:{
 labels:[
 '100% Cumpridos',
 'Em Andamento',
-'Abaixo 30%'
+'Abaixo de 30%'
 ],
 datasets:[{
 data:[
@@ -1136,7 +1138,16 @@ maintainAspectRatio:false,
 cutout:'58%',
 plugins:{
 legend:{
-position:'bottom'
+position:'bottom',
+labels:{
+color:'#000000',
+font:{
+size:window.innerWidth<768?10:13,
+weight:'900'
+},
+padding:16,
+boxWidth:14
+}
 },
 tooltip:{
 callbacks:{
@@ -1144,15 +1155,15 @@ label:(ctx)=>ctx.raw
 }
 },
 datalabels:{
-color:'#ffffff',
+color:'#000000',
 font:{
 weight:'900',
-size:14
+size:window.innerWidth<768?11:16
 },
 formatter:(v,ctx)=>{
 let total=ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0)
 let perc=Math.round((v*100)/total)
-return v+'\n'+perc+'%'
+return perc+'%'
 }
 }
 }
@@ -1160,54 +1171,52 @@ return v+'\n'+perc+'%'
 plugins:[ChartDataLabels]
 }
 )
-
+/*=========================================================
+008 DASHBOARD MAPA ITENS
+=========================================================*/
 let mapaItens={}
-
 lista.forEach(i=>{
-
 let item=String(
 i.item||
 getItemKey(i)||
 '0'
 )
-
 if(!mapaItens[item]){
 mapaItens[item]=[]
 }
-
 mapaItens[item].push(
 Number(getTotal(i)||0)
 )
-
 })
-
+/*=========================================================
+009 DASHBOARD LABELS E VALORES
+=========================================================*/
 let labels=Object.keys(mapaItens).sort((a,b)=>{
 let pa=a.split('.').map(Number)
 let pb=b.split('.').map(Number)
 if(pa[0]!==pb[0])return pa[0]-pb[0]
 return (pa[1]||0)-(pb[1]||0)
 })
-
 let valores=labels.map(l=>{
-
 let arr=mapaItens[l]
-
 return Math.round(
 arr.reduce((a,b)=>a+b,0)/(arr.length||1)
 )
-
 })
-
+/*=========================================================
+010 DASHBOARD CORES BARRAS
+=========================================================*/
 let cores=valores.map(v=>{
 if(v>=70)return '#22c55e'
 if(v>=31)return '#eab308'
 return '#ef4444'
 })
-
+/*=========================================================
+011 DASHBOARD DESTROI GRAFICO ANTERIOR
+=========================================================*/
 if(dashBarras){
 dashBarras.destroy()
 }
-
 dashBarras=new Chart(
 document.getElementById('graficoDashboardItens'),
 {
@@ -1240,8 +1249,8 @@ color:'#111827',
 anchor:'end',
 align:'top',
 font:{
-weight:'900',
-size:10
+size:window.innerWidth<768?9:14,
+weight:'900'
 },
 formatter:(v)=>v+'%'
 }
@@ -1259,7 +1268,6 @@ callback:(v)=>v+'%'
 plugins:[ChartDataLabels]
 }
 )
-
 console.log({
 media,
 totalItens,
@@ -1268,7 +1276,6 @@ concluidos,
 andamento,
 criticos
 })
-
 }
 /*=========================================================
 999 SEDAM CORE FUNCTION ABRIRDETALHESRESUMO
