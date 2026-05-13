@@ -285,9 +285,21 @@ tabUsuarios.style.display='none'
 
 }
 
-await carregarPerfis()
+if(
+!(
+perfil.origem==='SEDAM'&&
+Number(perfil.nivel_acesso)>=3
+)&&
+!(
+perfil.origem==='TCERO'&&
+Number(perfil.nivel_acesso)===4
+)
+){
 
+await carregarPerfis()
 await carregarTCERO()
+
+}
 
 await carregarDados()
 
@@ -421,6 +433,7 @@ viewTCERO.classList.add('hidden')
 if(isUsuarioSEDAM){
 
 if(tabTCERO){
+tabTCERO.classList.add('hidden')
 tabTCERO.style.display='none'
 }
 
@@ -464,7 +477,31 @@ v.style.opacity='0'
 document.querySelectorAll('.tab-btn').forEach(b=>{
 b.classList.remove('tab-active')
 })
+if(
+(
+origemUsuario==='SEDAM'&&
+nivelUsuario>=3
+)&&
+(
+t==='perfis'||
+t==='usuarios'||
+t==='tcero'
+)
+){
+return
+}
 
+if(
+origemUsuario==='TCERO'&&
+nivelUsuario===4&&
+(
+t==='perfis'||
+t==='usuarios'||
+t==='tcero'
+)
+){
+return
+}
 let view=document.getElementById('view-'+t)
 
 if(view){
