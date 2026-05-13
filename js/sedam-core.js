@@ -134,6 +134,34 @@ return
 }
 
 window.userP=perfil
+if(
+(
+perfil.origem==='SEDAM'&&
+Number(perfil.nivel_acesso)>=3
+)||
+(
+perfil.origem==='TCERO'&&
+Number(perfil.nivel_acesso)!==1
+)
+){
+
+let tabPerfis=document.getElementById('tab-perfis')
+let tabTCERO=document.getElementById('tab-tcero')
+let tabUsuarios=document.getElementById('tab-usuarios')
+
+if(tabPerfis){
+tabPerfis.style.display='none'
+}
+
+if(tabTCERO){
+tabTCERO.style.display='none'
+}
+
+if(tabUsuarios){
+tabUsuarios.style.display='none'
+}
+
+}
 userP=perfil
 
 localStorage.setItem(
