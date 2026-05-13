@@ -1051,7 +1051,9 @@ criticos++
 
 andamento++
 
-}else{
+}
+
+if(t<=0){
 
 pendentes++
 
