@@ -1030,17 +1030,34 @@ return acc+Number(getTotal(c)||0)
 },0)/(lista.length||1)
 )
 
-let concluidos=lista.filter(i=>Number(getTotal(i))>=100).length
+let concluidos=0
+let criticos=0
+let andamento=0
+let pendentes=0
 
-let andamento=lista.filter(i=>{
-let t=Number(getTotal(i))
-return t>0&&t<100
-}).length
+lista.forEach(i=>{
 
-let criticos=lista.filter(i=>{
-let t=Number(getTotal(i))
-return t<30
-}).length
+let t=Number(getTotal(i)||0)
+
+if(t>=100){
+
+concluidos++
+
+}else if(t>0&&t<=30){
+
+criticos++
+
+}else if(t>30&&t<100){
+
+andamento++
+
+}else{
+
+pendentes++
+
+}
+
+})
 
 document.getElementById('dashboardMediaGeral').innerText=media+'%'
 document.getElementById('dashboardTotalItens').innerText=totalItens
