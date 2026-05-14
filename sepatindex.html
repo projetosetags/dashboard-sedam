@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<!--=========================================================
+001 SEPAT INDEX HEAD
+=========================================================-->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TAG SEPAT-RO 2026</title>
+<link rel="icon" href="assets/sepat-card.png">
+<link rel="stylesheet" href="sepat.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="config.js"></script>
+</head>
+<body>
+<!--=========================================================
+002 SEPAT LOGIN
+=========================================================-->
+<section id="login-sepat" class="login-sepat">
+<div class="login-bg-sepat"></div>
+<div class="login-card-sepat">
+<div class="login-logo-sepat">SEPAT</div>
+<div class="login-sub-sepat">TAG/Sepat-2026</div>
+<input id="sepat-user" type="text" placeholder="Usuário" class="login-input-sepat">
+<input id="sepat-pass" type="password" placeholder="Senha" class="login-input-sepat">
+<button onclick="loginSepat()" class="login-btn-sepat">ACESSAR PAINEL</button>
+<button onclick="voltarPainelGeral()" class="login-voltar-sepat">← Voltar ao Painel Geral</button>
+</div>
+</section>
+<!--=========================================================
+003 SEPAT APP
+=========================================================-->
+<section id="app-sepat" class="app-sepat hidden">
+<header class="topo-sepat">
+<div>
+<div class="titulo-sepat">TAG SEPAT-RO 2026</div>
+<div id="sepat-user-info" class="usuario-sepat">-</div>
+</div>
+<div class="topo-acoes-sepat">
+<button onclick="voltarPainelGeral()" class="btn-topo-sepat">Painel Geral</button>
+<button onclick="logoutSepat()" class="btn-topo-sepat sair">Sair</button>
+</div>
+</header>
+<nav class="tabs-sepat">
+<button id="tab-dashboard" onclick="switchSepatTab('dashboard')" class="tab-sepat tab-active">📊<span>Dashboard</span></button>
+<button id="tab-resumo" onclick="switchSepatTab('resumo')" class="tab-sepat">📋<span>Resumo</span></button>
+<button id="tab-monitoramento" onclick="switchSepatTab('monitoramento')" class="tab-sepat">📝<span>Dados p/Monitoramento</span></button>
+<button id="tab-graficos" onclick="switchSepatTab('graficos')" class="tab-sepat">📈<span>Gráficos</span></button>
+<button id="tab-concluidos" onclick="switchSepatTab('concluidos')" class="tab-sepat">🏆<span>100% Cumpridos</span></button>
+<button id="tab-perfis" onclick="switchSepatTab('perfis')" class="tab-sepat hidden">👥<span>Perfis SEPAT</span></button>
+</nav>
+<main class="main-sepat">
+<!--=========================================================
+004 SEPAT DASHBOARD
+=========================================================-->
+<section id="view-dashboard" class="view-sepat">
+<div class="kpis-sepat">
+<div class="kpi-sepat azul"><div>Itens Estratégicos</div><strong id="kpiItensSepat">0</strong></div>
+<div class="kpi-sepat verde"><div>Subitens Monitorados</div><strong id="kpiSubitensSepat">0</strong></div>
+<div class="kpi-sepat roxo"><div>Produtos Únicos</div><strong id="kpiProdutosSepat">0</strong></div>
+<div class="kpi-sepat dourado"><div>Média Geral</div><strong id="kpiMediaSepat">0%</strong></div>
+</div>
+<div class="grid-dashboard-sepat">
+<div class="card-grafico-sepat">
+<div class="card-title-sepat">Evolução Geral</div>
+<canvas id="graficoLinhaSepat"></canvas>
+</div>
+<div class="card-grafico-sepat">
+<div class="card-title-sepat">Situação dos Subitens</div>
+<canvas id="graficoPizzaSepat"></canvas>
+</div>
+<div class="card-grafico-sepat full">
+<div class="card-title-sepat">Média por Item Estratégico</div>
+<canvas id="graficoBarrasSepat"></canvas>
+</div>
+</div>
+</section>
+<!--=========================================================
+005 SEPAT RESUMO
+=========================================================-->
+<section id="view-resumo" class="view-sepat hidden">
+<div class="barra-filtros-sepat">
+<button onclick="modoResumoSepat='item';renderResumoSepat()" class="btn-filtro-sepat">Itens</button>
+<button onclick="modoResumoSepat='subitem';renderResumoSepat()" class="btn-filtro-sepat">Subitens</button>
+<button onclick="gerarPDFResumoSepat()" class="btn-pdf-sepat">PDF Resumo</button>
+</div>
+<div id="cardsResumoSepat" class="cards-resumo-sepat"></div>
+</section>
+<!--=========================================================
+006 SEPAT MONITORAMENTO
+=========================================================-->
+<section id="view-monitoramento" class="view-sepat hidden">
+<div class="barra-filtros-sepat">
+<input id="buscaMonitoramentoSepat" oninput="renderTabelaSepat()" placeholder="Pesquisar..." class="input-busca-sepat">
+<button onclick="gerarPDFMonitoramentoSepat()" class="btn-pdf-sepat">PDF Monitoramento</button>
+</div>
+<div class="tabela-wrap-sepat">
+<table class="tabela-sepat">
+<thead>
+<tr>
+<th>Item</th>
+<th>Subitem</th>
+<th>Descrição</th>
+<th>Produto</th>
+<th>Responsável</th>
+<th>JAN</th>
+<th>FEV</th>
+<th>MAR</th>
+<th>ABR</th>
+<th>MAI</th>
+<th>TOTAL</th>
+</tr>
+</thead>
+<tbody id="tbodySepat"></tbody>
+</table>
+</div>
+</section>
+<!--=========================================================
+007 SEPAT GRAFICOS
+=========================================================-->
+<section id="view-graficos" class="view-sepat hidden">
+<div class="barra-filtros-sepat">
+<select id="filtroItemSepat" onchange="popularSubitensSepat();renderGraficoMasterSepat()" class="select-sepat"></select>
+<select id="filtroSubitemSepat" onchange="renderGraficoMasterSepat()" class="select-sepat"></select>
+<button onclick="gerarPDFGraficosSepat()" class="btn-pdf-sepat">PDF Gráficos</button>
+</div>
+<div class="card-grafico-sepat grande">
+<div class="card-title-sepat">Análise Gráfica SEPAT</div>
+<canvas id="graficoMasterSepat"></canvas>
+</div>
+<div id="descGraficoSepat" class="descricao-grafico-sepat"></div>
+</section>
+<!--=========================================================
+008 SEPAT CONCLUIDOS
+=========================================================-->
+<section id="view-concluidos" class="view-sepat hidden">
+<div class="barra-filtros-sepat">
+<button onclick="gerarPDFConcluidosSepat()" class="btn-pdf-sepat">PDF 100%</button>
+</div>
+<div id="cardsConcluidosSepat" class="cards-resumo-sepat"></div>
+</section>
+<!--=========================================================
+009 SEPAT PERFIS
+=========================================================-->
+<section id="view-perfis" class="view-sepat hidden">
+<div class="barra-filtros-sepat">
+<button onclick="carregarPerfisSepat()" class="btn-filtro-sepat">Atualizar Perfis</button>
+</div>
+<div id="listaPerfisSepat" class="lista-perfis-sepat"></div>
+</section>
+</main>
+</section>
+<!--=========================================================
+010 SEPAT MODAL
+=========================================================-->
+<div id="modalSepat" class="modal-sepat hidden">
+<div class="modal-card-sepat">
+<button onclick="fecharModalSepat()" class="modal-close-sepat">×</button>
+<div id="modalConteudoSepat"></div>
+</div>
+</div>
+<script src="sepat-core.js"></script>
+</body>
+</html>
