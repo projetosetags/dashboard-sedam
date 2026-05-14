@@ -359,7 +359,7 @@ await carregarDashboard()
 document.addEventListener('DOMContentLoaded',async()=>{
 
 await carregarListaMonitoramentos()
-
+await atualizarSemaforosAutomaticos()
 })
 
 async function filtrarMonitoramentos(){
@@ -658,7 +658,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
 
 await carregarTimeline()
 await carregarRanking()
-
+await carregarAlertasTecnicos()
 })
 
 async function carregarGraficoCriticidade(){
@@ -849,7 +849,7 @@ setInterval(async()=>{
 try{
 
 await carregarDashboard()
-
+await carregarAlertasTecnicos()
 }catch(e){
 
 console.log(e)
@@ -857,3 +857,157 @@ console.log(e)
 }
 
 },60000)
+
+async function atualizarSemaforosAutomaticos(){
+
+let{data,error}=await client
+.from('monitoramento_itens')
+.select('*')
+
+if(error){
+console.log(error)
+return
+}
+
+for(let item of(data||[])){
+
+let status=item.status||'EM ANDAMENTO'
+
+let percentual=Number(item.percentual||0)
+
+let prazo=item.prazo
+
+let criticidade='BAIXA'
+
+if(percentual<40){
+criticidade='ALTA'
+}else if(percentual<80){
+criticidade='MÉDIA'
+}
+
+if(prazo){
+
+let hoje=new Date()
+
+let dtPrazo=new Date(prazo)
+
+if(dtPrazo<hoje&&status!=='EXECUTADA'){
+
+criticidade='ALTA'
+
+}
+
+}
+
+await client
+.from('monitoramento_itens')
+.update({
+criticidade:criticidade
+})
+.eq('id',item.id)
+
+}
+
+await carregarItensMatriz()
+await carregarDashboard()
+
+}
+
+async function carregarAlertasTecnicos(){
+
+let{data,error}=await client
+.from('monitoramento_itens')
+.select('*')
+
+if(error){
+console.log(error)
+return
+}
+
+let html=''
+
+let hoje=new Date()
+
+;(data||[]).forEach(i=>{
+
+let alertas=[]
+
+let percentual=Number(i.percentual||0)
+
+if(percentual<40){
+
+alertas.push(
+'Percentual inferior a 40%'
+)
+
+}
+
+if(i.criticidade==='ALTA'){
+
+alertas.push(
+'Criticidade alta identificada'
+)
+
+}
+
+if(i.status==='NÃO EXECUTADA'){
+
+alertas.push(
+'Item não executado'
+)
+
+}
+
+if(i.prazo){
+
+let prazo=new Date(i.prazo)
+
+if(prazo<hoje&&i.status!=='EXECUTADA'){
+
+alertas.push(
+'Prazo expirado'
+)
+
+}
+
+}
+
+if(alertas.length>0){
+
+html+=`
+<div class="alerta-box">
+
+<div class="alerta-titulo">
+⚠ ITEM ${i.item||'-'} • ${i.subitem||'-'}
+</div>
+
+<div class="alerta-texto">
+
+${alertas.map(a=>`• ${a}`).join('<br>')}
+
+</div>
+
+</div>
+`
+
+}
+
+})
+
+if(!html){
+
+html=`
+<div class="alerta-box" style="background:#064e3b;border-color:#10b981;">
+<div class="alerta-titulo">
+✔ Nenhum alerta crítico identificado
+</div>
+<div class="alerta-texto" style="color:#d1fae5;">
+Os itens monitorados encontram-se dentro dos parâmetros técnicos esperados.
+</div>
+</div>
+`
+}
+
+document.getElementById('painelAlertas').innerHTML=html
+
+}
