@@ -376,63 +376,47 @@ let tabPerfis=document.getElementById('tab-perfis')
 let tabTCERO=document.getElementById('tab-tcero')
 let tabUsuarios=document.getElementById('tab-usuarios')
 
+let viewPerfis=document.getElementById('view-perfis')
+let viewTCERO=document.getElementById('view-tcero')
+let viewUsuarios=document.getElementById('view-usuarios')
+
 /*=========================================================
 OCULTA TUDO PRIMEIRO
 =========================================================*/
 ;[
 tabPerfis,
 tabTCERO,
-tabUsuarios
-].forEach(t=>{
+tabUsuarios,
+viewPerfis,
+viewTCERO,
+viewUsuarios
+].forEach(el=>{
 
-if(t){
-t.classList.add('hidden')
-t.style.display='none'
+if(el){
+el.classList.add('hidden')
+el.style.display='none'
 }
 
 })
 
 /*=========================================================
-SEDAM NIVEL 1 E 2
+LIBERA SOMENTE NIVEL 1
 =========================================================*/
-if(
-origem==='SEDAM'&&
-nivel<=2
-){
+if(nivel===1){
 
 if(tabPerfis){
 tabPerfis.classList.remove('hidden')
 tabPerfis.style.display='inline-flex'
-}
-
-if(tabUsuarios){
-tabUsuarios.classList.remove('hidden')
-tabUsuarios.style.display='inline-flex'
-}
-
-}
-
-/*=========================================================
-TCERO NIVEL 1
-=========================================================*/
-if(
-origem==='TCERO'&&
-nivel===1
-){
-
-if(tabPerfis){
-tabPerfis.classList.remove('hidden')
-tabPerfis.style.display='inline-flex'
-}
-
-if(tabUsuarios){
-tabUsuarios.classList.remove('hidden')
-tabUsuarios.style.display='inline-flex'
 }
 
 if(tabTCERO){
 tabTCERO.classList.remove('hidden')
 tabTCERO.style.display='inline-flex'
+}
+
+if(tabUsuarios){
+tabUsuarios.classList.remove('hidden')
+tabUsuarios.style.display='inline-flex'
 }
 
 }
@@ -587,21 +571,6 @@ b.classList.remove('tab-active')
 })
 
 if(
-(
-origemUsuario==='SEDAM'&&
-nivelUsuario>=3
-)&&
-(
-t==='perfis'||
-t==='usuarios'||
-t==='tcero'
-)
-){
-return
-}
-
-if(
-origemUsuario==='TCERO'&&
 nivelUsuario!==1&&
 (
 t==='perfis'||
