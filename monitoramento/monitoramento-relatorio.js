@@ -343,3 +343,27 @@ document.getElementById('previewRelatorio').innerHTML=html
 abrirTela('relatorios')
 
 }
+
+function abrirModoImpressao(){
+
+let html=document
+.getElementById('previewRelatorio')
+.innerHTML
+
+document
+.getElementById('conteudoImpressao')
+.innerHTML=html
+
+document
+.getElementById('modalImpressao')
+.classList.remove('hidden')
+
+}
+
+function fecharModalImpressao(){
+
+document
+.getElementById('modalImpressao')
+.classList.add('hidden')
+
+}
