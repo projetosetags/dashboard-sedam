@@ -727,6 +727,9 @@ return
 let query=client
 .from('deliberacoes')
 .select('*')
+.order('ordem1',{ascending:true})
+.order('ordem2',{ascending:true})
+.order('subitem',{ascending:true})
 
 let {data,error}=await query
 
@@ -776,8 +779,10 @@ total=Math.max(...meses,0)
 
 return{
 ...i,
-item:i.item||String(i.subitem||'').split('.')[0]||'0',
-subitem:i.subitem||'0.0',
+item:String(i.item||i.numitem||String(i.subitem||'').split('.')[0]||'0'),
+subitem:String(i.subitem||'0.0'),
+ordem1:Number(i.ordem1||i.numsubitem||0),
+ordem2:Number(i.ordem2||0),
 jan:Number(i.jan||0),
 fev:Number(i.fev||0),
 mar:Number(i.mar||0),
@@ -825,6 +830,7 @@ String(i.responsavel_id||'')===String(userP.id||'')
 
 }
 
+dadosFiltrados=dadosFiltrados.sort(compareSubitem)
 window.allData=[...dadosFiltrados]
 window.dados=[...dadosFiltrados]
 window.dadosFiltrados=[...dadosFiltrados]
@@ -896,15 +902,18 @@ renderDashboard()
 
 }
 
-
-
-
 /*=========================================================
-005 SEDAM CORE FUNCTION RENDERRESUMOITENS
+005A SEDAM CORE FUNCTION COMPARESUBITEM
 =========================================================*/
 function compareSubitem(a,b){
-let sa=String(a.item||a.subitem||'0.0').replace(/[^\d\.]/g,'')
-let sb=String(b.item||b.subitem||'0.0').replace(/[^\d\.]/g,'')
+let oa=Number(a.ordem1||a.ordem||a.numsubitem||0)
+let ob=Number(b.ordem1||b.ordem||b.numsubitem||0)
+if(oa>0&&ob>0&&oa!==ob)return oa-ob
+let o2a=Number(a.ordem2||0)
+let o2b=Number(b.ordem2||0)
+if(oa>0&&ob>0&&o2a!==o2b)return o2a-o2b
+let sa=String(a.subitem||a.item||'0.0').replace(/[^\d\.]/g,'')
+let sb=String(b.subitem||b.item||'0.0').replace(/[^\d\.]/g,'')
 let pa=sa.split('.').map(n=>parseInt(n)||0)
 let pb=sb.split('.').map(n=>parseInt(n)||0)
 let max=Math.max(pa.length,pb.length)
@@ -915,6 +924,9 @@ if(va!==vb)return va-vb
 }
 return 0
 }
+/*=========================================================
+005B SEDAM CORE FUNCTION RENDERRESUMO ITENS
+=========================================================*/
 function renderResumoItens(){
 let box=document.getElementById('cards-container')
 if(!box)return
@@ -1263,8 +1275,9 @@ return v
 return 0
 
 }
-
-
+/*=========================================================
+00 SEDAM CORE FUNCTION RENDERDASHBOARD
+=========================================================*/
 function renderDashboard(){
 console.log('RENDER DASHBOARD')
 let lista=window.allData||[]
