@@ -67,6 +67,10 @@ AUDITOR
 📑 Resultados
 </button>
 
+<button class="nav-btn" onclick="abrirTela('auditoria')">
+🕓 Auditoria
+</button>
+
 </nav>
 
 <main class="conteudo-monitoramento">
@@ -443,6 +447,20 @@ AUDITOR
 </div>
 
 <div id="listaResultados"></div>
+
+</section>
+
+<section id="tela-auditoria" class="tela-monitoramento hidden">
+
+<div class="top-actions">
+
+<button class="btn-padrao azul" onclick="carregarAuditoriaCompleta()">
+🔄 Atualizar Auditoria
+</button>
+
+</div>
+
+<div id="listaAuditoria"></div>
 
 </section>
 
