@@ -148,3 +148,39 @@ white-space:nowrap!important;
 overflow:hidden!important;
 text-overflow:ellipsis!important;
 }
+
+/*=========================================================
+000 PAINEL GERAL DE ACESSO
+=========================================================*/
+.painel-geral-acesso{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:url('assets/portovelho.png') center center/cover no-repeat;overflow:hidden;font-family:Inter,Arial,sans-serif}
+.painel-geral-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,80,150,.10),rgba(0,0,0,.25));backdrop-filter:saturate(1.2)}
+.painel-geral-conteudo{position:relative;z-index:2;width:min(1500px,94vw);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.painel-geral-titulo{font-size:clamp(34px,5vw,72px);font-weight:1000;color:#ffffff;letter-spacing:8px;text-align:center;text-shadow:0 8px 20px rgba(0,0,0,.45)}
+.painel-geral-subtitulo{font-size:clamp(18px,2vw,30px);font-weight:700;color:#ffffff;margin-top:12px;margin-bottom:42px;text-shadow:0 5px 14px rgba(0,0,0,.45)}
+.painel-geral-grid{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;align-items:stretch}
+.painel-card{height:470px;border-radius:28px;overflow:hidden;background:rgba(255,255,255,.62);box-shadow:0 24px 70px rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.72);backdrop-filter:blur(12px);cursor:pointer;transition:.25s ease;display:flex;flex-direction:column}
+.painel-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:0 30px 90px rgba(0,0,0,.38)}
+.painel-card-topo{height:92px;display:flex;align-items:center;justify-content:center;gap:20px;color:#fff}
+.painel-topo-sedam{background:linear-gradient(135deg,#123b17,#0f2f13)}
+.painel-topo-sepat{background:linear-gradient(135deg,#0877d8,#0050aa);flex-direction:column;gap:2px}
+.painel-topo-queimadas{height:0;background:transparent;position:relative}
+.painel-logo-texto{font-size:28px;font-weight:1000;letter-spacing:2px}
+.painel-logo-ro{font-size:44px;font-weight:1000;line-height:.72;border-left:2px solid rgba(255,255,255,.7);padding-left:18px}
+.painel-logo-ro span{font-size:28px;font-weight:900}
+.painel-logo-sepat{font-size:44px;font-weight:1000;letter-spacing:3px;line-height:1}
+.painel-logo-sub{font-size:15px;font-weight:700;text-align:center;line-height:1.15}
+.painel-logo-fogo{position:absolute;right:28px;top:26px;width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#c2410c,#7c2d12);border:3px solid rgba(255,255,255,.82);font-size:38px;box-shadow:0 14px 35px rgba(0,0,0,.35);z-index:5}
+.painel-card-img{height:205px;background-size:cover;background-position:center}
+.painel-img-sedam{background-image:url('assets/portovelho.png')}
+.painel-img-sepat{background-image:linear-gradient(rgba(0,80,170,.08),rgba(0,80,170,.08)),url('assets/sepat-card.png')}
+.painel-img-queimadas{background-image:linear-gradient(rgba(120,40,10,.10),rgba(120,40,10,.10)),url('assets/queimadas-card.png');height:297px}
+.painel-card-base{flex:1;background:rgba(255,255,255,.78);padding:24px 30px 28px;display:flex;flex-direction:column;justify-content:space-between}
+.painel-card-titulo{font-size:clamp(25px,2.2vw,38px);font-weight:1000;line-height:1.16;text-shadow:0 2px 0 rgba(255,255,255,.6)}
+.sedam-cor{color:#17451d}
+.sepat-cor{color:#073f91}
+.queimadas-cor{color:#7c2d12}
+.painel-card-btn{height:56px;border:none;border-radius:14px;font-size:18px;font-weight:1000;display:flex;align-items:center;justify-content:space-between;padding:0 22px;cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.btn-sedam{background:#17451d;color:#fff}
+.btn-sepat{background:#f8fbff;color:#0759c9;border:1px solid rgba(0,90,200,.35)}
+.btn-queimadas{background:#fffaf5;color:#c2410c;border:1px solid rgba(194,65,12,.35)}
+@media(max-width:1100px){.painel-geral-acesso{position:absolute;min-height:100vh;height:auto;padding:40px 0}.painel-geral-grid{grid-template-columns:1fr}.painel-card{height:430px}.painel-geral-titulo{letter-spacing:3px}.painel-geral-subtitulo{margin-bottom:24px}}
