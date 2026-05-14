@@ -22,7 +22,37 @@ document
 .querySelectorAll('.nav-btn')
 .forEach(b=>b.classList.remove('nav-active'))
 
+if(event&&event.target){
 event.target.classList.add('nav-active')
+}
+
+if(nome==='auditoria'){
+carregarAuditoriaCompleta()
+}
+
+if(nome==='dashboard'){
+carregarDashboard()
+}
+
+if(nome==='monitoramentos'){
+carregarListaMonitoramentos()
+}
+
+if(nome==='matriz'){
+carregarItensMatriz()
+}
+
+if(nome==='evidencias'){
+carregarEvidencias()
+}
+
+if(nome==='analises'){
+carregarAnalises()
+}
+
+if(nome==='resultados'){
+carregarResultados()
+}
 
 }
 
