@@ -28,20 +28,10 @@ if(!key)return
 if(!mapa[key])mapa[key]=[]
 mapa[key].push(i)
 })
-let keys=Object.keys(mapa)
-.filter(k=>k)
-.sort((a,b)=>{
-function ordem(v){
-let p=String(v).split('.')
-return{
-n1:parseInt(p[0]||0),
-n2:parseInt(p[1]||0)
-}
-}
-let pa=ordem(a)
-let pb=ordem(b)
-if(pa.n1!==pb.n1)return pa.n1-pb.n1
-return pa.n2-pb.n2
+let keys=Object.keys(mapa).filter(k=>k).sort((a,b)=>{
+let ra=(base||[]).find(x=>String((modoResumo==='item')?x.item:x.subitem)===String(a))||{subitem:a,item:a}
+let rb=(base||[]).find(x=>String((modoResumo==='item')?x.item:x.subitem)===String(b))||{subitem:b,item:b}
+return compareSubitem(ra,rb)
 })
 let html=''
 let container=document.getElementById('cards-container')
@@ -264,7 +254,7 @@ editar
 <td class="td-total text-emerald-400">${total.toFixed(2)}%</td>
 </tr>`
 }).join('')
-let itensTotal=new Set((window.allData||[]).map(x=>getItemKey(x))).size
+let itensTotal=new Set((window.allData||[]).map(x=>String(x.item||'').trim()).filter(Boolean)).size
 let pdfHTML=''
 if(
 userP&&
