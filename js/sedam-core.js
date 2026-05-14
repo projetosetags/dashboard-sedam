@@ -1493,7 +1493,7 @@ labels:[
 'Cumpridos 100%',
 'Em Andamento 30% a 99%',
 'Abaixo de 30%',
-'Pendentes'
+'Pendentes 0%'
 ],
 datasets:[{
 data:[
