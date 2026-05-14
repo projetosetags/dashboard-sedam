@@ -63,6 +63,10 @@ AUDITOR
 📄 Relatórios
 </button>
 
+<button class="nav-btn" onclick="abrirTela('resultados')">
+📑 Resultados
+</button>
+
 </nav>
 
 <main class="conteudo-monitoramento">
@@ -366,7 +370,75 @@ AUDITOR
 
 </div>
 
+<div class="relatorio-actions">
+
+<button class="btn-padrao verde" onclick="gerarRelatorioCompleto()">
+📑 Relatório Completo
+</button>
+
+<button class="btn-padrao azul" onclick="gerarResumoIA()">
+🧠 Resumo Executivo
+</button>
+
+<button class="btn-padrao" onclick="gerarPDFMonitoramento()">
+📄 Exportar PDF
+</button>
+
+</div>
+
 <div id="previewRelatorio" class="preview-relatorio"></div>
+
+</section>
+
+<section id="tela-resultados" class="tela-monitoramento hidden">
+
+<div class="top-actions">
+
+<button class="btn-padrao" onclick="salvarResultadoMonitoramento()">
+💾 Salvar Resultado
+</button>
+
+<button class="btn-padrao azul" onclick="limparResultadoMonitoramento()">
+🧹 Limpar
+</button>
+
+</div>
+
+<div class="form-matriz">
+
+<div class="campo-form">
+<label>Situação Encontrada</label>
+<textarea id="rSituacao" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Efeitos</label>
+<textarea id="rEfeitos" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Causas</label>
+<textarea id="rCausas" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Boas Práticas</label>
+<textarea id="rBoasPraticas" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Encaminhamento</label>
+<textarea id="rEncaminhamento" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Benefícios</label>
+<textarea id="rBeneficios" class="textarea-form"></textarea>
+</div>
+
+</div>
+
+<div id="listaResultados"></div>
 
 </section>
 
@@ -381,6 +453,7 @@ AUDITOR
 <script src="monitoramento-relatorio.js"></script>
 <script src="monitoramento-analise-ia.js"></script>
 <script src="monitoramento-pdf.js"></script>
+<script src="monitoramento-resultados.js"></script>
 
 </body>
 </html>
