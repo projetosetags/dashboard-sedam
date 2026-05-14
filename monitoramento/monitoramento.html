@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MONITORAMENTO TÉCNICO</title>
+<link rel="icon" href="../assets/logo.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link rel="stylesheet" href="monitoramento.css">
+</head>
+<body>
+
+<div id="appMonitoramento">
+
+<header class="topbar">
+
+<div class="topbar-left">
+<div class="logo-box">📊</div>
+<div>
+<h1 class="titulo-sistema">MONITORAMENTO TÉCNICO</h1>
+<div class="subtitulo-sistema">
+Tribunal de Contas • Painel de Auditoria
+</div>
+</div>
+</div>
+
+<div class="topbar-right">
+<div id="usuarioLogado" class="usuario-logado">
+AUDITOR
+</div>
+</div>
+
+</header>
+
+<nav class="nav-monitoramento">
+
+<button class="nav-btn nav-active" onclick="abrirTela('dashboard')">
+📈 Dashboard
+</button>
+
+<button class="nav-btn" onclick="abrirTela('monitoramentos')">
+📂 Monitoramentos
+</button>
+
+<button class="nav-btn" onclick="abrirTela('matriz')">
+🧩 Matriz
+</button>
+
+<button class="nav-btn" onclick="abrirTela('evidencias')">
+📎 Evidências
+</button>
+
+<button class="nav-btn" onclick="abrirTela('analises')">
+🧠 Análises
+</button>
+
+<button class="nav-btn" onclick="abrirTela('relatorios')">
+📄 Relatórios
+</button>
+
+</nav>
+
+<main class="conteudo-monitoramento">
+
+<section id="tela-dashboard" class="tela-monitoramento">
+
+<div class="grid-cards">
+
+<div class="card-kpi">
+<div class="kpi-titulo">TOTAL</div>
+<div id="kpiTotal" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi verde">
+<div class="kpi-titulo">EXECUTADAS</div>
+<div id="kpiExecutadas" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi amarelo">
+<div class="kpi-titulo">PARCIAIS</div>
+<div id="kpiParciais" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi vermelho">
+<div class="kpi-titulo">NÃO EXECUTADAS</div>
+<div id="kpiNaoExecutadas" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi azul">
+<div class="kpi-titulo">EM ANDAMENTO</div>
+<div id="kpiAndamento" class="kpi-valor">0</div>
+</div>
+
+</div>
+
+<div class="painel-graficos">
+
+<div class="grafico-box">
+<canvas id="graficoStatus"></canvas>
+</div>
+
+<div class="grafico-box">
+<canvas id="graficoEvolucao"></canvas>
+</div>
+
+</div>
+
+</section>
+
+<section id="tela-monitoramentos" class="tela-monitoramento hidden">
+
+<div class="top-actions">
+
+<button class="btn-padrao" onclick="novoMonitoramento()">
+➕ Novo Monitoramento
+</button>
+
+<input type="text" id="buscaMonitoramento" placeholder="Pesquisar..." class="input-busca">
+
+</div>
+
+<div id="listaMonitoramentos" class="lista-monitoramentos"></div>
+
+</section>
+
+<section id="tela-matriz" class="tela-monitoramento hidden">
+
+<div class="top-actions">
+
+<button class="btn-padrao" onclick="novoItemMatriz()">
+➕ Novo Item
+</button>
+
+</div>
+
+<div class="table-wrap">
+
+<table class="tabela-monitoramento">
+
+<thead>
+<tr>
+<th>Item</th>
+<th>Subitem</th>
+<th>Deliberação</th>
+<th>Status</th>
+<th>Criticidade</th>
+<th>Prazo</th>
+<th>%</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="tbodyMatriz"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+<section id="tela-evidencias" class="tela-monitoramento hidden">
+
+<div class="upload-box">
+
+<input type="file" id="arquivoEvidencia">
+
+<button class="btn-padrao" onclick="uploadEvidencia()">
+📤 Enviar Evidência
+</button>
+
+</div>
+
+<div id="listaEvidencias"></div>
+
+</section>
+
+<section id="tela-analises" class="tela-monitoramento hidden">
+
+<div class="analise-box">
+
+<textarea id="textoAnalise" class="textarea-analise" placeholder="Digite a análise técnica..."></textarea>
+
+<button class="btn-padrao" onclick="salvarAnalise()">
+💾 Salvar Análise
+</button>
+
+<button class="btn-padrao azul" onclick="gerarAnaliseIA()">
+🧠 Gerar IA
+</button>
+
+</div>
+
+<div id="listaAnalises"></div>
+
+</section>
+
+<section id="tela-relatorios" class="tela-monitoramento hidden">
+
+<div class="relatorio-actions">
+
+<button class="btn-padrao verde" onclick="gerarPDFMonitoramento()">
+📄 Gerar PDF
+</button>
+
+<button class="btn-padrao azul" onclick="gerarResumoIA()">
+🧠 Gerar Resumo IA
+</button>
+
+</div>
+
+<div id="previewRelatorio" class="preview-relatorio"></div>
+
+</section>
+
+</main>
+
+</div>
+
+<script src="monitoramento-core.js"></script>
+<script src="monitoramento-painel.js"></script>
+<script src="monitoramento-matriz.js"></script>
+<script src="monitoramento-evidencias.js"></script>
+<script src="monitoramento-relatorio.js"></script>
+<script src="monitoramento-analise-ia.js"></script>
+<script src="monitoramento-pdf.js"></script>
+
+</body>
+</html>
