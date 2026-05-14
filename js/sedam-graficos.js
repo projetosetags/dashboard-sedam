@@ -66,12 +66,7 @@ let filtroItem=document.getElementById('filtroItem')
 if(!sel||!filtroItem)return
 let dados=[...(window.allData||[])]
 let itemSelecionado=String(filtroItem.value||'todos')
-let lista=[]
-if(itemSelecionado==='todos'){
-lista=[...dados]
-}else{
-lista=dados.filter(i=>String(i.item||i.numitem||'')===String(itemSelecionado))
-}
+let lista=itemSelecionado==='todos'?dados:dados.filter(i=>String(i.item||i.numitem||'')===String(itemSelecionado))
 lista=lista.filter(i=>String(i.subitem||'').trim()!=='')
 lista=lista.sort(compareSubitemGrafico)
 let vistos={}
@@ -91,10 +86,17 @@ html+=`<option value="TOTAL">TODOS DO ITEM ${itemSelecionado} (${lista.length})<
 html+=lista.map(i=>{
 let total=getTotal(i)
 let idValor=i.id?i.id:i.subitem
-return `<option value="${idValor}">${i.subitem} • ${total}% • ${truncarTexto(String(i.descricao||'-'),120)}</option>`
+let sub=String(i.subitem||'-')
+let desc=String(i.descricao||'-').replace(/\s+/g,' ').trim()
+let descCurta=desc.length>72?desc.substring(0,72)+'...':desc
+return `<option title="${sub} • ${total}% • ${desc}" value="${idValor}">${sub} • ${total}% • ${descCurta}</option>`
 }).join('')
 sel.innerHTML=html
-console.log('SUBITENS CARREGADOS NO GRÁFICO:',lista.length,lista.map(i=>i.subitem))
+sel.style.maxWidth='100%'
+sel.style.width='100%'
+sel.style.fontSize='11px'
+sel.style.lineHeight='1.2'
+console.log('SUBITENS CARREGADOS NO GRÁFICO:',lista.length)
 }
 /*=========================================================
 004 GRAFICOS FUNCTION RENDERGRAFICOMASTER
