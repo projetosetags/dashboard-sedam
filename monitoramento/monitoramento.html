@@ -171,9 +171,100 @@ AUDITOR
 
 <div class="top-actions">
 
-<button class="btn-padrao" onclick="novoItemMatriz()">
-➕ Novo Item
+<button class="btn-padrao" onclick="salvarNovoItemMatriz()">
+💾 Salvar Item
 </button>
+
+<button class="btn-padrao azul" onclick="limparFormularioMatriz()">
+🧹 Limpar
+</button>
+
+</div>
+
+<div class="form-matriz">
+
+<div class="form-grid">
+
+<div class="campo-form">
+<label>Item</label>
+<input type="text" id="mItem" class="input-form">
+</div>
+
+<div class="campo-form">
+<label>Subitem</label>
+<input type="text" id="mSubitem" class="input-form">
+</div>
+
+<div class="campo-form">
+<label>Status</label>
+<select id="mStatus" class="input-form">
+<option>EM ANDAMENTO</option>
+<option>EXECUTADA</option>
+<option>PARCIALMENTE EXECUTADA</option>
+<option>NÃO EXECUTADA</option>
+</select>
+</div>
+
+<div class="campo-form">
+<label>Criticidade</label>
+<select id="mCriticidade" class="input-form">
+<option>ALTA</option>
+<option>MÉDIA</option>
+<option>BAIXA</option>
+</select>
+</div>
+
+<div class="campo-form">
+<label>Prazo</label>
+<input type="date" id="mPrazo" class="input-form">
+</div>
+
+<div class="campo-form">
+<label>Percentual</label>
+<input type="number" id="mPercentual" class="input-form" min="0" max="100">
+</div>
+
+</div>
+
+<div class="campo-form">
+<label>Achado</label>
+<textarea id="mAchado" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Causa</label>
+<textarea id="mCausa" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Efeito</label>
+<textarea id="mEfeito" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Deliberação</label>
+<textarea id="mDeliberacao" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Ação do Gestor</label>
+<textarea id="mAcaoGestor" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Produto Esperado</label>
+<textarea id="mProduto" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Entrega Esperada</label>
+<textarea id="mEntrega" class="textarea-form"></textarea>
+</div>
+
+<div class="campo-form">
+<label>Benefício Esperado</label>
+<textarea id="mBeneficio" class="textarea-form"></textarea>
+</div>
 
 </div>
 
@@ -185,11 +276,10 @@ AUDITOR
 <tr>
 <th>Item</th>
 <th>Subitem</th>
-<th>Deliberação</th>
 <th>Status</th>
+<th>%</th>
 <th>Criticidade</th>
 <th>Prazo</th>
-<th>%</th>
 <th>Ações</th>
 </tr>
 </thead>
