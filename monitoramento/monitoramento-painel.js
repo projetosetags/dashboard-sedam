@@ -843,3 +843,17 @@ plugins:[ChartDataLabels]
 })
 
 }
+
+setInterval(async()=>{
+
+try{
+
+await carregarDashboard()
+
+}catch(e){
+
+console.log(e)
+
+}
+
+},60000)
