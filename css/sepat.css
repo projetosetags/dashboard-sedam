@@ -10,8 +10,8 @@ canvas{width:100%!important;max-width:100%!important}
 /*=========================================================
 002 SEPAT LOGIN
 =========================================================*/
-.login-sepat{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:url('../assets/portovelho.png') center center/cover no-repeat}
-.login-bg-sepat{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,72,150,.25),rgba(0,0,0,.35));backdrop-filter:blur(1px)}
+.login-sepat{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:url('../assets/portovelho.png') center center/cover no-repeat;filter:contrast(1.08) saturate(1.15) brightness(1.02)}
+.login-bg-sepat{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,72,150,.10),rgba(0,0,0,.18));backdrop-filter:blur(.3px)}
 .login-card-sepat{position:relative;z-index:2;width:min(360px,90vw);background:rgba(255,255,255,.78);border:1px solid rgba(255,255,255,.9);box-shadow:0 25px 70px rgba(0,0,0,.35);border-radius:28px;padding:34px 28px;display:flex;flex-direction:column;gap:14px;text-align:center;backdrop-filter:blur(16px)}
 .login-logo-sepat{font-size:46px;font-weight:1000;color:#0759c9;letter-spacing:4px;line-height:1;text-shadow:0 2px 0 rgba(255,255,255,.8)}
 .login-sub-sepat{font-size:15px;font-weight:1000;color:#0f172a;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
