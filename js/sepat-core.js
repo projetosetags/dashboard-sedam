@@ -1,5 +1,4 @@
 /*=========================================================
-/*=========================================================
 001 SEPAT CORE CONFIG
 =========================================================*/
 const SEPAT_SUPABASE_URL=window.S_URL||window.SUPABASE_URL||''
@@ -245,7 +244,7 @@ return'vermelho'
 009 SEPAT CORE CARREGAR DADOS
 =========================================================*/
 async function carregarSepatDados(){
-let {data,error}=await sepatClient.from('vw_sepat_dashboard').select('*').order('numitem',{ascending:true}).order('numsubitem',{ascending:true}).order('numproduto',{ascending:true})
+let {data,error}=await sepatClient.from('sepat_deliberacoes').select('*').order('siglaitem',{ascending:true})
 if(error){
 console.log(error)
 alert('Erro ao carregar dados da SEPAT')
@@ -569,8 +568,7 @@ i.subitem,
 i.item,
 i.descricaoitem,
 i.produto,
-i.responsavel,
-i.setor
+i.cargo
 ]
 .join(' ')
 .toLowerCase()
@@ -589,16 +587,12 @@ let total=getTotalSepat(i)
 let html=`
 <tr>
 
-<td>
-<b>${i.siglaitem||'-'}</b>
-<br>
-<span>${i.item||'-'}</span>
+<td class="col-subitem">
+${i.siglaitem||'-'}
 </td>
 
 <td>
-<b>${i.subitem||'-'}</b>
-<br>
-${i.descricaoitem||'-'}
+${i.subitem||'-'}
 </td>
 
 <td>
@@ -606,16 +600,13 @@ ${i.produto||'-'}
 </td>
 
 <td>
-${i.responsavel||'-'}
+${i.cargo||'-'}
 </td>
 `
 
 MESES_SEPAT.forEach(mes=>{
-
 let nivel=Number(sepatUser?.nivel_acesso||99)
-
 let valorAtual=Number(i[mes]||0)
-
 let podeEditar=false
 
 /*=========================================================
@@ -625,7 +616,6 @@ EDITA SEMPRE
 if(nivel===1){
 podeEditar=true
 }
-
 /*=========================================================
 NIVEL 2
 SOMENTE MES VIGENTE
@@ -644,8 +634,18 @@ mes===mesAtual
 ?'mes-atual-sepat'
 :''
 
+let ocultar=(
+mes==='jun'||
+mes==='jul'||
+mes==='ago'||
+mes==='set'||
+mes==='out'||
+mes==='nov'||
+mes==='dez'
+)
+
 html+=`
-<td class="${clsMes}">
+<td class="${clsMes} ${ocultar?'hidden mes-col mes-'+mes:''}">
 <input
 type="number"
 min="0"
@@ -703,10 +703,10 @@ let item=sepatData.find(i=>String(i.id)===String(id))
 
 if(item){
 item[mes]=valor
+item.total_cumprimento=getTotalSepat(item)
 }
-
 renderDashboardSepat()
-
+controlarMesesSepat()
 }
 
 /*=========================================================
