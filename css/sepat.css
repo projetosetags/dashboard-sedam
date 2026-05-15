@@ -144,7 +144,13 @@ canvas{width:100%!important;max-width:100%!important}
 .tabela-wrap-sepat{border-radius:20px;max-height:calc(100vh - 245px);overflow:auto}
 .tabela-sepat{min-width:1180px}
 .tabela-sepat th{font-size:9px;padding:7px 6px;line-height:1;white-space:nowrap}
-
+.tabela-sepat th:nth-child(1){
+width:55px!important;
+min-width:55px!important;
+max-width:55px!important;
+text-align:center;
+padding:6px 2px!important;
+}
 .tabela-sepat td{
 font-size:10px;
 padding:6px 7px;
@@ -156,7 +162,17 @@ overflow:visible!important;
 text-overflow:unset!important;
 height:auto!important;
 }
-.tabela-sepat td:nth-child(1){width:10%;min-width:150px;font-size:11px;font-weight:900;line-height:1.15}
+.tabela-sepat td:nth-child(1){
+width:4%;
+min-width:55px;
+max-width:55px;
+font-size:10px;
+font-weight:1000;
+line-height:1.1;
+text-align:center;
+padding:4px 2px!important;
+white-space:nowrap!important;
+}
 .tabela-sepat td:nth-child(2){
 width:42%;
 min-width:760px;
@@ -221,4 +237,20 @@ background:#e5e7eb!important;
 color:#64748b!important;
 cursor:not-allowed;
 opacity:1!important;
+}
+/*=========================================================
+SUBITEM COMPACTO SEPAT
+=========================================================*/
+.tabela-sepat td:nth-child(1),
+.tabela-sepat th:nth-child(1){
+position:sticky;
+left:0;
+z-index:3;
+background:inherit;
+}
+.tabela-sepat td:nth-child(1){
+background:#f8fbff;
+}
+.tabela-sepat tr:nth-child(even) td:nth-child(1){
+background:#eef6ff;
 }
