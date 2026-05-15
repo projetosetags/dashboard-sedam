@@ -764,29 +764,91 @@ function gerarPDFMonitoramentoSepat(){
 let doc=criarDocSepat('l')
 let lista=[...(sepatData||[])].sort(compareSepat)
 let rows=lista.map(i=>[
-i.siglaitem||'-',
-i.subitem||'-',
-i.produto||'-',
-i.responsavel||'-',
+String(i.siglaitem||'-'),
+String(i.subitem||'-'),
+String(i.produto||'-'),
+String(i.responsavel||'-'),
 Number(i.jan||0)+'%',
 Number(i.fev||0)+'%',
 Number(i.mar||0)+'%',
 Number(i.abr||0)+'%',
 Number(i.mai||0)+'%',
+Number(i.jun||0)+'%',
+Number(i.jul||0)+'%',
+Number(i.ago||0)+'%',
+Number(i.set||0)+'%',
+Number(i.out||0)+'%',
+Number(i.nov||0)+'%',
+Number(i.dez||0)+'%',
 getTotalSepat(i)+'%'
 ])
-doc.setFontSize(14)
-doc.text('MONITORAMENTO COMPLETO - TAG SEPAT 2026',10,12)
+doc.setFontSize(15)
+doc.setTextColor(15,23,42)
+doc.text('MONITORAMENTO COMPLETO - TAG SEPAT 2026',14,14)
+doc.setFontSize(8)
+doc.setTextColor(100)
+doc.text('Painel consolidado de monitoramento técnico da SEPAT.',14,19)
 doc.autoTable({
-startY:22,
-head:[['Item','Subitem','Produto','Responsável','JAN','FEV','MAR','ABR','MAI','TOTAL']],
+startY:24,
+head:[['ITEM','SUBITEM / DESCRIÇÃO','PRODUTO','RESPONSÁVEL','JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ','TOTAL']],
 body:rows,
 theme:'grid',
-styles:{fontSize:6,overflow:'linebreak',cellPadding:1.5},
-headStyles:{fillColor:[7,89,201],textColor:[255,255,255]},
-columnStyles:{0:{cellWidth:18},1:{cellWidth:18},2:{cellWidth:92},3:{cellWidth:52},4:{cellWidth:12},5:{cellWidth:12},6:{cellWidth:12},7:{cellWidth:12},8:{cellWidth:12},9:{cellWidth:16}},
-margin:{top:18,bottom:28,left:5,right:5}
+styles:{
+fontSize:6.5,
+overflow:'linebreak',
+cellPadding:1.6,
+valign:'middle',
+textColor:[15,23,42],
+lineColor:[210,215,220],
+lineWidth:.2
+},
+headStyles:{
+fillColor:[7,89,201],
+textColor:[255,255,255],
+fontStyle:'bold',
+fontSize:7,
+halign:'center',
+valign:'middle'
+},
+alternateRowStyles:{
+fillColor:[248,250,252]
+},
+columnStyles:{
+0:{cellWidth:16,halign:'center'},
+1:{cellWidth:78},
+2:{cellWidth:52},
+3:{cellWidth:34},
+4:{cellWidth:10,halign:'center'},
+5:{cellWidth:10,halign:'center'},
+6:{cellWidth:10,halign:'center'},
+7:{cellWidth:10,halign:'center'},
+8:{cellWidth:10,halign:'center'},
+9:{cellWidth:10,halign:'center'},
+10:{cellWidth:10,halign:'center'},
+11:{cellWidth:10,halign:'center'},
+12:{cellWidth:10,halign:'center'},
+13:{cellWidth:10,halign:'center'},
+14:{cellWidth:10,halign:'center'},
+15:{cellWidth:10,halign:'center'},
+16:{cellWidth:14,halign:'center'}
+},
+margin:{
+top:20,
+bottom:26,
+left:6,
+right:6
+},
+didParseCell:function(data){
+if(data.section==='body'&&data.column.index===16){
+data.cell.styles.fontStyle='bold'
+data.cell.styles.textColor=[4,120,87]
+}
+}
 })
+let finalY=doc.lastAutoTable.finalY||260
+doc.setFontSize(7)
+doc.setTextColor(110)
+doc.text('As informações constantes neste painel possuem caráter preliminar e dependem de validação técnica documental.',14,finalY+8)
 rodapeSepat(doc)
 doc.save('pdf_monitoramento_tag_sepat.pdf')
 }
