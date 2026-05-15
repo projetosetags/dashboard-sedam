@@ -155,17 +155,19 @@ function compareSepat(a,b){
 let ga=grupoOrdemSepat(a.siglaitem)
 let gb=grupoOrdemSepat(b.siglaitem)
 if(ga!==gb)return ga-gb
-let na=Number(String(a.siglaitem||'').replace(/[^\d]/g,'')||0)
-let nb=Number(String(b.siglaitem||'').replace(/[^\d]/g,'')||0)
+let sa=String(a.siglaitem||'')
+let sb=String(b.siglaitem||'')
+let c=sa.localeCompare(sb,'pt-BR',{numeric:true,sensitivity:'base'})
+if(c!==0)return c
+let na=Number(a.numsubitem||0)
+let nb=Number(b.numsubitem||0)
 if(na!==nb)return na-nb
-let sa=Number(a.numsubitem||0)
-let sb=Number(b.numsubitem||0)
-if(sa!==sb)return sa-sb
 let pa=Number(a.numproduto||0)
 let pb=Number(b.numproduto||0)
 if(pa!==pb)return pa-pb
-return String(a.produto||'').localeCompare(String(b.produto||''))
+return String(a.produto||'').localeCompare(String(b.produto||''),'pt-BR',{numeric:true})
 }
+
 function grupoOrdemSepat(sigla){
 sigla=String(sigla||'').toUpperCase()
 if(sigla.startsWith('PI'))return 1
@@ -187,7 +189,7 @@ return'vermelho'
 009 SEPAT CORE CARREGAR DADOS
 =========================================================*/
 async function carregarSepatDados(){
-let {data,error}=await sepatClient.from('sepat_deliberacoes').select('*').order('numitem',{ascending:true}).order('numsubitem',{ascending:true}).order('numproduto',{ascending:true})
+let {data,error}=await sepatClient.from('vw_sepat_dashboard').select('*').order('numitem',{ascending:true}).order('numsubitem',{ascending:true}).order('numproduto',{ascending:true})
 if(error){
 console.log(error)
 alert('Erro ao carregar dados da SEPAT')
