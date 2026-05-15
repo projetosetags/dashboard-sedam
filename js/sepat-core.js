@@ -280,6 +280,17 @@ renderDashboardSepat()
 =========================================================*/
 function renderDashboardSepat(){
 let lista=[...(sepatData||[])].sort(compareSepat)
+lista=lista.map(i=>{
+let meses=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+for(let x=1;x<meses.length;x++){
+let anterior=meses[x-1]
+let atual=meses[x]
+if(Number(i[anterior]||0)>=100&&Number(i[atual]||0)<=0){
+i[atual]=100
+}
+}
+return i
+})
 let totalItens=[...new Set(lista.map(i=>String(i.siglaitem||'').trim()).filter(Boolean))].length
 let totalSubitens=lista.length
 let totalProdutos=[...new Set(lista.map(i=>String(i.produto||'').trim()).filter(Boolean))].length
@@ -597,7 +608,7 @@ document.getElementById('buscaMonitoramentoSepat')?.value||''
 )
 .toLowerCase()
 .trim()
-
+let ocultar100=document.getElementById('ocultar100Sepat')?.checked||false
 let lista=[...(sepatData||[])].sort(compareSepat)
 
 if(busca){
@@ -618,7 +629,9 @@ i.cargo
 })
 
 }
-
+if(ocultar100){
+lista=lista.filter(i=>getTotalSepat(i)<100)
+}
 const mesAtual='mai'
 
 tbody.innerHTML=lista.map(i=>{
@@ -632,7 +645,7 @@ let html=`
 ${i.siglaitem||'-'}
 </td>
 
-<td>
+<td style="max-width:420px">
 ${i.subitem||'-'}
 </td>
 
