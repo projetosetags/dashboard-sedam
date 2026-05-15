@@ -546,12 +546,12 @@ media:media
 box.innerHTML=grupos.map(g=>{
 let titulo=modoResumoSepat==='item'?g.base.siglaitem:g.base.subitem
 let subtitulo=modoResumoSepat==='item'?g.base.item:g.base.produto
-let desc=modoResumoSepat==='item'?g.base.item:g.base.descricaoitem
+let desc=modoResumoSepat==='item'?g.base.item:g.base.subitem
 return`
 <div class="card-resumo-sepat ${corClasseSepat(g.media)}" onclick="abrirModalResumoSepat('${g.chave}')">
 <div>
 <div class="card-resumo-head">${modoResumoSepat==='item'?'ITEM':'SUBITEM'} ${titulo||'-'}</div>
-<div class="card-resumo-desc">${truncarSepat(subtitulo||desc||'-',150)}</div>
+<div class="card-resumo-desc">${subtitulo||desc||'-'}</div>
 </div>
 <div class="card-resumo-total">${g.media}%</div>
 </div>
@@ -580,7 +580,7 @@ let media=Math.round(lista.reduce((acc,c)=>acc+getTotalSepat(c),0)/(lista.length
 conteudo.innerHTML=`
 <div class="modal-title-sepat">${modoResumoSepat==='item'?'ITEM':'SUBITEM'} ${modoResumoSepat==='item'?base.siglaitem:base.subitem} • ${media}%</div>
 <div class="modal-text-sepat"><b>Item:</b> ${base.item||'-'}</div>
-<div class="modal-text-sepat"><b>Descrição:</b> ${base.descricaoitem||'-'}</div>
+<div class="modal-text-sepat"><b>Descrição:</b> ${base.subitem||'-'}</div>
 <div class="modal-text-sepat"><b>Total de registros:</b> ${lista.length}</div>
 ${lista.map(i=>`
 <div style="margin-top:14px;border-top:1px solid #e5e7eb;padding-top:12px;">
