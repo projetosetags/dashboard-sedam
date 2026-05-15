@@ -51,9 +51,34 @@ canvas{width:100%!important;max-width:100%!important}
 .view-sepat{width:100%;animation:fadeSepat .18s ease}
 @keyframes fadeSepat{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .kpis-sepat{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:16px}
-.kpi-sepat{height:108px;border-radius:22px;padding:16px 18px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;color:#ffffff;box-shadow:0 18px 40px rgba(15,23,42,.16)}
-.kpi-sepat div{font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.5px;line-height:1.15}
-.kpi-sepat strong{font-size:34px;font-weight:1000;line-height:1}
+.kpi-sepat{
+height:138px;
+border-radius:28px;
+padding:18px 22px;
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+justify-content:space-between;
+color:#ffffff;
+box-shadow:0 18px 40px rgba(15,23,42,.16);
+border:1px solid rgba(255,255,255,.18);
+}
+.kpi-sepat div{
+font-size:15px;
+font-weight:1000;
+text-transform:uppercase;
+letter-spacing:.8px;
+line-height:1.1;
+color:#ffffff;
+text-shadow:0 1px 2px rgba(0,0,0,.18);
+}
+.kpi-sepat strong{
+font-size:62px;
+font-weight:1000;
+line-height:1;
+color:#ffffff;
+text-shadow:0 2px 4px rgba(0,0,0,.15);
+}
 .kpi-sepat.azul{background:linear-gradient(135deg,#0759c9,#38bdf8)}
 .kpi-sepat.verde{background:linear-gradient(135deg,#047857,#34d399)}
 .kpi-sepat.roxo{background:linear-gradient(135deg,#6d28d9,#a78bfa)}
@@ -63,10 +88,25 @@ canvas{width:100%!important;max-width:100%!important}
 006 SEPAT GRAFICOS
 =========================================================*/
 .grid-dashboard-sepat{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card-grafico-sepat{background:rgba(255,255,255,.9);border:1px solid rgba(15,23,42,.07);border-radius:22px;padding:14px;box-shadow:0 14px 36px rgba(15,23,42,.08);min-height:315px}
+.card-grafico-sepat{
+background:rgba(255,255,255,.82);
+border:1px solid rgba(15,23,42,.06);
+border-radius:34px;
+padding:18px;
+box-shadow:0 14px 36px rgba(15,23,42,.08);
+min-height:350px;
+backdrop-filter:blur(6px);
+}
 .card-grafico-sepat.full{grid-column:1/-1}
 .card-grafico-sepat.grande{min-height:400px}
-.card-title-sepat{font-size:12px;font-weight:1000;color:#0f172a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.card-title-sepat{
+font-size:28px;
+font-weight:1000;
+color:#111827;
+margin-bottom:16px;
+text-transform:uppercase;
+letter-spacing:.5px;
+}
 .card-grafico-sepat canvas{height:245px!important}
 .card-grafico-sepat.full canvas{height:280px!important}
 .card-grafico-sepat.grande canvas{height:310px!important}
@@ -182,3 +222,23 @@ canvas{width:100%!important;max-width:100%!important}
 .input-mes-sepat:disabled{background:#e5e7eb!important;color:#64748b!important;cursor:not-allowed;opacity:1!important}
 .mes-atual-sepat{transform:scale(1.05);background:#fff8d6!important;position:relative;z-index:5;border-left:2px solid #f59e0b!important;border-right:2px solid #f59e0b!important}
 .mes-atual-sepat input{font-size:11px!important;font-weight:1000!important;background:#fffbe7!important;border:2px solid #f59e0b!important;height:28px!important}
+/*=========================================================
+013 SEPAT DASHBOARD ESTILO SEDAM
+=========================================================*/
+.main-sepat{background:linear-gradient(rgba(255,255,255,.82),rgba(255,255,255,.82)),url('../assets/bandeira-ro.png') center center/560px no-repeat;border-radius:26px}
+.topo-sepat{background:linear-gradient(135deg,#0050aa,#0a67c7);border-bottom:1px solid rgba(255,255,255,.18)}
+.tabs-sepat{background:#eceff3;backdrop-filter:blur(6px)}
+.tab-sepat{background:#f8f8f8;font-size:14px;font-weight:1000;text-transform:uppercase;border:1px solid rgba(15,23,42,.06);box-shadow:0 8px 20px rgba(15,23,42,.06)}
+.tab-sepat.tab-active{background:linear-gradient(135deg,#0b73d1,#1597ff);color:#ffffff;box-shadow:0 16px 34px rgba(7,89,201,.28)}
+.kpis-sepat{margin-top:10px;margin-bottom:20px;gap:16px}
+.kpi-sepat{position:relative;overflow:hidden}
+.kpi-sepat::before{content:"";position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:rgba(255,255,255,.10);border-radius:50%}
+.kpi-sepat div{font-size:15px!important;font-weight:1000!important;text-transform:uppercase!important;letter-spacing:.8px!important;line-height:1.1!important;color:#ffffff!important;text-shadow:0 1px 2px rgba(0,0,0,.18)!important}
+.kpi-sepat strong{font-size:62px!important;font-weight:1000!important;line-height:1!important;color:#ffffff!important;text-shadow:0 2px 4px rgba(0,0,0,.15)!important}
+.card-grafico-sepat{background:rgba(255,255,255,.86)!important;border-radius:34px!important;padding:18px!important;backdrop-filter:blur(6px)!important}
+.card-title-sepat{font-size:28px!important;font-weight:1000!important;color:#111827!important;margin-bottom:16px!important;text-transform:uppercase!important;letter-spacing:.5px!important}
+.card-grafico-sepat canvas{filter:contrast(1.08) saturate(1.15)}
+.descricao-grafico-sepat{font-size:14px!important;font-weight:800!important;line-height:1.5!important}
+.chart-container-sepat{position:relative;height:100%;width:100%}
+.grafico-label-sepat{font-size:14px!important;font-weight:1000!important;color:#111827!important}
+@media(max-width:680px){.kpi-sepat strong{font-size:42px!important}.card-title-sepat{font-size:20px!important}.tab-sepat{font-size:11px!important}}
