@@ -114,7 +114,12 @@
 <div class="barra-filtros-sepat">
 <input id="buscaMonitoramentoSepat" oninput="renderTabelaSepat()" placeholder="Pesquisar..." class="input-busca-sepat">
 <button onclick="gerarPDFMonitoramentoSepat()" class="btn-pdf-sepat">PDF Monitoramento</button>
+<label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:1000;white-space:nowrap">
+<input type="checkbox" id="ocultar100Sepat" onchange="renderTabelaSepat()">
+OCULTAR 100%
+</label>
 </div>
+  
 <div class="tabela-wrap-sepat">
 <table class="tabela-sepat">
 <thead>
@@ -142,6 +147,7 @@
 <tbody id="tbodySepat"></tbody>
 </table>
 </div>
+  
 </section>
 <!--=========================================================
 007 SEPAT GRAFICOS
