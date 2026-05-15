@@ -1,4 +1,5 @@
 /*=========================================================
+/*=========================================================
 001 SEPAT CORE CONFIG
 =========================================================*/
 const SEPAT_SUPABASE_URL=window.S_URL||window.SUPABASE_URL||''
@@ -15,6 +16,52 @@ let graficoMasterSepat=null
 const MESES_SEPAT=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
 const MESES_LABEL_SEPAT=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ']
 const NOTA_TECNICA_SEPAT='As informações constantes neste painel, gráficos, indicadores e relatórios possuem caráter preliminar e meramente informativo, sendo baseadas nos dados declarados e apresentados até o presente momento pelos jurisdicionados envolvidos. Ressalta-se que tais informações ainda não passaram pela análise técnica de consistência documental, verificação de evidências, validação metodológica e conferência conclusiva pela equipe técnica de auditores designados.'
+
+/*=========================================================
+008 MESES AUTOMATICOS SEPAT
+=========================================================*/
+function controlarMesesSepat(){
+
+let mesAtual=5
+
+let meses=[
+'jan',
+'fev',
+'mar',
+'abr',
+'mai',
+'jun',
+'jul',
+'ago',
+'set',
+'out',
+'nov',
+'dez'
+]
+
+meses.forEach((m,index)=>{
+
+let numero=index+1
+
+document.querySelectorAll('.mes-'+m).forEach(el=>{
+
+if(numero<=mesAtual){
+
+el.classList.remove('hidden')
+el.style.display='table-cell'
+
+}else{
+
+el.classList.add('hidden')
+el.style.display='none'
+
+}
+
+})
+
+})
+
+}
 /*=========================================================
 002 SEPAT CORE DOMCONTENTLOADED
 =========================================================*/
@@ -28,6 +75,7 @@ document.getElementById('app-sepat').classList.remove('hidden')
 document.getElementById('sepat-user-info').innerText=(sepatUser.nome_completo||'-')+' • '+(sepatUser.cargo||'-')+' • '+(sepatUser.origem||'SEPAT')
 aplicarPermissoesSepat()
 await carregarSepatDados()
+controlarMesesSepat()
 switchSepatTab('dashboard')
 return
 }catch(e){
