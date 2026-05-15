@@ -520,7 +520,7 @@ ${lista.map(i=>`
 <div style="margin-top:14px;border-top:1px solid #e5e7eb;padding-top:12px;">
 <div class="modal-text-sepat"><b>Subitem:</b> ${i.subitem||'-'}</div>
 <div class="modal-text-sepat"><b>Produto:</b> ${i.produto||'-'}</div>
-<div class="modal-text-sepat"><b>Responsável:</b> ${i.responsavel||'-'}</div>
+<div class="modal-text-sepat"><b>Responsável:</b> ${i.cargo||'-'}</div>
 <div class="modal-grid-sepat">
 ${MESES_SEPAT.slice(0,5).map(m=>`
 <div class="modal-mes-sepat">
@@ -566,7 +566,6 @@ return[
 i.siglaitem,
 i.subitem,
 i.item,
-i.descricaoitem,
 i.produto,
 i.cargo
 ]
@@ -914,7 +913,7 @@ let base=arr[0]
 let media=Math.round(arr.reduce((acc,c)=>acc+getTotalSepat(c),0)/(arr.length||1))
 rows.push(['ITEM '+base.siglaitem,base.item||'-','',media+'%'])
 arr.sort(compareSepat).forEach(i=>{
-rows.push([i.subitem||'-',i.descricaoitem||i.item||'-',i.produto||'-',getTotalSepat(i)+'%'])
+rows.push([i.siglaitem||'-',i.subitem||'-',i.produto||'-',getTotalSepat(i)+'%'])
 })
 })
 doc.setFontSize(14)
@@ -950,7 +949,7 @@ let rows=lista.map(i=>[
 String(i.siglaitem||'-'),
 String(i.subitem||'-'),
 String(i.produto||'-'),
-String(i.responsavel||'-'),
+String(i.cargo||'-'),
 Number(i.jan||0)+'%',
 Number(i.fev||0)+'%',
 Number(i.mar||0)+'%',
@@ -1061,7 +1060,7 @@ doc.save('pdf_graficos_tag_sepat.pdf')
 function gerarPDFConcluidosSepat(){
 let doc=criarDocSepat('l')
 let lista=[...(sepatData||[])].filter(i=>getTotalSepat(i)>=100).sort(compareSepat)
-let rows=lista.map(i=>[i.siglaitem||'-',i.subitem||'-',i.produto||'-',i.responsavel||'-',getTotalSepat(i)+'%'])
+let rows=lista.map(i=>[i.siglaitem||'-',i.subitem||'-',i.produto||'-',i.cargo||'-',getTotalSepat(i)+'%'])
 doc.setFontSize(14)
 doc.text('SUBITENS 100% CUMPRIDOS - TAG SEPAT 2026',10,12)
 doc.setFontSize(10)
