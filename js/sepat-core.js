@@ -684,8 +684,28 @@ if(isNaN(valor))valor=0
 if(valor<0)valor=0
 if(valor>100)valor=100
 
+let itemAtual=sepatData.find(i=>String(i.id)===String(id))||{}
+
+itemAtual[mes]=valor
+
+let total=Math.max(
+Number(itemAtual.jan||0),
+Number(itemAtual.fev||0),
+Number(itemAtual.mar||0),
+Number(itemAtual.abr||0),
+Number(itemAtual.mai||0),
+Number(itemAtual.jun||0),
+Number(itemAtual.jul||0),
+Number(itemAtual.ago||0),
+Number(itemAtual.set||0),
+Number(itemAtual.out||0),
+Number(itemAtual.nov||0),
+Number(itemAtual.dez||0)
+)
+
 let update={}
 update[mes]=valor
+update.total_cumprimento=total
 
 let {error}=await sepatClient
 .from('sepat_deliberacoes')
