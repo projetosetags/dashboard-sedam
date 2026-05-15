@@ -141,14 +141,16 @@ carregarPerfisSepat()
 008 SEPAT CORE HELPERS
 =========================================================*/
 function getTotalSepat(i){
-let maior=0
-MESES_SEPAT.forEach(m=>{
+let vals=MESES_SEPAT.map(m=>{
 let v=Number(i[m]||0)
-if(v>maior)maior=v
+return isNaN(v)?0:v
 })
+let maior=Math.max(...vals,0)
 let total=Number(i.total_cumprimento||0)
-return Math.max(maior,total,0)
+if(isNaN(total))total=0
+return Math.max(maior,total)
 }
+
 function compareSepat(a,b){
 let ga=grupoOrdemSepat(a.siglaitem)
 let gb=grupoOrdemSepat(b.siglaitem)
@@ -224,7 +226,8 @@ let lista=[...(sepatData||[])].sort(compareSepat)
 let totalItens=[...new Set(lista.map(i=>String(i.siglaitem||'').trim()).filter(Boolean))].length
 let totalSubitens=lista.length
 let totalProdutos=[...new Set(lista.map(i=>String(i.produto||'').trim()).filter(Boolean))].length
-let media=Math.round(lista.reduce((acc,c)=>acc+getTotalSepat(c),0)/(lista.length||1))
+let validos=lista.filter(i=>!isNaN(getTotalSepat(i)))
+let media=Math.round(validos.reduce((acc,c)=>acc+getTotalSepat(c),0)/(validos.length||1))
 let kpiItens=document.getElementById('kpiItensSepat')
 let kpiSubitens=document.getElementById('kpiSubitensSepat')
 let kpiProdutos=document.getElementById('kpiProdutosSepat')
@@ -245,20 +248,17 @@ let canvas=document.getElementById('graficoLinhaSepat')
 if(!canvas)return
 let ctx=canvas.getContext('2d')
 if(graficoLinhaSepat)graficoLinhaSepat.destroy()
-let valores=MESES_SEPAT.map((m,idx)=>{
-let total=0
+let valores=MESES_SEPAT.map(m=>{
+let soma=0
+let qtd=0
 lista.forEach(i=>{
-let valor=0
-for(let x=idx;x>=0;x--){
-let k=MESES_SEPAT[x]
-if(Number(i[k]||0)>0){
-valor=Number(i[k]||0)
-break
+let v=Number(i[m]||0)
+if(!isNaN(v)){
+soma+=v
+qtd++
 }
-}
-total+=valor
 })
-return Math.round(total/(lista.length||1))
+return Math.round(soma/(qtd||1))
 })
 graficoLinhaSepat=new Chart(ctx,{
 type:'line',
@@ -618,13 +618,8 @@ let valores=MESES_SEPAT.map((m,idx)=>{
 let total=0
 lista.forEach(i=>{
 let valor=0
-for(let x=idx;x>=0;x--){
-let k=MESES_SEPAT[x]
-if(Number(i[k]||0)>0){
-valor=Number(i[k]||0)
-break
-}
-}
+valor=Number(i[m]||0)
+if(isNaN(valor))valor=0
 total+=valor
 })
 return Math.round(total/(lista.length||1))
