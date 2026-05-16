@@ -1324,9 +1324,7 @@ renderPerfisSepat()
 }
 
 async function salvarPerfisSepat(){
-
 let linhas=document.querySelectorAll('.inputPerfilSepat')
-
 for(let l of linhas){
 
 let id=l.dataset.id
@@ -1370,12 +1368,10 @@ nivel_acesso:Number(p.nivel_acesso||4)
 alert('Perfis salvos')
 carregarPerfisSepat()
 }
-
 let sepatPerfisTCERO=[]
 let editandoPerfisTCEROSepat=false
 
 async function carregarPerfisTCEROSepat(){
-
 let {data,error}=await sepatClient
 .from('perfistce')
 .select('*')
@@ -1433,7 +1429,6 @@ ${editandoPerfisTCEROSepat?
 
 `).join('')}
 `
-
 }
 
 function habilitarEdicaoPerfisTCEROSepat(){
