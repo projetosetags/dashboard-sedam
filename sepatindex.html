@@ -41,8 +41,30 @@
 <div id="sepat-user-info" class="usuario-sepat">-</div>
 </div>
 <div class="topo-acoes-sepat">
-<button onclick="voltarPainelGeral()" class="btn-topo-sepat">Painel Geral</button>
-<button onclick="logoutSepat()" class="btn-topo-sepat sair">Sair</button>
+
+<div id="miniKpisSepat" class="mini-kpis-topo-sepat hidden">
+<div class="mini-kpi-topo-sepat azul">
+<span id="miniItensSepat">0</span>
+<small>ITENS</small>
+</div>
+<div class="mini-kpi-topo-sepat verde">
+<span id="miniSubitensSepat">0</span>
+<small>SUBITENS</small>
+</div>
+<div class="mini-kpi-topo-sepat roxo">
+<span id="miniProdutosSepat">0</span>
+<small>PRODUTOS</small>
+</div>
+</div>
+
+<button class="btn-topo-sepat" onclick="switchViewSepat('dashboard')">
+Painel Geral
+</button>
+
+<button class="btn-topo-sepat sair" onclick="logoutSepat()">
+Sair
+</button>
+
 </div>
 </header>
 <nav class="tabs-sepat">
