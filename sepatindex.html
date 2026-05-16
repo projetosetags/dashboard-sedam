@@ -104,6 +104,10 @@
 <button onclick="modoResumoSepat='item';renderResumoSepat()" class="btn-filtro-sepat">Itens</button>
 <button onclick="modoResumoSepat='subitem';renderResumoSepat()" class="btn-filtro-sepat">Subitens</button>
 <button onclick="gerarPDFResumoSepat()" class="btn-pdf-sepat">PDF Resumo</button>
+<label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:1000;white-space:nowrap">
+<input type="checkbox" id="ocultar100ResumoSepat" onchange="renderResumoSepat()">
+OCULTAR 100%
+</label>
 </div>
 <div id="cardsResumoSepat" class="cards-resumo-sepat"></div>
 </section>
