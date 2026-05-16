@@ -393,22 +393,6 @@ sepatFiltrados=[...sepatData]
 renderDashboardSepat()
 controlarMesesSepat()
 
-let itens=[...new Set(
-(sepatData||[])
-.map(i=>String(i.siglaitem||'').trim())
-.filter(v=>v&&v!=='-')
-)].length
-
-let subitens=(sepatData||[]).filter(i=>
-String(i.subitem||'').trim()!==''
-).length
-
-let produtos=[...new Set(
-(sepatData||[])
-.map(i=>String(i.produto||'').trim())
-.filter(v=>v&&v!=='-')
-)].length
-
 let miniItens=document.getElementById('miniItensSepat')
 let miniSubitens=document.getElementById('miniSubitensSepat')
 let miniProdutos=document.getElementById('miniProdutosSepat')
