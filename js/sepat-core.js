@@ -101,39 +101,102 @@ document.getElementById('app-sepat').classList.add('hidden')
 003 SEPAT CORE LOGIN
 =========================================================*/
 async function loginSepat(){
+
 let usuario=document.getElementById('sepat-user').value.trim().toLowerCase()
 let senha=document.getElementById('sepat-pass').value.trim()
+
 if(!usuario||!senha){
 alert('Informe usuário e senha')
 return
 }
-let {data,error}=await sepatClient.from('sepat_perfis').select('*').eq('username',usuario).limit(1)
+
+let origem='SEPAT'
+
+let {data,error}=await sepatClient
+.from('sepat_perfis')
+.select('*')
+.eq('username',usuario)
+.limit(1)
+
+if(error||!data||!data.length){
+
+let r2=await sepatClient
+.from('perfistce')
+.select('*')
+.eq('username',usuario)
+.limit(1)
+
+data=r2.data
+error=r2.error
+
+if(data&&data.length){
+origem='TCERO'
+}
+
+}
+
 if(error){
 console.log(error)
 alert('Erro ao consultar perfil')
 return
 }
+
 if(!data||!data.length){
 alert('Usuário não encontrado')
 return
 }
+
 let perfil=data[0]
+
 if(String(perfil.senha||'')!==String(senha)){
 alert('Senha inválida')
 return
 }
+
 if(perfil.ativo===false){
 alert('Usuário inativo')
 return
 }
+
+perfil.origem=origem
+
 sepatUser=perfil
+
 localStorage.setItem('sepatUser',JSON.stringify(perfil))
+
 document.getElementById('login-sepat').classList.add('hidden')
+
 document.getElementById('app-sepat').classList.remove('hidden')
-document.getElementById('sepat-user-info').innerText=(perfil.nome_completo||'-')+' • '+(perfil.cargo||'-')+' • '+(perfil.origem||'SEPAT')
+
+document.getElementById('sepat-user-info').innerText=
+(perfil.nome_completo||'-')+
+' • '+
+(perfil.cargo||'-')+
+' • '+
+(perfil.origem||'SEPAT')
+
 aplicarPermissoesSepat()
+
 await carregarSepatDados()
+
+setTimeout(()=>{
+
+let itens=[...new Set((sepatData||[]).map(i=>String(i.siglaitem||'').trim()).filter(Boolean))].length
+let subitens=(sepatData||[]).length
+let produtos=[...new Set((sepatData||[]).map(i=>String(i.produto||'').trim()).filter(Boolean))].length
+
+let miniItens=document.getElementById('miniItensSepat')
+let miniSubitens=document.getElementById('miniSubitensSepat')
+let miniProdutos=document.getElementById('miniProdutosSepat')
+
+if(miniItens)miniItens.innerText=itens
+if(miniSubitens)miniSubitens.innerText=subitens
+if(miniProdutos)miniProdutos.innerText=produtos
+
+},400)
+
 switchSepatTab('dashboard')
+
 }
 /*=========================================================
 004 SEPAT CORE LOGOUT
@@ -177,32 +240,66 @@ tabPerfis.style.display='flex'
 007 SEPAT CORE SWITCHTAB
 =========================================================*/
 function switchSepatTab(t){
+
+localStorage.setItem('sepat_tab',t)
+
 document.querySelectorAll('.view-sepat').forEach(v=>{
 v.classList.add('hidden')
 })
+
 document.querySelectorAll('.tab-sepat').forEach(b=>{
 b.classList.remove('tab-active')
 })
+
 let view=document.getElementById('view-'+t)
 let tab=document.getElementById('tab-'+t)
+
 if(view)view.classList.remove('hidden')
 if(tab)tab.classList.add('tab-active')
+
+let mini=document.getElementById('miniKpisSepat')
+
+if(mini){
+
+if(t==='dashboard'){
+mini.classList.add('hidden')
+}else{
+mini.classList.remove('hidden')
+}
+
+}
+
 if(t==='dashboard')renderDashboardSepat()
+
 if(t==='resumo')renderResumoSepat()
+
 if(t==='monitoramento')renderTabelaSepat()
+
 if(t==='graficos'){
 popularItensSepat()
 popularSubitensSepat()
 renderGraficoMasterSepat()
 }
+
 if(t==='concluidos')renderConcluidosSepat()
+
 if(t==='perfis'){
-if(!sepatUser||Number(sepatUser.nivel_acesso||0)!==1){
+
+if(
+!sepatUser||
+(
+Number(sepatUser.nivel_acesso||0)!==1&&
+String(sepatUser.origem||'')!=='TCERO'
+)
+){
 switchSepatTab('dashboard')
 return
 }
+
 carregarPerfisSepat()
+
 }
+
 }
 /*=========================================================
 008 SEPAT CORE HELPERS
@@ -1175,4 +1272,77 @@ margin:{top:18,bottom:28,left:5,right:5}
 })
 rodapeSepat(doc)
 doc.save('pdf_100_tag_sepat.pdf')
+}
+
+
+
+let editandoPerfisSepat=false
+
+function habilitarEdicaoPerfisSepat(){
+editandoPerfisSepat=!editandoPerfisSepat
+renderPerfisSepat()
+}
+
+function novoPerfilSepat(){
+if(!Array.isArray(sepatPerfis))sepatPerfis=[]
+sepatPerfis.unshift({
+id:'novo_'+Date.now(),
+nome_completo:'',
+username:'',
+cargo:'',
+nivel_acesso:4
+})
+renderPerfisSepat()
+}
+
+async function salvarPerfisSepat(){
+
+let linhas=document.querySelectorAll('.inputPerfilSepat')
+
+for(let l of linhas){
+
+let id=l.dataset.id
+let campo=l.dataset.campo
+let valor=l.value
+
+let perfil=sepatPerfis.find(p=>String(p.id)===String(id))
+
+if(perfil){
+perfil[campo]=valor
+}
+
+}
+
+for(let p of sepatPerfis){
+
+if(String(p.id).startsWith('novo_')){
+
+await sepatClient
+.from('perfis')
+.insert([{
+nome_completo:p.nome_completo,
+username:p.username,
+cargo:p.cargo,
+nivel_acesso:Number(p.nivel_acesso||4)
+}])
+
+}else{
+
+await sepatClient
+.from('perfis')
+.update({
+nome_completo:p.nome_completo,
+username:p.username,
+cargo:p.cargo,
+nivel_acesso:Number(p.nivel_acesso||4)
+})
+.eq('id',p.id)
+
+}
+
+}
+
+alert('Perfis salvos')
+carregarPerfisSepat()
+
 }
