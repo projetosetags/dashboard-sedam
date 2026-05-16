@@ -184,3 +184,35 @@ text-overflow:ellipsis!important;
 .btn-sepat{background:#f8fbff;color:#0759c9;border:1px solid rgba(0,90,200,.35)}
 .btn-queimadas{background:#fffaf5;color:#c2410c;border:1px solid rgba(194,65,12,.35)}
 @media(max-width:1100px){.painel-geral-acesso{position:absolute;min-height:100vh;height:auto;padding:40px 0}.painel-geral-grid{grid-template-columns:1fr}.painel-card{height:430px}.painel-geral-titulo{letter-spacing:3px}.painel-geral-subtitulo{margin-bottom:24px}}
+.login-card-sepat-img,
+.login-card-sedam-img{
+position:relative;
+z-index:2;
+}
+
+.login-img-unificada{
+position:relative;
+z-index:1;
+pointer-events:none;
+}
+
+.login-actions-sepat,
+.login-actions-sedam{
+position:relative;
+z-index:5;
+margin-top:-30px;
+padding:22px;
+background:rgba(255,255,255,.92);
+backdrop-filter:blur(10px);
+border-radius:24px;
+box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.login-actions-sepat button,
+.login-actions-sedam button,
+.login-actions-sepat input,
+.login-actions-sedam input{
+position:relative;
+z-index:10;
+pointer-events:auto;
+}
