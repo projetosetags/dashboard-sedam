@@ -158,6 +158,20 @@ document.getElementById('user-info').innerHTML=
 ' • '+
 (perfil.origem||'-')
 
+let adminsBackup=['manoel','vagner']
+let btnBackup=document.getElementById('btnBackupSedam')
+if(btnBackup){
+if(
+adminsBackup.includes(
+String(perfil.username||'').toLowerCase()
+)
+){
+btnBackup.classList.remove('hidden')
+}else{
+btnBackup.classList.add('hidden')
+}
+}
+
 let tabPerfis=document.getElementById('tab-perfis')
 let tabTCERO=document.getElementById('tab-tcero')
 let tabUsuarios=document.getElementById('tab-usuarios')
