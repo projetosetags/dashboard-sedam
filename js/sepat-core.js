@@ -87,7 +87,6 @@ document.getElementById('app-sepat').classList.add('hidden')
 003 SEPAT CORE LOGIN
 =========================================================*/
 async function loginSepat(){
-
 let usuario=document.getElementById('sepat-user').value.trim().toLowerCase()
 let senha=document.getElementById('sepat-pass').value.trim()
 
@@ -96,15 +95,20 @@ alert('Informe usuário e senha')
 return
 }
 
-let origem='SEPAT'
+let perfil=null
 
-let {data,error}=await sepatClient
+let r1=await sepatClient
 .from('sepat_perfis')
 .select('*')
 .eq('username',usuario)
 .limit(1)
 
-if(error||!data||!data.length){
+if(r1.data&&r1.data.length){
+perfil=r1.data[0]
+perfil.origem='SEPAT'
+}
+
+if(!perfil){
 
 let r2=await sepatClient
 .from('perfistce')
@@ -112,27 +116,17 @@ let r2=await sepatClient
 .eq('username',usuario)
 .limit(1)
 
-data=r2.data
-error=r2.error
-
-if(data&&data.length){
-origem='TCERO'
+if(r2.data&&r2.data.length){
+perfil=r2.data[0]
+perfil.origem='TCERO'
 }
 
 }
 
-if(error){
-console.log(error)
-alert('Erro ao consultar perfil')
-return
-}
-
-if(!data||!data.length){
+if(!perfil){
 alert('Usuário não encontrado')
 return
 }
-
-let perfil=data[0]
 
 if(String(perfil.senha||'')!==String(senha)){
 alert('Senha inválida')
@@ -143,8 +137,6 @@ if(perfil.ativo===false){
 alert('Usuário inativo')
 return
 }
-
-perfil.origem=origem
 
 sepatUser=perfil
 
@@ -162,35 +154,13 @@ document.getElementById('sepat-user-info').innerText=
 (perfil.origem||'SEPAT')
 
 aplicarPermissoesSepat()
+
 await carregarSepatDados()
-setTimeout(()=>{
-let itens=[...new Set(
-(sepatData||[])
-.map(i=>String(i.siglaitem||'').trim())
-.filter(v=>v&&v!=='-')
-)].length
 
-let subitens=(sepatData||[]).filter(i=>
-String(i.subitem||'').trim()!==''
-).length
-
-let produtos=[...new Set(
-(sepatData||[])
-.map(i=>String(i.produto||'').trim())
-.filter(v=>v&&v!=='-')
-)].length
-
-let miniItens=document.getElementById('miniItensSepat')
-let miniSubitens=document.getElementById('miniSubitensSepat')
-let miniProdutos=document.getElementById('miniProdutosSepat')
-
-if(miniItens)miniItens.innerText=itens||0
-if(miniSubitens)miniSubitens.innerText=subitens||0
-if(miniProdutos)miniProdutos.innerText=produtos||0
-
-},900)
+controlarMesesSepat()
 
 switchSepatTab('dashboard')
+
 }
 /*=========================================================
 004 SEPAT CORE LOGOUT
