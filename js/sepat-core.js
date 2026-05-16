@@ -413,11 +413,68 @@ let miniItens=document.getElementById('miniItensSepat')
 let miniSubitens=document.getElementById('miniSubitensSepat')
 let miniProdutos=document.getElementById('miniProdutosSepat')
 
+let ocultar100Resumo=document.getElementById('ocultar100ResumoSepat')?.checked||false
+let ocultar100Tabela=document.getElementById('ocultar100Sepat')?.checked||false
+
+let listaContagem=[...(sepatData||[])]
+
+if(ocultar100Resumo||ocultar100Tabela){
+listaContagem=listaContagem.filter(i=>getTotalSepat(i)<100)
+}
+
+let itens=[...new Set(
+listaContagem
+.map(i=>String(i.siglaitem||'').trim())
+.filter(v=>v&&v!=='-')
+)].length
+
+let subitens=listaContagem.filter(i=>
+String(i.subitem||'').trim()!==''
+).length
+
+let produtos=[...new Set(
+listaContagem
+.map(i=>String(i.produto||'').trim())
+.filter(v=>v&&v!=='-')
+)].length
+
 if(miniItens)miniItens.innerText=itens||0
 if(miniSubitens)miniSubitens.innerText=subitens||0
 if(miniProdutos)miniProdutos.innerText=produtos||0
 }
+/*=========================================================
+009A SEPAT CORE MINI KPIS
+=========================================================*/
+function atualizarMiniKPIsSepat(){
 
+let ocultar100Resumo=document.getElementById('ocultar100ResumoSepat')?.checked||false
+let ocultar100Tabela=document.getElementById('ocultar100Sepat')?.checked||false
+
+let lista=[...(sepatData||[])]
+
+if(ocultar100Resumo||ocultar100Tabela){
+lista=lista.filter(i=>getTotalSepat(i)<100)
+}
+
+let itens=[...new Set(
+lista.map(i=>String(i.siglaitem||'').trim()).filter(Boolean)
+)].length
+
+let subitens=lista.length
+
+let produtos=[...new Set(
+lista.map(i=>String(i.produto||'').trim()).filter(Boolean)
+)].length
+
+let miniItens=document.getElementById('miniItensSepat')
+let miniSubitens=document.getElementById('miniSubitensSepat')
+let miniProdutos=document.getElementById('miniProdutosSepat')
+
+if(miniItens)miniItens.innerText=itens
+if(miniSubitens)miniSubitens.innerText=subitens
+if(miniProdutos)miniProdutos.innerText=produtos
+
+}
 /*=========================================================
 010 SEPAT CORE RENDER DASHBOARD
 =========================================================*/
@@ -691,6 +748,7 @@ return`
 </div>
 `
 }).join('')
+atualizarMiniKPIsSepat()
 }
 
 /*=========================================================
@@ -867,7 +925,7 @@ ${total}%
 return html
 
 }).join('')
-
+atualizarMiniKPIsSepat()
 }
 /*=========================================================
 018 SEPAT CORE SALVAR PERCENTUAL
