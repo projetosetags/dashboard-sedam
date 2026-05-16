@@ -722,11 +722,8 @@ if(modal)modal.classList.add('hidden')
 017 SEPAT CORE RENDER TABELA MONITORAMENTO
 =========================================================*/
 function renderTabelaSepat(){
-
 let tbody=document.getElementById('tbodySepat')
-
 if(!tbody)return
-
 let busca=String(
 document.getElementById('buscaMonitoramentoSepat')?.value||''
 )
@@ -734,7 +731,6 @@ document.getElementById('buscaMonitoramentoSepat')?.value||''
 .trim()
 let ocultar100=document.getElementById('ocultar100Sepat')?.checked||false
 let lista=[...(sepatData||[])].sort(compareSepat)
-let ocultar100=document.getElementById('ocultar100Sepat')?.checked||false
 if(busca){
 lista=lista.filter(i=>{
 return[
@@ -747,7 +743,6 @@ i.cargo
 .join(' ')
 .toLowerCase()
 .includes(busca)
-
 })
 
 }
@@ -755,11 +750,8 @@ if(ocultar100){
 lista=lista.filter(i=>getTotalSepat(i)<100)
 }
 const mesAtual='mai'
-
 tbody.innerHTML=lista.map(i=>{
-
 let total=getTotalSepat(i)
-
 let html=`
 <tr>
 
@@ -788,7 +780,6 @@ MESES_SEPAT.forEach(mes=>{
 let nivel=Number(sepatUser?.nivel_acesso||99)
 let valorAtual=Number(i[mes]||0)
 let podeEditar=false
-
 /*=========================================================
 NIVEL 1
 EDITA SEMPRE
