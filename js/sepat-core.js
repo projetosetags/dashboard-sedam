@@ -533,6 +533,7 @@ mapa[chave]=[]
 mapa[chave].push(i)
 })
 let ocultar100Resumo=document.getElementById('ocultar100ResumoSepat')?.checked||false
+let grupos=Object.keys(mapa).map(k=>{
 let arr=mapa[k]||[]
 let base=arr[0]||{}
 let media=Math.round(arr.reduce((acc,c)=>acc+getTotalSepat(c),0)/(arr.length||1))
@@ -561,6 +562,7 @@ return`
 `
 }).join('')
 }
+
 /*=========================================================
 015 SEPAT CORE ABRIR MODAL RESUMO
 =========================================================*/
