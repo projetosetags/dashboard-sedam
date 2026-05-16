@@ -219,22 +219,16 @@ window.location.href='index.html'
 006 SEPAT CORE PERMISSOES
 =========================================================*/
 function aplicarPermissoesSepat(){
-
 let tabPerfis=document.getElementById('tab-perfis')
-
-if(!tabPerfis)return
-
-tabPerfis.classList.add('hidden')
-tabPerfis.style.display='none'
-
+if(tabPerfis){
 if(
-sepatUser &&
+sepatUser&&
 Number(sepatUser.nivel_acesso||0)===1
 ){
 tabPerfis.classList.remove('hidden')
-tabPerfis.style.display='flex'
+}else{
+tabPerfis.classList.add('hidden')
 }
-
 }
 /*=========================================================
 007 SEPAT CORE SWITCHTAB
@@ -284,20 +278,14 @@ renderGraficoMasterSepat()
 if(t==='concluidos')renderConcluidosSepat()
 
 if(t==='perfis'){
-
 if(
 !sepatUser||
-(
-Number(sepatUser.nivel_acesso||0)!==1&&
-String(sepatUser.origem||'')!=='TCERO'
-)
+Number(sepatUser.nivel_acesso||0)!==1
 ){
 switchSepatTab('dashboard')
 return
 }
-
 carregarPerfisSepat()
-
 }
 
 }
