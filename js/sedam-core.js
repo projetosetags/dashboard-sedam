@@ -64,11 +64,26 @@ aplicarPermissoesAbas()
 
 await carregarDados()
 
-setTimeout(()=>{
-
 let abaSalva=localStorage.getItem('activeTab')||'dashboard'
 
 switchTab(abaSalva)
+
+setTimeout(()=>{
+
+if(dash){
+dash.classList.remove('hidden')
+dash.style.display='block'
+dash.style.visibility='visible'
+dash.style.opacity='1'
+}
+
+document.querySelectorAll('canvas').forEach(c=>{
+c.style.display='block'
+c.style.visibility='visible'
+c.style.opacity='1'
+})
+
+window.dispatchEvent(new Event('resize'))
 
 if(typeof renderDashboard==='function'){
 renderDashboard()
@@ -90,9 +105,11 @@ if(typeof initPainelGrafico==='function'){
 initPainelGrafico()
 }
 
-},400)
+},300)
 
+setTimeout(()=>{
 document.body.style.visibility='visible'
+},100)
 
 return
 
