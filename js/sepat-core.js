@@ -62,28 +62,70 @@ await sepatClient.from('sepat_deliberacoes').update({[prox]:100}).eq('id',i.id)
 002 SEPAT CORE DOMCONTENTLOADED
 =========================================================*/
 document.addEventListener('DOMContentLoaded',async()=>{
-document.body.style.visibility='hidden'
-let salvo=localStorage.getItem('sepatUser')
-if(salvo){
+
 try{
+
+document.body.style.visibility='hidden'
+
+let salvo=localStorage.getItem('sepatUser')
+
+if(salvo){
+
+try{
+
 sepatUser=JSON.parse(salvo)
+
 document.getElementById('login-sepat').classList.add('hidden')
+
 document.getElementById('app-sepat').classList.remove('hidden')
-document.getElementById('sepat-user-info').innerText=(sepatUser.nome_completo||'-')+' • '+(sepatUser.cargo||'-')+' • '+(sepatUser.origem||'SEPAT')
+
+document.getElementById('sepat-user-info').innerText=
+(sepatUser.nome_completo||'-')+
+' • '+
+(sepatUser.cargo||'-')+
+' • '+
+(sepatUser.origem||'SEPAT')
+
 aplicarPermissoesSepat()
+
 await carregarSepatDados()
+
 controlarMesesSepat()
+
 switchSepatTab('dashboard')
 
-return
 }catch(e){
+
 console.log(e)
+
 localStorage.removeItem('sepatUser')
-}
-}
+
 document.getElementById('login-sepat').classList.remove('hidden')
+
 document.getElementById('app-sepat').classList.add('hidden')
+
+}
+
+}else{
+
+document.getElementById('login-sepat').classList.remove('hidden')
+
+document.getElementById('app-sepat').classList.add('hidden')
+
+}
+
+}catch(e){
+
+console.log(e)
+
+document.getElementById('login-sepat').classList.remove('hidden')
+
+document.getElementById('app-sepat').classList.add('hidden')
+
+}
+
 document.body.style.visibility='visible'
+
 })
 /*=========================================================
 003 SEPAT CORE LOGIN
