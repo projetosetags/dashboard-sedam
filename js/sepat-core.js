@@ -230,6 +230,18 @@ tabPerfis.classList.remove('hidden')
 tabPerfis.classList.add('hidden')
 }
 }
+let tabPerfisTCERO=document.getElementById('tab-perfistce')
+if(tabPerfisTCERO){
+if(
+sepatUser&&
+Number(sepatUser.nivel_acesso||0)===1
+){
+tabPerfisTCERO.classList.remove('hidden')
+}else{
+tabPerfisTCERO.classList.add('hidden')
+}
+}
+}
 /*=========================================================
 007 SEPAT CORE SWITCHTAB
 =========================================================*/
@@ -287,7 +299,16 @@ return
 }
 carregarPerfisSepat()
 }
-
+if(t==='perfistce'){
+if(
+!sepatUser||
+Number(sepatUser.nivel_acesso||0)!==1
+){
+switchSepatTab('dashboard')
+return
+}
+carregarPerfisTCEROSepat()
+}
 }
 /*=========================================================
 008 SEPAT CORE HELPERS
@@ -1323,12 +1344,125 @@ cargo:p.cargo,
 nivel_acesso:Number(p.nivel_acesso||4)
 })
 .eq('id',p.id)
-
 }
-
 }
-
 alert('Perfis salvos')
 carregarPerfisSepat()
+}
 
+let sepatPerfisTCERO=[]
+let editandoPerfisTCEROSepat=false
+
+async function carregarPerfisTCEROSepat(){
+
+let {data,error}=await sepatClient
+.from('perfistce')
+.select('*')
+.order('nome_completo',{ascending:true})
+
+if(error){
+console.log(error)
+return
+}
+
+sepatPerfisTCERO=data||[]
+
+let box=document.getElementById('listaPerfisTCEROSepat')
+
+if(!box)return
+
+box.innerHTML=`
+
+<div class="perfil-row-sepat" style="background:#e2e8f0;font-weight:1000">
+<div>NOME</div>
+<div>USUÁRIO</div>
+<div>CARGO</div>
+<div>NÍVEL</div>
+</div>
+
+${sepatPerfisTCERO.map(p=>`
+
+<div class="perfil-row-sepat">
+
+<div>
+${editandoPerfisTCEROSepat?
+`<input class="inputPerfilTCEROSepat" data-id="${p.id}" data-campo="nome_completo" value="${p.nome_completo||''}">`
+:(p.nome_completo||'-')}
+</div>
+
+<div>
+${editandoPerfisTCEROSepat?
+`<input class="inputPerfilTCEROSepat" data-id="${p.id}" data-campo="username" value="${p.username||''}">`
+:(p.username||'-')}
+</div>
+
+<div>
+${editandoPerfisTCEROSepat?
+`<input class="inputPerfilTCEROSepat" data-id="${p.id}" data-campo="cargo" value="${p.cargo||''}">`
+:(p.cargo||'-')}
+</div>
+
+<div>
+${editandoPerfisTCEROSepat?
+`<input class="inputPerfilTCEROSepat" data-id="${p.id}" data-campo="nivel_acesso" value="${p.nivel_acesso||4}">`
+:(p.nivel_acesso||'-')}
+</div>
+
+</div>
+
+`).join('')}
+`
+
+}
+
+function habilitarEdicaoPerfisTCEROSepat(){
+editandoPerfisTCEROSepat=!editandoPerfisTCEROSepat
+carregarPerfisTCEROSepat()
+}
+
+function novoPerfilTCEROSepat(){
+sepatPerfisTCERO.unshift({
+id:'novo_'+Date.now(),
+nome_completo:'',
+username:'',
+cargo:'',
+nivel_acesso:4
+})
+editandoPerfisTCEROSepat=true
+carregarPerfisTCEROSepat()
+}
+
+async function salvarPerfisTCEROSepat(){
+let inputs=document.querySelectorAll('.inputPerfilTCEROSepat')
+inputs.forEach(i=>{
+let perfil=sepatPerfisTCERO.find(p=>String(p.id)===String(i.dataset.id))
+if(perfil){
+perfil[i.dataset.campo]=i.value
+}
+})
+for(let p of sepatPerfisTCERO){
+if(String(p.id).startsWith('novo_')){
+await sepatClient
+.from('perfistce')
+.insert([{
+nome_completo:p.nome_completo,
+username:p.username,
+cargo:p.cargo,
+nivel_acesso:Number(p.nivel_acesso||4)
+}])
+}else{
+await sepatClient
+.from('perfistce')
+.update({
+nome_completo:p.nome_completo,
+username:p.username,
+cargo:p.cargo,
+nivel_acesso:Number(p.nivel_acesso||4)
+})
+.eq('id',p.id)
+}
+}
+alert('Perfis TCE-RO salvos')
+editandoPerfisTCEROSepat=false
+carregarPerfisTCEROSepat()
 }
