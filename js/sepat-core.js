@@ -92,7 +92,8 @@ await carregarSepatDados()
 
 controlarMesesSepat()
 
-switchSepatTab('dashboard')
+let abaSalva=localStorage.getItem('sepat_tab')||'dashboard'
+switchSepatTab(abaSalva)
 
 }catch(e){
 
@@ -1622,4 +1623,10 @@ return
 
 carregarPerfisSepat()
 
+}
+
+function voltarPainelGeral(){
+localStorage.removeItem('sepatUser')
+localStorage.removeItem('sepat_tab')
+window.location.href='index.html'
 }
