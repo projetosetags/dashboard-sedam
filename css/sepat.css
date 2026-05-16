@@ -243,3 +243,10 @@ letter-spacing:.5px;
 .chart-container-sepat{position:relative;height:100%;width:100%}
 .grafico-label-sepat{font-size:14px!important;font-weight:1000!important;color:#111827!important}
 @media(max-width:680px){.kpi-sepat strong{font-size:42px!important}.card-title-sepat{font-size:20px!important}.tab-sepat{font-size:11px!important}}
+.mini-kpis-topo-sepat{display:flex;gap:8px;align-items:center;margin-right:12px}
+.mini-kpi-topo-sepat{min-width:84px;height:48px;border-radius:14px;padding:4px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ffffff;font-weight:1000;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.mini-kpi-topo-sepat span{font-size:18px;line-height:1}
+.mini-kpi-topo-sepat small{font-size:9px;letter-spacing:.5px}
+.mini-kpi-topo-sepat.azul{background:linear-gradient(135deg,#2563eb,#38bdf8)}
+.mini-kpi-topo-sepat.verde{background:linear-gradient(135deg,#059669,#34d399)}
+.mini-kpi-topo-sepat.roxo{background:linear-gradient(135deg,#7c3aed,#a78bfa)}
