@@ -55,6 +55,9 @@ carregarResultados()
 if(nome==='historico'){
 carregarHistorico()
 }
+if(nome==='riscos'){
+carregarPainelRiscos()
+}
 }
 
 async function carregarUsuarioMonitoramento(){
