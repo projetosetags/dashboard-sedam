@@ -7,7 +7,6 @@ window.SUPABASE_ANON_KEY
 
 
 function abrirTela(nome){
-
 if(
 typeof USER_MONITORAMENTO==='undefined'
 ){
