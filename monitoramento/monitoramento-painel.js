@@ -304,7 +304,7 @@ let html=''
 ;(data||[]).forEach(m=>{
 
 html+=`
-<div class="card-monitoramento">
+<div class="card-monitoramento" onclick="abrirMonitoramento(${m.id})">
 <div class="card-monitoramento-topo">
 <div>
 <div class="monitoramento-titulo">${m.titulo||'-'}</div>
@@ -1032,5 +1032,55 @@ Os itens monitorados encontram-se dentro dos parâmetros técnicos esperados.
 }
 
 document.getElementById('painelAlertas').innerHTML=html
+
+}
+async function abrirMonitoramento(id){
+
+MONITORAMENTO_ATUAL=id
+
+localStorage.setItem(
+'monitoramentoAtual',
+id
+)
+
+let monitoramento=
+await carregarMonitoramentoAtual()
+
+if(!monitoramento){
+return
+}
+
+document.querySelectorAll('.card-monitoramento')
+.forEach(c=>{
+c.classList.remove('card-monitoramento-ativo')
+})
+
+await carregarDashboard()
+
+if(typeof carregarItensMatriz==='function'){
+await carregarItensMatriz()
+}
+
+if(typeof carregarPainelRiscos==='function'){
+await carregarPainelRiscos()
+}
+
+if(typeof carregarPainelExecutivo==='function'){
+await carregarPainelExecutivo()
+}
+
+if(typeof carregarHistorico==='function'){
+await carregarHistorico()
+}
+
+if(typeof carregarCentralEvidencias==='function'){
+await carregarCentralEvidencias()
+}
+
+if(typeof carregarPainelBeneficios==='function'){
+await carregarPainelBeneficios()
+}
+
+abrirTela('dashboard')
 
 }
