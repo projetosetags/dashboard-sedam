@@ -58,6 +58,10 @@ carregarHistorico()
 if(nome==='riscos'){
 carregarPainelRiscos()
 }
+if(nome==='workflow'){
+carregarWorkflow()
+}
+  
 }
 
 async function carregarUsuarioMonitoramento(){
