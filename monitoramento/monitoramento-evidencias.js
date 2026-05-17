@@ -296,3 +296,44 @@ console.log(e)
 }
 
 }
+async function editarEvidencia(id){
+let{data,error}=await client.from('monitoramento_evidencias').select('*').eq('id',id).single()
+if(error||!data){
+console.log(error)
+return
+}
+let descricao=prompt('Descrição',data.descricao||'')
+if(descricao===null)return
+let confiabilidade=prompt('Confiabilidade: ALTA, MÉDIA ou BAIXA',data.confiabilidade||'MÉDIA')
+if(confiabilidade===null)return
+let status=prompt('Status: VALIDADA, PENDENTE ou REJEITADA',data.status_validacao||'PENDENTE')
+if(status===null)return
+let payload={
+descricao:descricao,
+confiabilidade:confiabilidade.toUpperCase(),
+status_validacao:status.toUpperCase()
+}
+let{error:updateError}=await client.from('monitoramento_evidencias').update(payload).eq('id',id)
+if(updateError){
+console.log(updateError)
+alert('Erro ao editar')
+return
+}
+await registrarLog('EDIÇÃO EVIDÊNCIA','monitoramento_evidencias',id)
+await carregarCentralEvidencias()
+alert('Evidência atualizada')
+}
+
+async function excluirEvidencia(id){
+let ok=confirm('Excluir evidência?')
+if(!ok)return
+let{error}=await client.from('monitoramento_evidencias').delete().eq('id',id)
+if(error){
+console.log(error)
+alert('Erro ao excluir')
+return
+}
+await registrarLog('EXCLUSÃO EVIDÊNCIA','monitoramento_evidencias',id)
+await carregarCentralEvidencias()
+alert('Evidência removida')
+}
