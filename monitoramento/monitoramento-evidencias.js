@@ -219,10 +219,18 @@ try{
 await client
 .from('monitoramento_logs')
 .insert([{
-usuario:'AUDITOR',
+usuario:
+USER_MONITORAMENTO?.nome||
+USER_MONITORAMENTO?.username||
+'AUDITOR',
 acao:acao,
 tabela:tabela,
 registro_id:registro,
+monitoramento_id:MONITORAMENTO_ATUAL||null,
+origem:
+USER_MONITORAMENTO?.origem||'-',
+nivel:
+USER_MONITORAMENTO?.nivel||4,
 dados:{
 data:new Date().toISOString()
 }
