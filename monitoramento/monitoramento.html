@@ -72,6 +72,9 @@ NÃO IDENTIFICADO
 🕓 Auditoria
 </button>
 
+<button class="nav-btn" onclick="abrirTela('historico')">
+📈 Histórico
+</button>
 </nav>
 
 <main class="conteudo-monitoramento">
@@ -466,7 +469,23 @@ NÃO IDENTIFICADO
 <div id="listaAuditoria"></div>
 
 </section>
+<section id="tela-historico" class="tela-monitoramento hidden">
 
+<div class="top-actions">
+
+<button class="btn-padrao verde" onclick="sincronizarHistoricoTAG()">
+🔄 Sincronizar TAG
+</button>
+
+</div>
+
+<div class="grafico-box">
+<canvas id="graficoHistorico"></canvas>
+</div>
+
+<div id="listaHistorico"></div>
+
+</section>
 </main>
 
 </div>
