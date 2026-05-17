@@ -335,41 +335,69 @@ let titulo=prompt('Título do monitoramento')
 
 if(!titulo)return
 
-let orgao=prompt('Órgão')
+let orgao=prompt('Órgão responsável')
 
-let processo=prompt('Processo')
+if(!orgao)return
 
-let acordao=prompt('Acórdão')
+let origem=prompt(
+'Origem: SEDAM, SEPAT ou QUEIMADAS',
+'SEDAM'
+)
 
-let relator=prompt('Relator')
+if(!origem)return
 
-let auditor=prompt('Auditor Responsável')
+origem=origem.toUpperCase().trim()
 
-let criticidade=prompt('Criticidade')
+let tabela='vw_monitoramento_integrado'
 
-let status='EM ANDAMENTO'
+if(origem==='SEPAT'){
+tabela='vw_monitoramento_integrado'
+}
 
-let{error}=await client
-.from('monitoramentos')
-.insert([{
+if(origem==='QUEIMADAS'){
+tabela='vw_monitoramento_integrado'
+}
+
+let payload={
+
 titulo:titulo,
+
 orgao:orgao,
-processo:processo,
-acordao:acordao,
-relator:relator,
-auditor_responsavel:auditor,
-criticidade:criticidade,
-status:status
-}])
+
+origem:origem,
+
+tabela_origem:tabela,
+
+descricao_origem:
+'Integração institucional '+origem,
+
+status:'EM ANDAMENTO'
+
+}
+
+let{data,error}=await client
+.from('monitoramentos')
+.insert([payload])
+.select()
+.single()
 
 if(error){
-alert('Erro ao criar')
 console.log(error)
+alert('Erro ao criar monitoramento')
 return
 }
 
+MONITORAMENTO_ATUAL=data.id
+
+await registrarLog(
+'NOVO MONITORAMENTO',
+'monitoramentos',
+data.id
+)
+
 await carregarListaMonitoramentos()
-await carregarDashboard()
+
+alert('Monitoramento criado com sucesso')
 
 }
 
