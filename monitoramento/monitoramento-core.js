@@ -1,5 +1,7 @@
 let MONITORAMENTO_ATUAL=null
 let USER_MONITORAMENTO=null
+let ORIGEM_ATUAL='TODAS'
+
 const client=supabase.createClient(
 window.S_URL,
 window.S_KEY
@@ -29,9 +31,18 @@ document
 .querySelectorAll('.nav-btn')
 .forEach(b=>b.classList.remove('nav-active'))
 
-if(event&&event.target){
-event.target.classList.add('nav-active')
+document
+.querySelectorAll('.nav-btn')
+.forEach(b=>{
+
+if(
+b.getAttribute('onclick')===
+`abrirTela('${nome}')`
+){
+b.classList.add('nav-active')
 }
+
+})
 
 if(nome==='dashboard'){
 carregarDashboard()
@@ -222,4 +233,19 @@ return 0
 }
 function ordenarDataGlobal(data){
 return ordenarItensMonitoramento(data)
+}
+function aplicarFiltroOrigem(data){
+
+if(
+!ORIGEM_ATUAL||
+ORIGEM_ATUAL==='TODAS'
+){
+return data
+}
+
+return(data||[]).filter(i=>
+(i.origem||'').toUpperCase()===
+ORIGEM_ATUAL.toUpperCase()
+)
+
 }
