@@ -60,6 +60,10 @@ alert(`${total} registros sincronizados`)
 }
 
 async function atualizarMonitoramentoAutomatico(){
+if(window.SYNC_EM_EXECUCAO){
+return
+}
+window.SYNC_EM_EXECUCAO=true
 let monitoramento=await carregarMonitoramentoAtual()
 if(!monitoramento){
 return
@@ -133,4 +137,5 @@ if(typeof carregarHistorico==='function'){
 await carregarHistorico()
 }
 console.log('Monitoramentos sincronizados:',{inseridos,atualizados})
+window.SYNC_EM_EXECUCAO=false
 }
