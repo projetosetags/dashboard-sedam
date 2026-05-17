@@ -173,10 +173,18 @@ el.disabled=true
 }
 
 }
+
 document.addEventListener('DOMContentLoaded',async()=>{
 await carregarUsuarioMonitoramento()
 await carregarDashboard()
+if(typeof atualizarMonitoramentoAutomatico==='function'){
+await atualizarMonitoramentoAutomatico()
+setInterval(async()=>{
+await atualizarMonitoramentoAutomatico()
+},300000)
+}
 })
+
 
 window.addEventListener('error',e=>{
 
