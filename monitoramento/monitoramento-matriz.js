@@ -2,7 +2,13 @@ window.ITEM_EDITANDO=null
 
 async function carregarItensMatriz(){
 
-if(!MONITORAMENTO_ATUAL)return
+if(!MONITORAMENTO_ATUAL){
+
+document.getElementById('tbodyMatriz').innerHTML=''
+
+return
+
+}
 
 let{data,error}=await client
 .from('monitoramento_itens')
@@ -19,6 +25,14 @@ let html=''
 
 ;(data||[]).forEach(i=>{
 
+let classe='verde'
+
+if(i.criticidade==='ALTA'){
+classe='vermelho'
+}else if(i.criticidade==='MÉDIA'){
+classe='amarelo'
+}
+
 html+=`
 <tr>
 
@@ -27,7 +41,7 @@ html+=`
 <td>${i.subitem||'-'}</td>
 
 <td>
-<span class="badge-status ${getClasseStatus(i.status)}">
+<span class="badge-status ${classe}">
 ${i.status||'-'}
 </span>
 </td>
@@ -44,27 +58,15 @@ ${i.criticidade||'-'}
 ${formatarData(i.prazo)}
 </td>
 
-<td>
+<td style="display:flex;gap:6px;flex-wrap:wrap;">
 
-<div style="display:flex;gap:6px;flex-wrap:wrap;">
-
-<button class="btn-padrao azul" onclick="editarItemMatriz(${i.id})">
-Editar
+<button class="btn-tabela azul" onclick="editarItemMatriz(${i.id})">
+✏
 </button>
 
-<button class="btn-padrao verde" onclick="abrirEvidencias(${i.id})">
-Evidências
+<button class="btn-tabela vermelho" onclick="excluirItemMatriz(${i.id})">
+🗑
 </button>
-
-<button class="btn-padrao amarelo" onclick="abrirAnalises(${i.id})">
-Análises
-</button>
-
-<button class="btn-padrao vermelho" onclick="excluirItem(${i.id})">
-Excluir
-</button>
-
-</div>
 
 </td>
 
