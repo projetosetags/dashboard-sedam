@@ -59,8 +59,22 @@ let beneficios=0
 
 data=(data||[]).sort((a,b)=>{
 
-let sa=String(a.subitem||'0.0').split('.').map(Number)
-let sb=String(b.subitem||'0.0').split('.').map(Number)
+let ia=String(a.item||'0').split('.').map(Number)
+let ib=String(b.item||'0').split('.').map(Number)
+
+for(let i=0;i<Math.max(ia.length,ib.length);i++){
+
+let va=ia[i]||0
+let vb=ib[i]||0
+
+if(va!==vb){
+return va-vb
+}
+
+}
+
+let sa=String(a.subitem||'0').split('.').map(Number)
+let sb=String(b.subitem||'0').split('.').map(Number)
 
 for(let i=0;i<Math.max(sa.length,sb.length);i++){
 
