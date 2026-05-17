@@ -987,3 +987,33 @@ background:#fff;
 display:none!important;
 }
 }
+.card-monitoramento{
+position:relative;
+transition:.25s;
+cursor:pointer;
+border:1px solid rgba(255,255,255,.06);
+}
+.card-monitoramento:hover{
+transform:translateY(-2px);
+border-color:rgba(59,130,246,.45);
+box-shadow:0 10px 25px rgba(59,130,246,.12);
+}
+.card-monitoramento-ativo{
+border:2px solid #3b82f6!important;
+background:linear-gradient(135deg,rgba(30,41,59,.98),rgba(15,23,42,1));
+box-shadow:0 0 0 1px rgba(59,130,246,.3),0 15px 40px rgba(59,130,246,.22);
+transform:translateY(-2px);
+}
+.card-monitoramento-ativo::before{
+content:'MONITORAMENTO ATIVO';
+position:absolute;
+top:-10px;
+right:12px;
+background:#3b82f6;
+color:#fff;
+font-size:10px;
+font-weight:700;
+padding:4px 10px;
+border-radius:999px;
+letter-spacing:.5px;
+}
