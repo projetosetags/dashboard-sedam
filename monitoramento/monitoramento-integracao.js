@@ -73,6 +73,7 @@ return
 window.SYNC_EM_EXECUCAO=true
 let monitoramento=await carregarMonitoramentoAtual()
 if(!monitoramento){
+window.SYNC_EM_EXECUCAO=false
 return
 }
 let origem=monitoramento.origem||''
@@ -81,8 +82,10 @@ if(origem){
 query=query.eq('origem',origem)
 }
 let{data,error}=await query
+data=ordenarDataGlobal(data)
 if(error){
 console.log(error)
+window.SYNC_EM_EXECUCAO=false
 return
 }
 let atualizados=0
