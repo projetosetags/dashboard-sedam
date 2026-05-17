@@ -384,8 +384,36 @@ alert('Monitoramento criado com sucesso')
 
 async function abrirMonitoramento(id){
 MONITORAMENTO_ATUAL=id
-abrirTela('matriz')
+localStorage.setItem('monitoramentoAtual',id)
+let monitoramento=await carregarMonitoramentoAtual()
+if(!monitoramento){
+return
+}
+document.querySelectorAll('.card-monitoramento').forEach(c=>{
+c.classList.remove('card-monitoramento-ativo')
+})
+let cardSelecionado=document.querySelector(`[data-monitoramento="${id}"]`)
+if(cardSelecionado){
+cardSelecionado.classList.add('card-monitoramento-ativo')
+}
+await carregarDashboard()
 await carregarItensMatriz()
+if(typeof carregarPainelRiscos==='function'){
+await carregarPainelRiscos()
+}
+if(typeof carregarPainelExecutivo==='function'){
+await carregarPainelExecutivo()
+}
+if(typeof carregarHistorico==='function'){
+await carregarHistorico()
+}
+if(typeof carregarCentralEvidencias==='function'){
+await carregarCentralEvidencias()
+}
+if(typeof carregarPainelBeneficios==='function'){
+await carregarPainelBeneficios()
+}
+abrirTela('dashboard')
 }
 
 async function excluirMonitoramento(id){
@@ -485,7 +513,7 @@ if(m.percentual){
 percentual=Number(m.percentual)
 }
 html+=`
-<div class="card-monitoramento">
+<div class="card-monitoramento" data-monitoramento="${m.id}">
 <div class="card-monitoramento-topo">
 <div>
 <div class="monitoramento-titulo">
