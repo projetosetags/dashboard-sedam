@@ -1,8 +1,8 @@
 let MONITORAMENTO_ATUAL=null
 let USER_MONITORAMENTO=null
 const client=supabase.createClient(
-window.SUPABASE_URL,
-window.SUPABASE_ANON_KEY
+window.S_URL,
+window.S_KEY
 )
 
 
