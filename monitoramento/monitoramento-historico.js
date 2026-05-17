@@ -77,7 +77,9 @@ alert(
 
 async function carregarHistorico(){
 
-if(!MONITORAMENTO_ATUAL)return
+let ctx=document.getElementById('graficoHistorico')
+
+if(!ctx)return
 
 let{data,error}=await client
 .from('monitoramento_historico')
@@ -91,42 +93,49 @@ return
 
 let mapa={}
 
-;(data||[]).forEach(h=>{
+;(data||[]).forEach(i=>{
 
-if(!mapa[h.mes_referencia]){
-mapa[h.mes_referencia]=[]
+let d=new Date(i.created_at)
+
+let chave=
+String(d.getMonth()+1).padStart(2,'0')+
+'/'+
+d.getFullYear()
+
+if(!mapa[chave]){
+mapa[chave]=[]
 }
 
-mapa[h.mes_referencia]
-.push(Number(h.percentual||0))
+mapa[chave].push(
+Number(i.percentual||0)
+)
 
 })
 
 let labels=[]
 let valores=[]
 
-Object.keys(mapa).forEach(m=>{
+Object.keys(mapa).forEach(k=>{
 
-labels.push(m)
+labels.push(k)
 
-let arr=mapa[m]
+let arr=mapa[k]
 
 let media=
 arr.reduce((a,b)=>a+b,0)/arr.length
 
 valores.push(
-Number(media.toFixed(2))
+Number(media.toFixed(1))
 )
 
 })
 
-let ctx=document.getElementById('graficoHistorico')
-
-if(graficoHistorico){
-graficoHistorico.destroy()
+if(window.graficoHistoricoObj){
+window.graficoHistoricoObj.destroy()
 }
 
-graficoHistorico=new Chart(ctx,{
+window.graficoHistoricoObj=
+new Chart(ctx,{
 type:'line',
 data:{
 labels:labels,
@@ -136,7 +145,7 @@ data:valores,
 borderColor:'#10b981',
 backgroundColor:'rgba(16,185,129,.2)',
 fill:true,
-tension:.3
+tension:.35
 }]
 },
 options:{
@@ -146,9 +155,6 @@ legend:{
 labels:{
 color:'#fff'
 }
-},
-datalabels:{
-color:'#fff'
 }
 },
 scales:{
@@ -169,50 +175,7 @@ color:'rgba(255,255,255,.05)'
 }
 }
 }
-},
-plugins:[ChartDataLabels]
-})
-
-let html=''
-
-;(data||[]).forEach(h=>{
-
-let classe='azul'
-
-if(Number(h.percentual)>=100){
-classe='verde'
-}else if(Number(h.percentual)<40){
-classe='vermelho'
-}else if(Number(h.percentual)<80){
-classe='amarelo'
 }
-
-html+=`
-<div class="card-monitoramento">
-
-<div class="card-monitoramento-topo">
-
-<div>
-<div class="monitoramento-titulo">
-${h.mes_referencia||'-'}
-</div>
-
-<div class="monitoramento-subtitulo">
-Origem: ${h.origem||'-'}
-</div>
-</div>
-
-<div class="badge-status ${classe}">
-${Number(h.percentual||0)}%
-</div>
-
-</div>
-
-</div>
-`
-
 })
-
-document.getElementById('listaHistorico').innerHTML=html
 
 }
