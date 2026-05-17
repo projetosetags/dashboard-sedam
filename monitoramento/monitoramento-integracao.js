@@ -49,9 +49,15 @@ beneficio_esperado:'Fortalecimento institucional',
 responsavel:d.responsavel,
 prazo:d.prazo_texto
 }
+try{
 let{error:insertError}=await client.from('monitoramento_itens').insert([payload])
-if(!insertError){
+if(insertError){
+console.log('ERRO INSERT:',insertError)
+}else{
 total++
+}
+}catch(e){
+console.log('ERRO GERAL INSERT:',e)
 }
 }
 await carregarDashboard()
@@ -114,7 +120,9 @@ sincronizado_em:new Date().toISOString()
 let{data:existe}=await client.from('monitoramento_itens').select('id').eq('monitoramento_id',MONITORAMENTO_ATUAL).eq('subitem',d.subitem).limit(1)
 if(existe&&existe.length){
 let{error:updateError}=await client.from('monitoramento_itens').update(payload).eq('id',existe[0].id)
-if(!updateError){
+if(updateError){
+console.log('ERRO UPDATE:',updateError)
+}else{
 atualizados++
 }
 }else{
