@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>MONITORAMENTO TÉCNICO</title>
-<link rel="icon" href="./assets/bandeira-ro.png">
+<link rel="icon" href="/tags/assets/bandeira-ro.png">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/tags/config.js"></script>
@@ -31,9 +31,18 @@ Tribunal de Contas • Painel de Auditoria
 </div>
 
 <div class="topbar-right">
+
+<select id="filtroOrigem" class="select-monitoramento" onchange="filtrarOrigemMonitoramento()">
+<option value="">Todas Origens</option>
+<option value="SEDAM">SEDAM</option>
+<option value="SEPAT">SEPAT</option>
+<option value="QUEIMADAS">QUEIMADAS</option>
+</select>
+
 <div id="usuarioLogado" class="usuario-logado">
 NÃO IDENTIFICADO
 </div>
+
 </div>
 
 </header>
@@ -75,29 +84,35 @@ NÃO IDENTIFICADO
 <button class="nav-btn" onclick="abrirTela('historico')">
 📈 Histórico
 </button>
+
 <button class="nav-btn" onclick="abrirTela('riscos')">
 🔥 Riscos
 </button>
+
 <button class="nav-btn" onclick="abrirTela('workflow')">
 ✔ Workflow
 </button>
+
 <button class="nav-btn" onclick="abrirTela('executivo')">
 🏛 Executivo
 </button>
+
 <button class="nav-btn" onclick="abrirTela('central')">
 📂 Central
 </button>
+
 <button class="nav-btn" onclick="abrirTela('beneficios')">
 💎 Benefícios
 </button>
 
-  
 </nav>
 
 <main class="conteudo-monitoramento">
 
 <section id="tela-dashboard" class="tela-monitoramento">
+
 <div id="painelAlertas"></div>
+
 <div class="grid-cards">
 
 <div class="card-kpi">
@@ -164,9 +179,11 @@ NÃO IDENTIFICADO
 <section id="tela-monitoramentos" class="tela-monitoramento hidden">
 
 <div class="top-actions">
-<button class="btn-padrao verde" onclick="importarDaTAG()">
-⬇ Importar da TAG
+
+<button class="btn-padrao verde" onclick="sincronizarTAGSedam()">
+🔄 Sincronizar TAGS/SEDAM
 </button>
+
 <button class="btn-padrao" onclick="novoMonitoramento()">
 ➕ Novo Monitoramento
 </button>
