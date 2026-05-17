@@ -38,7 +38,8 @@ query=query.eq('origem',origem)
 }
 
 let{data,error}=await query
-
+data=ordenarDataGlobal(data)
+data=aplicarFiltroOrigem(data)
 if(error){
 console.log(error)
 return
@@ -56,33 +57,6 @@ let riscoMedio=0
 let riscoBaixo=0
 
 let beneficios=0
-
-data=(data||[]).sort((a,b)=>{
-
-let pa=String(a.item||'0.0')
-.split('.')
-.map(n=>parseInt(n)||0)
-
-let pb=String(b.item||'0.0')
-.split('.')
-.map(n=>parseInt(n)||0)
-
-let max=Math.max(pa.length,pb.length)
-
-for(let i=0;i<max;i++){
-
-let va=pa[i]||0
-let vb=pb[i]||0
-
-if(va!==vb){
-return va-vb
-}
-
-}
-
-return 0
-
-})
 
 ;(data||[]).forEach(i=>{
 let percentual=Number(i.percentual||0)
@@ -318,7 +292,7 @@ async function carregarListaMonitoramentos(){
 let{data,error}=await client
 .from('monitoramentos')
 .select('*')
-.order('id',{ascending:false})
+.order('titulo',{ascending:true})
 
 if(error){
 console.log(error)
@@ -408,39 +382,6 @@ await carregarListaMonitoramentos()
 alert('Monitoramento criado com sucesso')
 }
 
-async function abrirMonitoramento(id){
-MONITORAMENTO_ATUAL=id
-localStorage.setItem('monitoramentoAtual',id)
-let monitoramento=await carregarMonitoramentoAtual()
-if(!monitoramento){
-return
-}
-document.querySelectorAll('.card-monitoramento').forEach(c=>{
-c.classList.remove('card-monitoramento-ativo')
-})
-let cardSelecionado=document.querySelector(`[data-monitoramento="${id}"]`)
-if(cardSelecionado){
-cardSelecionado.classList.add('card-monitoramento-ativo')
-}
-await carregarDashboard()
-await carregarItensMatriz()
-if(typeof carregarPainelRiscos==='function'){
-await carregarPainelRiscos()
-}
-if(typeof carregarPainelExecutivo==='function'){
-await carregarPainelExecutivo()
-}
-if(typeof carregarHistorico==='function'){
-await carregarHistorico()
-}
-if(typeof carregarCentralEvidencias==='function'){
-await carregarCentralEvidencias()
-}
-if(typeof carregarPainelBeneficios==='function'){
-await carregarPainelBeneficios()
-}
-abrirTela('dashboard')
-}
 
 async function excluirMonitoramento(id){
 if(!confirm('Excluir monitoramento?'))return
@@ -501,7 +442,7 @@ let criticidade=document
 let query=client
 .from('monitoramentos')
 .select('*')
-.order('id',{ascending:false})
+.order('titulo',{ascending:true})
 if(status){
 query=query.eq('status',status)
 }
@@ -595,7 +536,7 @@ async function carregarTimeline(){
 let{data,error}=await client
 .from('monitoramento_logs')
 .select('*')
-.order('id',{ascending:false})
+.order('titulo',{ascending:true})
 .limit(20)
 if(error){
 console.log(error)
@@ -743,7 +684,7 @@ async function carregarGraficoCriticidade(){
 let{data,error}=await client
 .from('monitoramento_itens')
 .select('criticidade')
-
+data=aplicarFiltroOrigem(data)
 if(error){
 console.log(error)
 return
@@ -838,7 +779,7 @@ async function carregarGraficoBeneficios(){
 let{data,error}=await client
 .from('monitoramento_itens')
 .select('beneficio_esperado')
-
+data=aplicarFiltroOrigem(data)
 if(error){
 console.log(error)
 return
@@ -940,7 +881,7 @@ async function atualizarSemaforosAutomaticos(){
 let{data,error}=await client
 .from('monitoramento_itens')
 .select('*')
-
+data=ordenarDataGlobal(data)
 if(error){
 console.log(error)
 return
@@ -992,6 +933,8 @@ await carregarDashboard()
 
 async function carregarAlertasTecnicos(){
 let{data,error}=await client.from('monitoramento_itens').select('*')
+data=ordenarDataGlobal(data)
+data=aplicarFiltroOrigem(data)
 if(error){
 console.log(error)
 return
