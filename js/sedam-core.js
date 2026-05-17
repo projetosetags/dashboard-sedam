@@ -151,130 +151,73 @@ document.body.style.visibility='visible'
 002 SEDAM CORE FUNCTION LOGIN
 =========================================================*/
 window.login=async function(){
-
 let usuario=document.getElementById('u').value.trim().toLowerCase()
 let senha=document.getElementById('p').value.trim()
-
 if(!usuario||!senha){
 alert('Informe usuário e senha')
 return
 }
-
 let perfil=null
-
-let {data:p1,error:e1}=await client
-.from('perfistce')
-.select('*')
-.eq('username',usuario)
-.eq('senha',senha)
-.limit(1)
-
-if(e1){
-console.log(e1)
-}
-
+let {data:p1,error:e1}=await client.from('perfistce').select('*').eq('username',usuario).eq('senha',senha).limit(1)
+if(e1)console.log(e1)
 if(p1&&p1.length){
-
 perfil=p1[0]
 perfil.origem='TCERO'
-
 }else{
-
-let {data:p2,error:e2}=await client
-.from('perfis')
-.select('*')
-.eq('username',usuario)
-.limit(1)
-
-if(e2){
-console.log(e2)
-}
-
+let {data:p2,error:e2}=await client.from('perfis').select('*').eq('username',usuario).limit(1)
+if(e2)console.log(e2)
 if(p2&&p2.length){
-
 perfil=p2[0]
 perfil.origem='SEDAM'
-
-if(
-perfil.senha&&
-String(perfil.senha)!==String(senha)
-){
+if(perfil.senha&&String(perfil.senha)!==String(senha)){
 alert('Senha inválida')
 return
 }
-
 }
-
 }
-
 if(!perfil){
 alert('Usuário não encontrado')
 return
 }
-
 window.userP=perfil
-if(
-(
-perfil.origem==='SEDAM'&&
-Number(perfil.nivel_acesso)>=3
-)||
-(
-perfil.origem==='TCERO'&&
-Number(perfil.nivel_acesso)!==1
-)
-){
-
+userP=perfil
+localStorage.setItem('user',JSON.stringify(perfil))
+document.body.classList.remove('login-bg')
+let loginScreen=document.getElementById('login-screen')
+let dashboard=document.getElementById('dashboard')
+if(loginScreen){
+loginScreen.classList.add('hidden')
+loginScreen.style.display='none'
+}
+if(dashboard){
+dashboard.classList.remove('hidden')
+dashboard.style.display='block'
+dashboard.style.visibility='visible'
+dashboard.style.opacity='1'
+}
+let info=document.getElementById('user-info')
+if(info){
+info.innerHTML=(perfil.nome_completo||'-')+' • '+(perfil.cargo||'-')+' • '+(perfil.origem||'-')
+}
 let tabPerfis=document.getElementById('tab-perfis')
 let tabTCERO=document.getElementById('tab-tcero')
 let tabUsuarios=document.getElementById('tab-usuarios')
-
 if(tabPerfis){
+tabPerfis.classList.add('hidden')
 tabPerfis.style.display='none'
 }
-
 if(tabTCERO){
+tabTCERO.classList.add('hidden')
 tabTCERO.style.display='none'
 }
-
 if(tabUsuarios){
+tabUsuarios.classList.add('hidden')
 tabUsuarios.style.display='none'
 }
-
-}
-userP=perfil
-aplicarPermissoesAbas()
-localStorage.setItem(
-'user',
-JSON.stringify(perfil)
-)
-
-document.body.classList.remove('login-bg')
-
-document.getElementById('login-screen')
-.classList.add('hidden')
-
-document.getElementById('dashboard')
-.classList.remove('hidden')
-
-document.getElementById('user-info').innerHTML=
-(perfil.nome_completo||'-')+
-' • '+
-(perfil.cargo||'-')+
-' • '+
-(perfil.origem||'-')
-
-let adminsBackup=[
-'manoel',
-'vagner',
-'franciscovagner',
-'francisco.vagner',
-'vagner9'
-]
+let adminsBackup=['manoel','vagner','franciscovagner','francisco.vagner','vagner9']
 let btnBackup=document.getElementById('btnBackupSedam')
 if(btnBackup){
-let usuarioAtual=String(perfil.username||'')
-.toLowerCase()
-.trim()
+let usuarioAtual=String(perfil.username||'').toLowerCase().trim()
 if(adminsBackup.includes(usuarioAtual)){
 btnBackup.classList.remove('hidden')
 btnBackup.style.display='inline-flex'
@@ -285,182 +228,57 @@ btnBackup.classList.add('hidden')
 btnBackup.style.display='none'
 }
 }
-
-let tabPerfis=document.getElementById('tab-perfis')
-let tabTCERO=document.getElementById('tab-tcero')
-let tabUsuarios=document.getElementById('tab-usuarios')
-
-if(tabPerfis){
-tabPerfis.classList.add('hidden')
-tabPerfis.style.display='none'
-}
-
-if(tabTCERO){
-tabTCERO.classList.add('hidden')
-tabTCERO.style.display='none'
-}
-
-if(tabUsuarios){
-tabUsuarios.classList.add('hidden')
-tabUsuarios.style.display='none'
-}
-
-let usernameAtual=(perfil.username||'').toLowerCase()
-
-let adminsTCERO=[
-'manoel',
-'vagner',
-'gleidi'
-]
-
-/*=========================================================
-SEDAM NIVEL 1 E 2
-=========================================================*/
-if(
-perfil.origem==='SEDAM'&&
-Number(perfil.nivel_acesso)<=2
-){
-
+if(perfil.origem==='SEDAM'&&Number(perfil.nivel_acesso)<=2){
 if(tabPerfis){
 tabPerfis.classList.remove('hidden')
 tabPerfis.style.display='inline-flex'
 tabPerfis.innerHTML='<div>👥</div><div>Perfis Sedam</div>'
 }
-
 if(tabUsuarios){
 tabUsuarios.classList.remove('hidden')
 tabUsuarios.style.display='inline-flex'
 }
-
-if(tabTCERO){
-tabTCERO.classList.add('hidden')
-tabTCERO.style.display='none'
 }
-
-}
-
-/*=========================================================
-SEDAM NIVEL 3 E 4
-=========================================================*/
-if(
-perfil.origem==='SEDAM'&&
-Number(perfil.nivel_acesso)>=3
-){
-
-if(tabPerfis){
-tabPerfis.classList.add('hidden')
-tabPerfis.style.display='none'
-}
-
-if(tabUsuarios){
-tabUsuarios.classList.add('hidden')
-tabUsuarios.style.display='none'
-}
-
-if(tabTCERO){
-tabTCERO.classList.add('hidden')
-tabTCERO.style.display='none'
-}
-
-}
-
-/*=========================================================
-TCERO NIVEL 1
-=========================================================*/
-if(
-perfil.origem==='TCERO'&&
-Number(perfil.nivel_acesso)===1
-){
-
+if(perfil.origem==='TCERO'&&Number(perfil.nivel_acesso)===1){
 if(tabPerfis){
 tabPerfis.classList.remove('hidden')
 tabPerfis.style.display='inline-flex'
 tabPerfis.innerHTML='<div>👥</div><div>Perfis Sedam</div>'
 }
-
 if(tabTCERO){
 tabTCERO.classList.remove('hidden')
 tabTCERO.style.display='inline-flex'
 }
-
 if(tabUsuarios){
 tabUsuarios.classList.remove('hidden')
 tabUsuarios.style.display='inline-flex'
 }
-
 }
-
-/*=========================================================
-TCERO NIVEL 2 3 E 4
-=========================================================*/
-if(
-perfil.origem==='TCERO'&&
-Number(perfil.nivel_acesso)!==1
-){
-
-if(tabPerfis){
-tabPerfis.classList.add('hidden')
-tabPerfis.style.display='none'
+if(!(perfil.origem==='SEDAM'&&Number(perfil.nivel_acesso)>=3)&&!(perfil.origem==='TCERO'&&Number(perfil.nivel_acesso)!==1)){
+try{
+await Promise.all([
+carregarPerfis(),
+carregarTCERO()
+])
+}catch(e){
+console.log(e)
 }
-
-if(tabTCERO){
-tabTCERO.classList.add('hidden')
-tabTCERO.style.display='none'
 }
-
-if(tabUsuarios){
-tabUsuarios.classList.add('hidden')
-tabUsuarios.style.display='none'
-}
-
-}
-
-if(
-!(
-perfil.origem==='SEDAM'&&
-Number(perfil.nivel_acesso)>=3
-)&&
-!(
-perfil.origem==='TCERO'&&
-Number(perfil.nivel_acesso)!==1
-)
-){
-
-await carregarPerfis()
-await carregarTCERO()
-
-}
-
-await carregarDados()
-
-setTimeout(async ()=>{
-
-await carregarDados()
-
+requestAnimationFrame(()=>{
 switchTab('dashboard')
-
-if(typeof renderDashboard==='function'){
-renderDashboard()
+})
+setTimeout(async ()=>{
+try{
+await carregarDados()
+if(typeof renderDashboard==='function')renderDashboard()
+if(typeof renderResumo==='function')renderResumo()
+if(typeof renderTable==='function')renderTable()
+if(typeof renderConcluidos==='function')renderConcluidos()
+if(typeof initPainelGrafico==='function')initPainelGrafico()
+}catch(e){
+console.log(e)
 }
-
-if(typeof renderResumo==='function'){
-renderResumo()
-}
-
-if(typeof renderTable==='function'){
-renderTable()
-}
-
-if(typeof renderConcluidos==='function'){
-renderConcluidos()
-}
-
-if(typeof initPainelGrafico==='function'){
-initPainelGrafico()
-}
-
-},700)
-
+},120)
 }
 /*=========================================================
 002A SEDAM CORE FUNCTION APLICARPERMISSOESABAS
