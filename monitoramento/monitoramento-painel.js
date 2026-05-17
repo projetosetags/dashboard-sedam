@@ -344,124 +344,75 @@ return''
 }
 
 async function novoMonitoramento(){
-
 let titulo=prompt('Título do monitoramento')
-
 if(!titulo)return
-
 let orgao=prompt('Órgão responsável')
-
 if(!orgao)return
-
-let origem=prompt(
-'Origem: SEDAM, SEPAT ou QUEIMADAS',
-'SEDAM'
-)
-
+let origem=prompt('Origem: SEDAM, SEPAT ou QUEIMADAS','SEDAM')
 if(!origem)return
-
 origem=origem.toUpperCase().trim()
-
 let tabela='vw_monitoramento_integrado'
-
 if(origem==='SEPAT'){
 tabela='vw_monitoramento_integrado'
 }
-
 if(origem==='QUEIMADAS'){
 tabela='vw_monitoramento_integrado'
 }
-
 let payload={
-
 titulo:titulo,
-
 orgao:orgao,
-
 origem:origem,
-
 tabela_origem:tabela,
-
-descricao_origem:
-'Integração institucional '+origem,
-
+descricao_origem:'Integração institucional '+origem,
 status:'EM ANDAMENTO'
-
 }
-
 let{data,error}=await client
 .from('monitoramentos')
 .insert([payload])
 .select()
 .single()
-
 if(error){
 console.log(error)
 alert('Erro ao criar monitoramento')
 return
 }
-
 MONITORAMENTO_ATUAL=data.id
-
-await registrarLog(
-'NOVO MONITORAMENTO',
-'monitoramentos',
-data.id
-)
-
+await registrarLog('NOVO MONITORAMENTO','monitoramentos',data.id)
 await carregarListaMonitoramentos()
-
 alert('Monitoramento criado com sucesso')
-
 }
 
 async function abrirMonitoramento(id){
-
 MONITORAMENTO_ATUAL=id
-
 abrirTela('matriz')
-
 await carregarItensMatriz()
-
 }
 
 async function excluirMonitoramento(id){
-
 if(!confirm('Excluir monitoramento?'))return
-
 let{error}=await client
 .from('monitoramentos')
 .delete()
 .eq('id',id)
-
 if(error){
 console.log(error)
 return
 }
-
 await carregarListaMonitoramentos()
 await carregarDashboard()
-
 }
 
 async function editarMonitoramento(id){
-
 let{data,error}=await client
 .from('monitoramentos')
 .select('*')
 .eq('id',id)
 .single()
-
 if(error||!data)return
-
 let titulo=prompt('Título',data.titulo||'')
-
 if(titulo===null)return
-
 let status=prompt('Status',data.status||'')
-
 let criticidade=prompt('Criticidade',data.criticidade||'')
-
 let{error:updateError}=await client
 .from('monitoramentos')
 .update({
@@ -470,185 +421,132 @@ status:status,
 criticidade:criticidade
 })
 .eq('id',id)
-
 if(updateError){
 console.log(updateError)
 return
 }
-
 await carregarListaMonitoramentos()
 await carregarDashboard()
-
 }
-
 document.addEventListener('DOMContentLoaded',async()=>{
-
 await carregarListaMonitoramentos()
 await atualizarSemaforosAutomaticos()
 })
 
 async function filtrarMonitoramentos(){
-
 let busca=document
 .getElementById('buscaMonitoramento')
 .value
 .toLowerCase()
-
 let status=document
 .getElementById('filtroStatus')
 .value
-
 let criticidade=document
 .getElementById('filtroCriticidade')
 .value
-
 let query=client
 .from('monitoramentos')
 .select('*')
 .order('id',{ascending:false})
-
 if(status){
 query=query.eq('status',status)
 }
-
 if(criticidade){
 query=query.eq('criticidade',criticidade)
 }
-
 let{data,error}=await query
-
 if(error){
 console.log(error)
 return
 }
-
 if(busca){
-
 data=(data||[]).filter(m=>
-
 (m.titulo||'')
 .toLowerCase()
 .includes(busca)
-
 ||
-
 (m.orgao||'')
 .toLowerCase()
 .includes(busca)
-
 ||
-
 (m.processo||'')
 .toLowerCase()
 .includes(busca)
-
 )
-
 }
-
 renderizarMonitoramentos(data||[])
-
 }
 
 function renderizarMonitoramentos(data){
-
 let html=''
-
 ;(data||[]).forEach(m=>{
-
 let percentual=0
-
 if(m.percentual){
 percentual=Number(m.percentual)
 }
-
 html+=`
 <div class="card-monitoramento">
-
 <div class="card-monitoramento-topo">
-
 <div>
 <div class="monitoramento-titulo">
 ${m.titulo||'-'}
 </div>
-
 <div class="monitoramento-subtitulo">
 ${m.orgao||'-'} • ${m.processo||'-'}
 </div>
 </div>
-
 <div class="badge-status ${getClasseStatus(m.status)}">
 ${m.status||'-'}
 </div>
-
 </div>
-
 <div class="monitoramento-info-grid">
-
 <div>
 <b>Acórdão:</b>
 ${m.acordao||'-'}
 </div>
-
 <div>
 <b>Relator:</b>
 ${m.relator||'-'}
 </div>
-
 <div>
 <b>Auditor:</b>
 ${m.auditor_responsavel||'-'}
 </div>
-
 <div>
 <b>Criticidade:</b>
 ${m.criticidade||'-'}
 </div>
-
 </div>
-
 <div class="progress-monitoramento">
 <div class="progress-monitoramento-bar" style="width:${percentual}%"></div>
 </div>
-
 <div class="monitoramento-actions">
-
 <button class="btn-padrao" onclick="abrirMonitoramento(${m.id})">
 Abrir
 </button>
-
 <button class="btn-padrao azul" onclick="editarMonitoramento(${m.id})">
 Editar
 </button>
-
 <button class="btn-padrao vermelho" onclick="excluirMonitoramento(${m.id})">
 Excluir
 </button>
-
 </div>
-
 </div>
 `
-
 })
-
 document.getElementById('listaMonitoramentos').innerHTML=html
-
 }
 
 async function carregarTimeline(){
-
 let{data,error}=await client
 .from('monitoramento_logs')
 .select('*')
 .order('id',{ascending:false})
 .limit(20)
-
 if(error){
 console.log(error)
 return
 }
-
 let html=`
 <div class="timeline-box">
 <div class="monitoramento-titulo">
