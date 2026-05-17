@@ -87,7 +87,11 @@ NÃO IDENTIFICADO
 <button class="nav-btn" onclick="abrirTela('central')">
 📂 Central
 </button>
+<button class="nav-btn" onclick="abrirTela('beneficios')">
+💎 Benefícios
+</button>
 
+  
 </nav>
 
 <main class="conteudo-monitoramento">
@@ -686,6 +690,67 @@ Status Institucional
 </div>
 
 <div id="listaCentralEvidencias"></div>
+
+</section>
+<section id="tela-beneficios" class="tela-monitoramento hidden">
+
+<div class="grid-cards">
+
+<div class="card-kpi verde">
+<div class="kpi-titulo">FINANCEIRO</div>
+<div id="kpiBeneficioFinanceiro" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi azul">
+<div class="kpi-titulo">OPERACIONAL</div>
+<div id="kpiBeneficioOperacional" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi amarelo">
+<div class="kpi-titulo">SOCIAL</div>
+<div id="kpiBeneficioSocial" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi verde">
+<div class="kpi-titulo">AMBIENTAL</div>
+<div id="kpiBeneficioAmbiental" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi azul">
+<div class="kpi-titulo">GOVERNANÇA</div>
+<div id="kpiBeneficioGovernanca" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi vermelho">
+<div class="kpi-titulo">EFETIVIDADE</div>
+<div id="kpiIndiceEfetividade" class="kpi-valor">0%</div>
+</div>
+
+</div>
+
+<div class="painel-graficos">
+
+<div class="grafico-box">
+<div class="grafico-header">
+<div class="grafico-titulo">
+Matriz de Benefícios
+</div>
+</div>
+<canvas id="graficoBeneficiosInstitucionais"></canvas>
+</div>
+
+<div class="grafico-box">
+<div class="grafico-header">
+<div class="grafico-titulo">
+Efetividade Institucional
+</div>
+</div>
+<canvas id="graficoEfetividadeInstitucional"></canvas>
+</div>
+
+</div>
+
+<div id="listaBeneficios"></div>
 
 </section>
   
