@@ -60,78 +60,77 @@ alert(`${total} registros sincronizados`)
 }
 
 async function atualizarMonitoramentoAutomatico(){
-
-let{data,error}=await client
-.from('vw_monitoramento_integrado')
-.select('*')
-
+let monitoramento=await carregarMonitoramentoAtual()
+if(!monitoramento){
+return
+}
+let origem=monitoramento.origem||''
+let query=client.from('vw_monitoramento_integrado').select('*')
+if(origem){
+query=query.eq('origem',origem)
+}
+let{data,error}=await query
 if(error){
 console.log(error)
 return
 }
-
 let atualizados=0
-
+let inseridos=0
 for(let d of(data||[])){
-
 let criticidade='BAIXA'
-
-if(Number(d.percentual)<40){
-
+let percentual=Number(d.percentual||0)
+if(percentual<40){
 criticidade='ALTA'
-
-}else if(Number(d.percentual)<80){
-
+}else if(percentual<80){
 criticidade='MÉDIA'
-
 }
-
+let status='EM ANDAMENTO'
+if(percentual>=100){
+status='EXECUTADA'
+}else if(percentual===0){
+status='NÃO EXECUTADA'
+}else if(percentual>0&&percentual<100){
+status='PARCIALMENTE EXECUTADA'
+}
 let payload={
-
-status:d.status,
-
+monitoramento_id:MONITORAMENTO_ATUAL,
+item:d.item||'-',
+subitem:d.subitem||'-',
+descricao:d.descricao||'-',
+status:status,
 criticidade:criticidade,
-
-percentual:Number(d.percentual||0),
-
+percentual:percentual,
 acao_gestor:d.produto||'',
-
 produto_esperado:d.produto||'',
-
 responsavel:d.responsavel||'',
-
-deliberacao:d.descricao||''
-
+deliberacao:d.descricao||'',
+origem:d.origem||origem,
+sincronizado_em:new Date().toISOString()
 }
-
-let{error:updateError}=await client
-.from('monitoramento_itens')
-.update(payload)
-.eq('subitem',d.subitem)
-
+let{data:existe}=await client.from('monitoramento_itens').select('id').eq('monitoramento_id',MONITORAMENTO_ATUAL).eq('subitem',d.subitem).limit(1)
+if(existe&&existe.length){
+let{error:updateError}=await client.from('monitoramento_itens').update(payload).eq('id',existe[0].id)
 if(!updateError){
 atualizados++
 }
-
+}else{
+let{error:insertError}=await client.from('monitoramento_itens').insert([payload])
+if(!insertError){
+inseridos++
 }
-
+}
+}
+await registrarLog('SINCRONIZAÇÃO AUTOMÁTICA','monitoramento_itens',MONITORAMENTO_ATUAL)
+await carregarItensMatriz()
 await carregarDashboard()
-
 if(typeof carregarPainelExecutivo==='function'){
 await carregarPainelExecutivo()
 }
-
 if(typeof carregarPainelRiscos==='function'){
 await carregarPainelRiscos()
 }
-
 if(typeof carregarHistorico==='function'){
 await carregarHistorico()
 }
-
-console.log(
-'Monitoramentos atualizados:',
-atualizados
-)
-
+console.log('Monitoramentos sincronizados:',{inseridos,atualizados})
 }
