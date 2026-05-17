@@ -67,7 +67,11 @@ carregarPainelExecutivo()
 if(nome==='central'){
 carregarCentralEvidencias()
 }
-  
+if(nome==='beneficios'){
+carregarPainelBeneficios()
+}
+
+
 }
 
 async function carregarUsuarioMonitoramento(){
