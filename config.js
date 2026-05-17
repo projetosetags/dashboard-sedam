@@ -12,46 +12,5 @@ autoRefreshToken:true
 }
 )
 
-const oldFrom=window.client.from.bind(window.client)
-
-window.client.from=function(tabela){
-
-console.log('========================')
-console.log('SUPABASE TABELA:')
-console.log(tabela)
-
-let query=oldFrom(tabela)
-
-let oldSelect=query.select.bind(query)
-
-query.select=function(...args){
-
-console.log('SELECT:')
-console.log(args)
-
-let resultado=oldSelect(...args)
-
-resultado.then(r=>{
-
-if(r.error){
-
-console.log('ERRO SUPABASE:')
-console.log(r.error)
-
-alert(
-'TABELA: '+tabela+
-'\n\n'+
-JSON.stringify(r.error,null,2)
-)
-
-}
-
-})
-
-return resultado
-
-}
-
-return query
-
-}
+console.log('SUPABASE OK')
+console.log(window.client)
