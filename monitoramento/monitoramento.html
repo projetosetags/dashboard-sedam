@@ -15,11 +15,18 @@
 <link rel="stylesheet" href="monitoramento.css">
 </head>
 <body>
-
-<div id="appMonitoramento">
-
+<section id="loginMonitoramento" class="login-monitoramento">
+<div class="login-monitoramento-box">
+<div class="login-monitoramento-logo">📊</div>
+<div class="login-monitoramento-titulo">MONITORAMENTO TÉCNICO</div>
+<div class="login-monitoramento-subtitulo">Tribunal de Contas • Painel de Auditoria</div>
+<input id="usuario" placeholder="Usuário" class="input-login-monitoramento">
+<input id="senha" type="password" placeholder="Senha" class="input-login-monitoramento">
+<button onclick="loginMonitoramento()" class="btn-login-monitoramento">ENTRAR</button>
+</div>
+</section>
+<div id="appMonitoramento" style="display:none;">
 <header class="topbar">
-
 <div class="topbar-left">
 <div class="logo-box">📊</div>
 <div>
@@ -29,169 +36,127 @@ Tribunal de Contas • Painel de Auditoria
 </div>
 </div>
 </div>
-
 <div class="topbar-right">
-
 <select id="filtroOrigem" class="select-monitoramento" onchange="filtrarOrigemMonitoramento()">
 <option value="">Todas Origens</option>
 <option value="SEDAM">SEDAM</option>
 <option value="SEPAT">SEPAT</option>
 <option value="QUEIMADAS">QUEIMADAS</option>
 </select>
-
 <div id="usuarioLogado" class="usuario-logado">
-NÃO IDENTIFICADO
+SESSÃO ATIVA
 </div>
-
+<button class="btn-padrao vermelho" onclick="logoutMonitoramento()">
+Sair
+</button>
 </div>
-
 </header>
-
 <nav class="nav-monitoramento" id="navMonitoramento">
-
 <button class="nav-btn nav-active" onclick="abrirTela('dashboard')">
 📈 Dashboard
 </button>
-
 <button class="nav-btn" onclick="abrirTela('monitoramentos')">
 📂 Monitoramentos
 </button>
-
 <button class="nav-btn" onclick="abrirTela('matriz')">
 🧩 Matriz
 </button>
-
 <button class="nav-btn" onclick="abrirTela('evidencias')">
 📎 Evidências
 </button>
-
 <button class="nav-btn" onclick="abrirTela('analises')">
 🧠 Análises
 </button>
-
 <button class="nav-btn" onclick="abrirTela('relatorios')">
 📄 Relatórios
 </button>
-
 <button class="nav-btn" onclick="abrirTela('resultados')">
 📑 Resultados
 </button>
-
 <button class="nav-btn" onclick="abrirTela('auditoria')">
 🕓 Auditoria
 </button>
-
 <button class="nav-btn" onclick="abrirTela('historico')">
 📈 Histórico
 </button>
-
 <button class="nav-btn" onclick="abrirTela('riscos')">
 🔥 Riscos
 </button>
-
 <button class="nav-btn" onclick="abrirTela('workflow')">
 ✔ Workflow
 </button>
-
 <button class="nav-btn" onclick="abrirTela('executivo')">
 🏛 Executivo
 </button>
-
 <button class="nav-btn" onclick="abrirTela('central')">
 📂 Central
 </button>
-
 <button class="nav-btn" onclick="abrirTela('beneficios')">
 💎 Benefícios
 </button>
-
 </nav>
-
 <main class="conteudo-monitoramento">
-
 <section id="tela-dashboard" class="tela-monitoramento">
-
 <div id="painelAlertas" class="mb-4"></div>
-
 <div class="grid-cards">
-
 <div class="card-kpi glass-card">
 <div class="kpi-titulo">TOTAL</div>
 <div id="kpiTotal" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi glass-card verde">
 <div class="kpi-titulo">EXECUTADAS</div>
 <div id="kpiExecutadas" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi glass-card amarelo">
 <div class="kpi-titulo">PARCIAIS</div>
 <div id="kpiParciais" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi glass-card vermelho">
 <div class="kpi-titulo">NÃO EXECUTADAS</div>
 <div id="kpiNaoExecutadas" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi glass-card azul">
 <div class="kpi-titulo">EM ANDAMENTO</div>
 <div id="kpiAndamento" class="kpi-valor">0</div>
 </div>
-
 </div>
-
 <div class="painel-graficos">
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">Situação Geral</div>
 </div>
 <canvas id="graficoStatus"></canvas>
 </div>
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">Evolução Mensal</div>
 </div>
 <canvas id="graficoEvolucao"></canvas>
 </div>
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">Criticidade</div>
 </div>
 <canvas id="graficoCriticidade"></canvas>
 </div>
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">Benefícios Esperados</div>
 </div>
 <canvas id="graficoBeneficios"></canvas>
 </div>
-
 </div>
-
 </section>
-
 <section id="tela-monitoramentos" class="tela-monitoramento hidden">
-
 <div class="top-actions">
-
 <button class="btn-padrao verde admin-only" onclick="sincronizarTAGSedam()">
 🔄 Sincronizar TAGS/SEDAM
 </button>
-
 <button class="btn-padrao admin-only" onclick="novoMonitoramento()">
 ➕ Novo Monitoramento
 </button>
-
 <div class="filtros-monitoramento">
-
 <input type="text" id="buscaMonitoramento" placeholder="Pesquisar..." class="input-busca" onkeyup="filtrarMonitoramentos()">
-
 <select id="filtroStatus" class="select-monitoramento" onchange="filtrarMonitoramentos()">
 <option value="">Todos Status</option>
 <option>EXECUTADA</option>
@@ -199,50 +164,35 @@ NÃO IDENTIFICADO
 <option>NÃO EXECUTADA</option>
 <option>EM ANDAMENTO</option>
 </select>
-
 <select id="filtroCriticidade" class="select-monitoramento" onchange="filtrarMonitoramentos()">
 <option value="">Criticidade</option>
 <option>ALTA</option>
 <option>MÉDIA</option>
 <option>BAIXA</option>
 </select>
-
 </div>
-
 </div>
-
 <div id="listaMonitoramentos" class="lista-monitoramentos cards-grid-monitoramento"></div>
-
 </section>
-
 <section id="tela-matriz" class="tela-monitoramento hidden">
-
 <div class="top-actions">
-
 <button class="btn-padrao" onclick="salvarNovoItemMatriz()">
 💾 Salvar Item
 </button>
-
 <button class="btn-padrao azul" onclick="limparFormularioMatriz()">
 🧹 Limpar
 </button>
-
 </div>
-
 <div class="form-matriz">
-
 <div class="form-grid">
-
 <div class="campo-form">
 <label>Item</label>
 <input type="text" id="mItem" class="input-form">
 </div>
-
 <div class="campo-form">
 <label>Subitem</label>
 <input type="text" id="mSubitem" class="input-form">
 </div>
-
 <div class="campo-form">
 <label>Status</label>
 <select id="mStatus" class="input-form">
@@ -252,7 +202,6 @@ NÃO IDENTIFICADO
 <option>NÃO EXECUTADA</option>
 </select>
 </div>
-
 <div class="campo-form">
 <label>Criticidade</label>
 <select id="mCriticidade" class="input-form">
@@ -261,64 +210,50 @@ NÃO IDENTIFICADO
 <option>BAIXA</option>
 </select>
 </div>
-
 <div class="campo-form">
 <label>Prazo</label>
 <input type="date" id="mPrazo" class="input-form">
 </div>
-
 <div class="campo-form">
 <label>Percentual</label>
 <input type="number" id="mPercentual" class="input-form" min="0" max="100">
 </div>
-
 </div>
-
 <div class="campo-form">
 <label>Achado</label>
 <textarea id="mAchado" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Causa</label>
 <textarea id="mCausa" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Efeito</label>
 <textarea id="mEfeito" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Deliberação</label>
 <textarea id="mDeliberacao" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Ação do Gestor</label>
 <textarea id="mAcaoGestor" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Produto Esperado</label>
 <textarea id="mProduto" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Entrega Esperada</label>
 <textarea id="mEntrega" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Benefício Esperado</label>
 <textarea id="mBeneficio" class="textarea-form"></textarea>
 </div>
-
 </div>
-
 <div class="table-wrap tabela-sticky">
 <table class="tabela-monitoramento">
-
 <thead>
 <tr>
 <th>Item</th>
@@ -330,79 +265,50 @@ NÃO IDENTIFICADO
 <th>Ações</th>
 </tr>
 </thead>
-
 <tbody id="tbodyMatriz"></tbody>
-
 </table>
-
 </div>
-
 </section>
-
 <section id="tela-evidencias" class="tela-monitoramento hidden">
-
 <div class="upload-box">
-
 <input type="file" id="arquivoEvidencia">
-
 <button class="btn-padrao" onclick="uploadEvidencia()">
 📤 Enviar Evidência
 </button>
-
 </div>
-
 <div id="listaEvidencias"></div>
-
 </section>
-
 <section id="tela-analises" class="tela-monitoramento hidden">
-
 <div class="analise-box">
-
 <div class="toolbar-analise">
-
 <button class="btn-editor" onclick="formatarTexto('bold')">
 <b>B</b>
 </button>
-
 <button class="btn-editor" onclick="formatarTexto('italic')">
 <i>I</i>
 </button>
-
 <button class="btn-editor" onclick="formatarTexto('underline')">
 <u>U</u>
 </button>
-
 <button class="btn-editor" onclick="inserirTopico()">
 • Tópico
 </button>
-
 <button class="btn-editor" onclick="inserirConclusaoPadrao()">
 📌 Conclusão
 </button>
-
 </div>
-
 <div id="textoAnalise" class="editor-analise" contenteditable="true"></div>
-
 <button class="btn-padrao" onclick="salvarAnalise()">
 💾 Salvar Análise
 </button>
-
 <button class="btn-padrao azul" onclick="gerarAnaliseIA()">
 🧠 Gerar IA
 </button>
-
 </div>
-
 <div id="listaAnalises"></div>
-
 </section>
-
 <section id="tela-relatorios" class="tela-monitoramento hidden">
-
 <div class="relatorio-actions">
-
 <button class="btn-padrao verde" onclick="gerarPDFMonitoramento()">
 📄 Gerar PDF
 </button>
@@ -412,144 +318,99 @@ NÃO IDENTIFICADO
 <button class="btn-padrao azul" onclick="abrirModoImpressao()">
 🖨 Modo Impressão
 </button>
-  
 <button class="btn-padrao azul" onclick="gerarResumoIA()">
 🧠 Gerar Resumo IA
 </button>
-
 </div>
-
 <div class="relatorio-actions">
-
 <button class="btn-padrao verde" onclick="gerarRelatorioCompleto()">
 📑 Relatório Completo
 </button>
-
 <button class="btn-padrao azul" onclick="gerarResumoIA()">
 🧠 Resumo Executivo
 </button>
-
 <button class="btn-padrao" onclick="gerarPDFMonitoramento()">
 📄 Exportar PDF
 </button>
-
 </div>
-
 <div id="previewRelatorio" class="preview-relatorio"></div>
-
 </section>
-
 <section id="tela-resultados" class="tela-monitoramento hidden">
-
 <div class="top-actions">
-
 <button class="btn-padrao" onclick="salvarResultadoMonitoramento()">
 💾 Salvar Resultado
 </button>
-
 <button class="btn-padrao azul" onclick="limparResultadoMonitoramento()">
 🧹 Limpar
 </button>
-
 </div>
-
 <div class="form-matriz">
-
 <div class="campo-form">
 <label>Situação Encontrada</label>
 <textarea id="rSituacao" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Efeitos</label>
 <textarea id="rEfeitos" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Causas</label>
 <textarea id="rCausas" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Boas Práticas</label>
 <textarea id="rBoasPraticas" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Encaminhamento</label>
 <textarea id="rEncaminhamento" class="textarea-form"></textarea>
 </div>
-
 <div class="campo-form">
 <label>Benefícios</label>
 <textarea id="rBeneficios" class="textarea-form"></textarea>
 </div>
-
 </div>
-
 <div id="listaResultados"></div>
-
 </section>
-
 <section id="tela-auditoria" class="tela-monitoramento hidden">
-
 <div class="top-actions">
-
 <button class="btn-padrao azul" onclick="carregarAuditoriaCompleta()">
 🔄 Atualizar Auditoria
 </button>
-
 </div>
-
 <div id="listaAuditoria"></div>
-
 </section>
 <section id="tela-historico" class="tela-monitoramento hidden">
-
 <div class="top-actions">
-
 <button class="btn-padrao verde" onclick="sincronizarHistoricoTAG()">
 🔄 Sincronizar TAG
 </button>
-
 </div>
-
 <div class="grafico-box animate-fade">
 <canvas id="graficoHistorico"></canvas>
 </div>
-
 <div id="listaHistorico"></div>
-
 </section>
-
 <section id="tela-riscos" class="tela-monitoramento hidden">
-
 <div class="grid-cards">
-
 <div class="card-kpi vermelho">
 <div class="kpi-titulo">RISCO ALTO</div>
 <div id="kpiRiscoAlto" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi amarelo">
 <div class="kpi-titulo">RISCO MÉDIO</div>
 <div id="kpiRiscoMedio" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi verde">
 <div class="kpi-titulo">RISCO BAIXO</div>
 <div id="kpiRiscoBaixo" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi azul">
 <div class="kpi-titulo">SCORE MÉDIO</div>
 <div id="kpiScoreRisco" class="kpi-valor">0%</div>
 </div>
-
 </div>
-
 <div class="painel-graficos">
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">
@@ -558,7 +419,6 @@ Mapa de Risco
 </div>
 <canvas id="graficoRiscos"></canvas>
 </div>
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">
@@ -567,69 +427,50 @@ Mapa de Risco
 </div>
 <canvas id="graficoOrgaosCriticos"></canvas>
 </div>
-
 </div>
-
 <div id="listaRiscos"></div>
-
 </section>
 <section id="tela-workflow" class="tela-monitoramento hidden">
-
 <div class="grid-cards">
-
 <div class="card-kpi">
 <div class="kpi-titulo">RASCUNHO</div>
 <div id="kpiRascunho" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi azul">
 <div class="kpi-titulo">EM ANÁLISE</div>
 <div id="kpiEmAnalise" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi verde">
 <div class="kpi-titulo">VALIDADO</div>
 <div id="kpiValidado" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi vermelho">
 <div class="kpi-titulo">REJEITADO</div>
 <div id="kpiRejeitado" class="kpi-valor">0</div>
 </div>
-
 </div>
-
 <div id="listaWorkflow"></div>
-
 </section>
 <section id="tela-executivo" class="tela-monitoramento hidden">
-
 <div class="grid-cards">
-
 <div class="card-kpi verde">
 <div class="kpi-titulo">EFETIVIDADE GERAL</div>
 <div id="kpiEfetividade" class="kpi-valor">0%</div>
 </div>
-
 <div class="card-kpi azul">
 <div class="kpi-titulo">ÓRGÃOS</div>
 <div id="kpiOrgaosExecutivo" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi amarelo">
 <div class="kpi-titulo">MONITORAMENTOS</div>
 <div id="kpiMonitoramentosExecutivo" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi vermelho">
 <div class="kpi-titulo">CRÍTICOS</div>
 <div id="kpiCriticosExecutivo" class="kpi-valor">0</div>
 </div>
-
 </div>
-
 <div class="painel-graficos">
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">
@@ -638,7 +479,6 @@ Efetividade por Órgão
 </div>
 <canvas id="graficoExecutivoOrgaos"></canvas>
 </div>
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">
@@ -647,107 +487,78 @@ Status Institucional
 </div>
 <canvas id="graficoExecutivoStatus"></canvas>
 </div>
-
 </div>
-
 <div class="ranking-box">
-
 <div class="monitoramento-titulo">
 🏛 Painel Estratégico
 </div>
-
 <div id="listaExecutiva"></div>
-
 </div>
-
 </section>
 <section id="tela-central" class="tela-monitoramento hidden">
-
 <div class="top-actions">
-
 <input type="text" id="buscaCentral" class="input-busca" placeholder="Pesquisar evidências..." onkeyup="filtrarCentralEvidencias()">
-
 <select id="filtroValidacaoCentral" class="select-monitoramento" onchange="filtrarCentralEvidencias()">
 <option value="">Validação</option>
 <option>VALIDADA</option>
 <option>PENDENTE</option>
 <option>REJEITADA</option>
 </select>
-
 <select id="filtroConfiabilidadeCentral" class="select-monitoramento" onchange="filtrarCentralEvidencias()">
 <option value="">Confiabilidade</option>
 <option>ALTA</option>
 <option>MÉDIA</option>
 <option>BAIXA</option>
 </select>
-
 </div>
-
 <div class="grid-cards">
-
 <div class="card-kpi verde">
 <div class="kpi-titulo">VALIDADAS</div>
 <div id="kpiCentralValidada" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi amarelo">
 <div class="kpi-titulo">PENDENTES</div>
 <div id="kpiCentralPendente" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi vermelho">
 <div class="kpi-titulo">REJEITADAS</div>
 <div id="kpiCentralRejeitada" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi azul">
 <div class="kpi-titulo">TOTAL</div>
 <div id="kpiCentralTotal" class="kpi-valor">0</div>
 </div>
-
 </div>
-
 <div id="listaCentralEvidencias" class="cards-grid-monitoramento"></div>
-
 </section>
 <section id="tela-beneficios" class="tela-monitoramento hidden">
-
 <div class="grid-cards">
-
 <div class="card-kpi verde">
 <div class="kpi-titulo">FINANCEIRO</div>
 <div id="kpiBeneficioFinanceiro" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi azul">
 <div class="kpi-titulo">OPERACIONAL</div>
 <div id="kpiBeneficioOperacional" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi amarelo">
 <div class="kpi-titulo">SOCIAL</div>
 <div id="kpiBeneficioSocial" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi verde">
 <div class="kpi-titulo">AMBIENTAL</div>
 <div id="kpiBeneficioAmbiental" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi azul">
 <div class="kpi-titulo">GOVERNANÇA</div>
 <div id="kpiBeneficioGovernanca" class="kpi-valor">0</div>
 </div>
-
 <div class="card-kpi vermelho">
 <div class="kpi-titulo">EFETIVIDADE</div>
 <div id="kpiIndiceEfetividade" class="kpi-valor">0%</div>
 </div>
-
 </div>
-
 <div class="painel-graficos">
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">
@@ -756,7 +567,6 @@ Matriz de Benefícios
 </div>
 <canvas id="graficoBeneficiosInstitucionais"></canvas>
 </div>
-
 <div class="grafico-box animate-fade">
 <div class="grafico-header">
 <div class="grafico-titulo">
@@ -765,18 +575,29 @@ Efetividade Institucional
 </div>
 <canvas id="graficoEfetividadeInstitucional"></canvas>
 </div>
-
 </div>
-
 <div id="listaBeneficios" class="cards-grid-monitoramento"></div>
-
 </section>
-  
-  
 </main>
-
 </div>
-
+<div id="modalImpressao" class="modal-impressao hidden">
+<div class="modal-impressao-content">
+<div class="modal-impressao-topo">
+<div class="modal-impressao-titulo">
+📄 Impressão Oficial
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;">
+<button class="btn-padrao verde" onclick="window.print()">
+🖨 Imprimir
+</button>
+<button class="btn-padrao vermelho" onclick="fecharModalImpressao()">
+Fechar
+</button>
+</div>
+</div>
+<div id="conteudoImpressao"></div>
+</div>
+</div>
 <script src="monitoramento-core.js"></script>
 <script src="monitoramento-painel.js"></script>
 <script src="monitoramento-matriz.js"></script>
@@ -786,36 +607,6 @@ Efetividade Institucional
 <script src="monitoramento-pdf.js"></script>
 <script src="monitoramento-resultados.js"></script>
 <script src="monitoramento-auditoria.js"></script>
-  
-<div id="modalImpressao" class="modal-impressao hidden">
-
-<div class="modal-impressao-content">
-
-<div class="modal-impressao-topo">
-
-<div class="modal-impressao-titulo">
-📄 Impressão Oficial
-</div>
-
-<div style="display:flex;gap:10px;flex-wrap:wrap;">
-
-<button class="btn-padrao verde" onclick="window.print()">
-🖨 Imprimir
-</button>
-
-<button class="btn-padrao vermelho" onclick="fecharModalImpressao()">
-Fechar
-</button>
-
-</div>
-
-</div>
-
-<div id="conteudoImpressao"></div>
-
-</div>
-
-</div>
 <script src="monitoramento-historico.js"></script>
 <script src="monitoramento-riscos.js"></script>
 <script src="monitoramento-workflow.js"></script>
@@ -823,6 +614,5 @@ Fechar
 <script src="monitoramento-central.js"></script>
 <script src="monitoramento-beneficios.js"></script>
 <script src="monitoramento-integracao.js"></script>
-  
 </body>
 </html>
