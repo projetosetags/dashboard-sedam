@@ -24,8 +24,7 @@ for(let item of(itens||[])){
 let{data:evolucao,error:evolucaoError}=await client
 .from('evolucao_mensal')
 .select('*')
-.eq('deliberacao_id',item.id)
-
+.eq('deliberacao_id',item.deliberacao_id||item.id_origem)
 if(evolucaoError){
 console.log(evolucaoError)
 continue
