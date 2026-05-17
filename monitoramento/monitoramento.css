@@ -1110,3 +1110,11 @@ line-height:1.8;
 .preview-relatorio *{
 color:#0f172a!important;
 }
+.cards-grid-monitoramento{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+.glass-card{background:linear-gradient(135deg,rgba(17,24,39,.96),rgba(30,41,59,.96));backdrop-filter:blur(10px);}
+.animate-fade{animation:fadePainel .35s ease;}
+@keyframes fadePainel{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.tabela-sticky{border-radius:20px;overflow:auto;max-height:75vh;}
+.tabela-sticky thead th{position:sticky;top:0;z-index:20;background:#1e293b;}
+#navMonitoramento{scrollbar-width:none;}
+#navMonitoramento::-webkit-scrollbar{display:none;}
