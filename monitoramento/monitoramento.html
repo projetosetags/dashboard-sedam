@@ -84,7 +84,10 @@ NÃO IDENTIFICADO
 <button class="nav-btn" onclick="abrirTela('executivo')">
 🏛 Executivo
 </button>
-  
+<button class="nav-btn" onclick="abrirTela('central')">
+📂 Central
+</button>
+
 </nav>
 
 <main class="conteudo-monitoramento">
@@ -634,6 +637,55 @@ Status Institucional
 <div id="listaExecutiva"></div>
 
 </div>
+
+</section>
+<section id="tela-central" class="tela-monitoramento hidden">
+
+<div class="top-actions">
+
+<input type="text" id="buscaCentral" class="input-busca" placeholder="Pesquisar evidências..." onkeyup="filtrarCentralEvidencias()">
+
+<select id="filtroValidacaoCentral" class="select-monitoramento" onchange="filtrarCentralEvidencias()">
+<option value="">Validação</option>
+<option>VALIDADA</option>
+<option>PENDENTE</option>
+<option>REJEITADA</option>
+</select>
+
+<select id="filtroConfiabilidadeCentral" class="select-monitoramento" onchange="filtrarCentralEvidencias()">
+<option value="">Confiabilidade</option>
+<option>ALTA</option>
+<option>MÉDIA</option>
+<option>BAIXA</option>
+</select>
+
+</div>
+
+<div class="grid-cards">
+
+<div class="card-kpi verde">
+<div class="kpi-titulo">VALIDADAS</div>
+<div id="kpiCentralValidada" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi amarelo">
+<div class="kpi-titulo">PENDENTES</div>
+<div id="kpiCentralPendente" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi vermelho">
+<div class="kpi-titulo">REJEITADAS</div>
+<div id="kpiCentralRejeitada" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi azul">
+<div class="kpi-titulo">TOTAL</div>
+<div id="kpiCentralTotal" class="kpi-valor">0</div>
+</div>
+
+</div>
+
+<div id="listaCentralEvidencias"></div>
 
 </section>
   
