@@ -2,11 +2,6 @@ let MONITORAMENTO_ATUAL=null
 let USER_MONITORAMENTO=null
 let ORIGEM_ATUAL='TODAS'
 
-const client=supabase.createClient(
-window.S_URL,
-window.S_KEY
-)
-
 
 function abrirTela(nome){
 if(
