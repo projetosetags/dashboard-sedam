@@ -6,16 +6,24 @@ let MONITORAMENTO_ATUAL=null
 let USER_MONITORAMENTO=null
 
 function abrirTela(nome){
-if(!USER_MONITORAMENTO){
+
+if(
+typeof USER_MONITORAMENTO==='undefined'
+){
 return
 }
+
 document
 .querySelectorAll('.tela-monitoramento')
 .forEach(t=>t.classList.add('hidden'))
 
-document
-.getElementById('tela-'+nome)
-.classList.remove('hidden')
+let tela=document.getElementById(
+'tela-'+nome
+)
+
+if(tela){
+tela.classList.remove('hidden')
+}
 
 document
 .querySelectorAll('.nav-btn')
@@ -23,10 +31,6 @@ document
 
 if(event&&event.target){
 event.target.classList.add('nav-active')
-}
-
-if(nome==='auditoria'){
-carregarAuditoriaCompleta()
 }
 
 if(nome==='dashboard'){
@@ -52,25 +56,34 @@ carregarAnalises()
 if(nome==='resultados'){
 carregarResultados()
 }
+
+if(nome==='auditoria'){
+carregarAuditoriaCompleta()
+}
+
 if(nome==='historico'){
 carregarHistorico()
 }
+
 if(nome==='riscos'){
 carregarPainelRiscos()
 }
+
 if(nome==='workflow'){
 carregarWorkflow()
 }
+
 if(nome==='executivo'){
 carregarPainelExecutivo()
 }
+
 if(nome==='central'){
 carregarCentralEvidencias()
 }
+
 if(nome==='beneficios'){
 carregarPainelBeneficios()
 }
-
 
 }
 
