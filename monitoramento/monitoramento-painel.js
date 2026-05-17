@@ -536,7 +536,7 @@ async function carregarTimeline(){
 let{data,error}=await client
 .from('monitoramento_logs')
 .select('*')
-.order('titulo',{ascending:true})
+.order('created_at',{ascending:false})
 .limit(20)
 if(error){
 console.log(error)
