@@ -6,7 +6,9 @@ async function carregarPainelRiscos(){
 let{data,error}=await client
 .from('monitoramento_itens')
 .select('*')
-
+data=ordenarDataGlobal(data)
+data=aplicarFiltroOrigem(data)
+  
 if(error){
 console.log(error)
 return
@@ -230,14 +232,7 @@ plugins:[ChartDataLabels]
 async function carregarListaRiscos(data){
 
 let html=''
-
-let ordenado=
-(data||[])
-.sort((a,b)=>
-Number(a.percentual||0)-
-Number(b.percentual||0)
-)
-
+let ordenado=ordenarDataGlobal(data)
 ordenado.forEach(i=>{
 
 let percentual=Number(i.percentual||0)
