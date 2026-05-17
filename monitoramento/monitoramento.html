@@ -75,6 +75,10 @@ NÃO IDENTIFICADO
 <button class="nav-btn" onclick="abrirTela('historico')">
 📈 Histórico
 </button>
+<button class="nav-btn" onclick="abrirTela('riscos')">
+🔥 Riscos
+</button>
+  
 </nav>
 
 <main class="conteudo-monitoramento">
@@ -486,6 +490,58 @@ NÃO IDENTIFICADO
 <div id="listaHistorico"></div>
 
 </section>
+
+<section id="tela-riscos" class="tela-monitoramento hidden">
+
+<div class="grid-cards">
+
+<div class="card-kpi vermelho">
+<div class="kpi-titulo">RISCO ALTO</div>
+<div id="kpiRiscoAlto" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi amarelo">
+<div class="kpi-titulo">RISCO MÉDIO</div>
+<div id="kpiRiscoMedio" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi verde">
+<div class="kpi-titulo">RISCO BAIXO</div>
+<div id="kpiRiscoBaixo" class="kpi-valor">0</div>
+</div>
+
+<div class="card-kpi azul">
+<div class="kpi-titulo">SCORE MÉDIO</div>
+<div id="kpiScoreRisco" class="kpi-valor">0%</div>
+</div>
+
+</div>
+
+<div class="painel-graficos">
+
+<div class="grafico-box">
+<div class="grafico-header">
+<div class="grafico-titulo">
+Mapa de Risco
+</div>
+</div>
+<canvas id="graficoRiscos"></canvas>
+</div>
+
+<div class="grafico-box">
+<div class="grafico-header">
+<div class="grafico-titulo">
+Órgãos Críticos
+</div>
+</div>
+<canvas id="graficoOrgaosCriticos"></canvas>
+</div>
+
+</div>
+
+<div id="listaRiscos"></div>
+
+</section>
 </main>
 
 </div>
@@ -529,6 +585,6 @@ Fechar
 </div>
 
 </div>
-  
+<script src="monitoramento-historico.js"></script>
 </body>
 </html>
