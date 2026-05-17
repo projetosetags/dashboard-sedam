@@ -313,3 +313,130 @@ let dt=new Date(d)
 return dt.toLocaleDateString('pt-BR')
 
 }
+async function importarDaTAG(){
+
+if(!MONITORAMENTO_ATUAL){
+alert('Selecione um monitoramento')
+return
+}
+
+let itemFiltro=prompt(
+'Informe o ITEM da TAG para importar (ex: 1,2,3...)'
+)
+
+if(!itemFiltro)return
+
+let{data,error}=await client
+.from('deliberacoes')
+.select('*')
+.ilike('item',`${itemFiltro}%`)
+.order('subitem',{ascending:true})
+
+if(error){
+console.log(error)
+alert('Erro ao importar')
+return
+}
+
+if(!data||data.length===0){
+alert('Nenhum item encontrado')
+return
+}
+
+let inseridos=0
+
+for(let d of(data||[])){
+
+let percentual=Math.max(
+Number(d.jan||0),
+Number(d.fev||0),
+Number(d.mar||0),
+Number(d.abr||0),
+Number(d.mai||0),
+Number(d.jun||0),
+Number(d.jul||0),
+Number(d.ago||0),
+Number(d.set||0),
+Number(d.out||0),
+Number(d.nov||0),
+Number(d.dez||0)
+)
+
+let status='EM ANDAMENTO'
+
+if(percentual>=100){
+status='EXECUTADA'
+}else if(percentual>=40){
+status='PARCIALMENTE EXECUTADA'
+}else if(percentual===0){
+status='NÃO EXECUTADA'
+}
+
+let criticidade='BAIXA'
+
+if(percentual<40){
+criticidade='ALTA'
+}else if(percentual<80){
+criticidade='MÉDIA'
+}
+
+let payload={
+
+monitoramento_id:MONITORAMENTO_ATUAL,
+
+item:d.item||'',
+
+subitem:d.subitem||'',
+
+status:status,
+
+criticidade:criticidade,
+
+percentual:percentual,
+
+achado:d.descricao||'',
+
+causa:'A definir',
+
+efeito:'A definir',
+
+deliberacao:d.descricao||'',
+
+acao_gestor:d.produto||'',
+
+produto_esperado:d.produto||'',
+
+entrega_esperada:d.produto||'',
+
+beneficio_esperado:'Melhoria institucional',
+
+responsavel:d.responsavel||'',
+
+prazo:d.prazo_texto||''
+
+}
+
+let{error:insertError}=await client
+.from('monitoramento_itens')
+.insert([payload])
+
+if(!insertError){
+inseridos++
+}
+
+}
+
+await registrarLog(
+'IMPORTAÇÃO TAG',
+'monitoramento_itens',
+MONITORAMENTO_ATUAL
+)
+
+await carregarItensMatriz()
+await carregarDashboard()
+
+alert(
+`${inseridos} itens importados`
+)
+
+}
