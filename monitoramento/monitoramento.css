@@ -1039,27 +1039,188 @@ color:#0f172a!important;
 .alerta-texto{font-size:12px;line-height:1.45;color:#dbeafe}
 .alerta-texto b{font-size:15px;color:#fff}
 .alertas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-/*=========================================================005 RESPONSIVIDADE=========================================================*/
+/*=========================================================
+005 MONITORAMENTO.CSS RESPONSIVIDADE
+=========================================================*/
 @media(max-width:1200px){
-.nav-monitoramento{flex-wrap:wrap}
+.nav-monitoramento{display:flex;flex-wrap:wrap;justify-content:flex-start}
+.nav-btn{flex:none}
 }
 @media(max-width:900px){
-.topbar{flex-direction:column;align-items:flex-start}
-.topbar-right{width:100%;justify-content:flex-start}
-.nav-monitoramento{width:100%;flex-wrap:wrap}
+.topbar{display:flex;flex-direction:column;align-items:flex-start;padding:18px}
+.topbar-left{width:100%}
+.topbar-right{width:100%;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:12px}
+.nav-monitoramento{width:100%;display:flex;flex-wrap:wrap;justify-content:flex-start;padding:14px}
 .nav-btn{font-size:15px;padding:14px 18px}
-.titulo-sistema{font-size:34px}
-.usuario-logado{width:100%;min-width:auto}
-.select-monitoramento{width:100%}
+.titulo-sistema{font-size:34px;line-height:1.1}
+.subtitulo-sistema{font-size:15px}
+.usuario-logado{width:100%;min-width:auto;font-size:15px;white-space:normal;text-align:center}
+.select-monitoramento{width:100%;min-width:100%}
+.cards-grid-monitoramento{grid-template-columns:1fr}
+.monitoramento-info-grid{grid-template-columns:1fr}
+.painel-graficos{grid-template-columns:1fr}
+.grid-cards{grid-template-columns:1fr 1fr}
 }
-.input-inline-monitoramento{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#fff;font-size:14px;font-weight:600;outline:none;margin-top:6px}
-.input-inline-monitoramento:focus{border-color:#3b82f6;background:rgba(255,255,255,.10)}
-.select-inline-monitoramento{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 12px;color:#fff;font-size:14px;font-weight:700;outline:none;margin-top:6px}
-.titulo-inline{font-size:30px;font-weight:900;background:transparent;border:none;padding:0;margin:0;color:#fff}
-.subtitulo-inline{display:inline-block;width:auto;min-width:120px;background:transparent;border:none;padding:0;margin:0;color:#cbd5e1;font-size:15px}
-.card-monitoramento{display:flex;flex-direction:column;gap:18px}
-.monitoramento-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.monitoramento-info-grid b{display:block;margin-bottom:4px;color:#93c5fd}
-@media(max-width:768px){.monitoramento-info-grid{grid-template-columns:1fr}}
-.painel-dashboard-topo{padding:0 22px 18px 22px;background:linear-gradient(to bottom,rgba(2,6,23,.98),rgba(2,6,23,.94));border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:40}
-.painel-dashboard-topo .painel-graficos{margin-top:18px}
+@media(max-width:768px){
+.monitoramento-info-grid{grid-template-columns:1fr}
+.grid-cards{grid-template-columns:1fr}
+.titulo-sistema{font-size:28px}
+.nav-btn{width:100%;justify-content:center;text-align:center}
+.topbar-right button{width:100%}
+}
+
+/*=========================================================
+006 MONITORAMENTO.CSS CAMPOS INLINE MONITORAMENTOS
+=========================================================*/
+.input-inline-monitoramento{
+width:100%;
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.08);
+border-radius:12px;
+padding:10px 12px;
+color:#fff;
+font-size:14px;
+font-weight:600;
+outline:none;
+margin-top:6px;
+transition:.2s;
+}
+.input-inline-monitoramento:focus{
+border-color:#3b82f6;
+background:rgba(255,255,255,.10);
+box-shadow:0 0 0 2px rgba(59,130,246,.22);
+}
+.select-inline-monitoramento{
+width:100%;
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.08);
+border-radius:12px;
+padding:10px 12px;
+color:#fff;
+font-size:14px;
+font-weight:700;
+outline:none;
+margin-top:6px;
+transition:.2s;
+}
+.select-inline-monitoramento:focus{
+border-color:#3b82f6;
+background:rgba(255,255,255,.10);
+box-shadow:0 0 0 2px rgba(59,130,246,.22);
+}
+.select-inline-monitoramento option{
+background:#0f172a;
+color:#fff;
+}
+
+/*=========================================================
+007 MONITORAMENTO.CSS CARDS MONITORAMENTOS
+=========================================================*/
+.card-monitoramento{
+display:flex;
+flex-direction:column;
+gap:18px;
+background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(17,24,39,.96));
+border:1px solid rgba(255,255,255,.08);
+border-radius:24px;
+padding:22px;
+box-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+.monitoramento-info-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+}
+.monitoramento-info-grid b{
+display:block;
+margin-bottom:4px;
+color:#93c5fd;
+font-size:13px;
+letter-spacing:.3px;
+}
+
+/*=========================================================
+008 MONITORAMENTO.CSS TÍTULOS INLINE
+=========================================================*/
+.titulo-inline{
+width:100%;
+font-size:30px;
+font-weight:900;
+background:transparent;
+border:none;
+padding:0;
+margin:0;
+color:#fff;
+outline:none;
+}
+.subtitulo-inline{
+display:inline-block;
+width:auto;
+min-width:120px;
+background:transparent;
+border:none;
+padding:0;
+margin:0;
+color:#cbd5e1;
+font-size:15px;
+outline:none;
+}
+
+/*=========================================================
+009 MONITORAMENTO.CSS PAINEL DASHBOARD
+=========================================================*/
+.painel-dashboard-topo{
+padding:0 22px 18px 22px;
+background:linear-gradient(to bottom,rgba(2,6,23,.98),rgba(2,6,23,.94));
+border-bottom:1px solid rgba(255,255,255,.06);
+position:sticky;
+top:0;
+z-index:40;
+}
+.painel-dashboard-topo .painel-graficos{
+margin-top:18px;
+}
+
+/*=========================================================
+010 MONITORAMENTO.CSS CAMPOS EDITÁVEIS
+=========================================================*/
+.select-card-monitoramento{
+background:#2563eb;
+color:#fff;
+border:none;
+border-radius:12px;
+padding:8px 10px;
+font-weight:700;
+width:100%;
+outline:none;
+}
+.input-card-monitoramento{
+width:100%;
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.10);
+border-radius:12px;
+padding:8px 10px;
+color:#fff;
+font-weight:700;
+outline:none;
+transition:.2s;
+}
+.input-card-monitoramento:focus{
+border-color:#3b82f6;
+background:rgba(255,255,255,.12);
+box-shadow:0 0 0 2px rgba(59,130,246,.22);
+}
+.monitoramento-info-grid div[contenteditable="true"],
+.monitoramento-titulo[contenteditable="true"],
+.monitoramento-subtitulo span[contenteditable="true"]{
+border-radius:10px;
+padding:4px 6px;
+transition:.2s;
+outline:none;
+}
+.monitoramento-info-grid div[contenteditable="true"]:focus,
+.monitoramento-titulo[contenteditable="true"]:focus,
+.monitoramento-subtitulo span[contenteditable="true"]:focus{
+background:rgba(59,130,246,.18);
+box-shadow:0 0 0 2px rgba(59,130,246,.30);
+}
