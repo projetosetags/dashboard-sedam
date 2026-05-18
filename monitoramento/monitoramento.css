@@ -999,34 +999,56 @@ line-height:1.8;
 .preview-relatorio *{
 color:#0f172a!important;
 }
-.cards-grid-monitoramento{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
-.glass-card{background:linear-gradient(135deg,rgba(17,24,39,.96),rgba(30,41,59,.96));backdrop-filter:blur(10px);}
-.animate-fade{animation:fadePainel .35s ease;}
-@keyframes fadePainel{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-.tabela-sticky{border-radius:20px;overflow:auto;max-height:75vh;}
-.tabela-sticky thead th{position:sticky;top:0;z-index:20;background:#1e293b;}
-#navMonitoramento{scrollbar-width:none;}
-#navMonitoramento::-webkit-scrollbar{display:none;}
+.cards-grid-monitoramento{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.glass-card{background:linear-gradient(135deg,rgba(17,24,39,.96),rgba(30,41,59,.96));backdrop-filter:blur(10px)}
+.animate-fade{animation:fadePainel .35s ease}
+@keyframes fadePainel{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tabela-sticky{border-radius:20px;overflow:auto;max-height:75vh}
+.tabela-sticky thead th{position:sticky;top:0;z-index:20;background:#1e293b}
+#navMonitoramento{scrollbar-width:none}
+#navMonitoramento::-webkit-scrollbar{display:none}
 /*=========================================================001 LOGIN MONITORAMENTO MODERNO=========================================================*/
-.login-monitoramento{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(1,8,30,.82),rgba(1,8,30,.88)),url('../assets/bg-monitoramento.png') center center/cover no-repeat;z-index:9999;padding:20px}
-.login-monitoramento-box{width:100%;max-width:520px;background:rgba(9,17,40,.78);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(14px);border-radius:28px;padding:40px;display:flex;flex-direction:column;align-items:center;box-shadow:0 20px 60px rgba(0,0,0,.45)}
-.login-monitoramento-logo{width:88px;height:88px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg,#2563eb,#3b82f6);box-shadow:0 10px 30px rgba(37,99,235,.45);margin-bottom:22px}
-.login-monitoramento-titulo{font-size:42px;font-weight:900;color:#fff;text-align:center;line-height:1.1;margin-bottom:10px}
-.login-monitoramento-subtitulo{font-size:18px;color:#cbd5e1;text-align:center;margin-bottom:30px}
-.input-login-monitoramento{width:100%;height:62px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);padding:0 20px;font-size:18px;color:#fff;outline:none;margin-bottom:18px;transition:.25s}
+.login-monitoramento{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(1,8,30,.84),rgba(1,8,30,.92)),url('../assets/bg-monitoramento.png') center center/cover no-repeat;z-index:9999;padding:24px}
+.login-monitoramento-box{width:100%;max-width:560px;background:rgba(9,17,40,.82);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(16px);border-radius:30px;padding:44px;display:flex;flex-direction:column;align-items:center;box-shadow:0 20px 70px rgba(0,0,0,.48)}
+.login-monitoramento-logo{width:92px;height:92px;border-radius:26px;display:flex;align-items:center;justify-content:center;font-size:44px;background:linear-gradient(135deg,#2563eb,#3b82f6);box-shadow:0 12px 30px rgba(37,99,235,.45);margin-bottom:24px}
+.login-monitoramento-titulo{font-size:44px;font-weight:900;color:#fff;text-align:center;line-height:1.05;margin-bottom:12px}
+.login-monitoramento-subtitulo{font-size:18px;color:#cbd5e1;text-align:center;margin-bottom:32px}
+.input-login-monitoramento{width:100%;height:64px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);padding:0 22px;font-size:18px;color:#fff;outline:none;margin-bottom:18px;transition:.25s}
 .input-login-monitoramento:focus{border-color:#3b82f6;background:rgba(255,255,255,.10);box-shadow:0 0 0 4px rgba(59,130,246,.18)}
-.btn-login-monitoramento{width:100%;height:62px;border:none;border-radius:18px;background:linear-gradient(135deg,#2563eb,#3b82f6);font-size:20px;font-weight:800;color:#fff;cursor:pointer;transition:.25s;margin-top:4px}
+.btn-login-monitoramento{width:100%;height:64px;border:none;border-radius:20px;background:linear-gradient(135deg,#2563eb,#3b82f6);font-size:20px;font-weight:900;color:#fff;cursor:pointer;transition:.25s;margin-top:4px}
 .btn-login-monitoramento:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(37,99,235,.45)}
-.login-monitoramento-info{margin-top:22px;font-size:15px;color:#cbd5e1;text-align:center}
+.login-monitoramento-info{margin-top:24px;font-size:15px;color:#cbd5e1;text-align:center}
 /*=========================================================002 CABEÇALHO SEM TRUNCAMENTO=========================================================*/
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 26px;flex-wrap:wrap}
-.topbar-left{display:flex;align-items:center;gap:18px;min-width:320px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:18px 24px;flex-wrap:wrap}
+.topbar-left{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
-.usuario-logado{min-width:260px;max-width:none;padding:14px 22px;border-radius:18px;background:rgba(255,255,255,.08);color:#fff;font-weight:700;font-size:18px;white-space:nowrap;overflow:visible;text-overflow:unset;text-align:center}
-.titulo-sistema{font-size:44px;font-weight:900;line-height:1;color:#fff;margin:0}
+.logo-box{width:58px;height:58px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;background:linear-gradient(135deg,#2563eb,#3b82f6);box-shadow:0 8px 22px rgba(37,99,235,.35)}
+.usuario-logado{min-width:260px;max-width:none;padding:14px 22px;border-radius:18px;background:rgba(255,255,255,.08);color:#fff;font-weight:800;font-size:17px;white-space:nowrap;overflow:visible;text-overflow:unset;text-align:center}
+.titulo-sistema{font-size:46px;font-weight:900;line-height:1;color:#fff;margin:0}
 .subtitulo-sistema{font-size:18px;color:#cbd5e1;margin-top:6px}
-/*=========================================================003 MENU SUPERIOR MODERNO=========================================================*/
-.nav-monitoramento{display:flex;gap:14px;padding:18px 24px;overflow-x:auto;flex-wrap:nowrap}
-.nav-btn{border:none;background:rgba(255,255,255,.08);color:#fff;padding:16px 22px;border-radius:18px;font-size:18px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.25s;min-width:max-content}
+.select-monitoramento{height:52px;border:none;border-radius:16px;padding:0 18px;background:rgba(255,255,255,.08);color:#fff;font-size:16px;font-weight:700;min-width:190px}
+/*=========================================================003 MENU SUPERIOR RESPONSIVO SEM CORTES=========================================================*/
+.nav-monitoramento{display:flex;gap:14px;padding:18px 22px;flex-wrap:wrap;overflow:visible}
+.nav-btn{border:none;background:rgba(255,255,255,.08);color:#fff;padding:16px 22px;border-radius:18px;font-size:17px;font-weight:800;cursor:pointer;white-space:nowrap;transition:.25s;display:flex;align-items:center;gap:8px}
 .nav-btn:hover{background:rgba(59,130,246,.25);transform:translateY(-2px)}
 .nav-active{background:linear-gradient(135deg,#2563eb,#3b82f6);box-shadow:0 10px 25px rgba(37,99,235,.35)}
+/*=========================================================004 CARDS ALERTAS MAIS COMPACTOS=========================================================*/
+.alerta-box{background:linear-gradient(135deg,#07142c,#091b3f);border-left:4px solid #ef4444;border-radius:22px;padding:16px 18px;min-height:260px;overflow:hidden}
+.alerta-item{font-size:14px;font-weight:900;color:#fff;margin-bottom:6px;line-height:1.25}
+.alerta-subitem{font-size:12px;color:#93c5fd;font-weight:700;margin-bottom:10px}
+.alerta-texto{font-size:12px;line-height:1.45;color:#dbeafe}
+.alerta-texto b{font-size:15px;color:#fff}
+.alertas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+/*=========================================================005 RESPONSIVIDADE=========================================================*/
+@media(max-width:1200px){
+.nav-monitoramento{flex-wrap:wrap}
+}
+@media(max-width:900px){
+.topbar{flex-direction:column;align-items:flex-start}
+.topbar-right{width:100%;justify-content:flex-start}
+.nav-monitoramento{width:100%;flex-wrap:wrap}
+.nav-btn{font-size:15px;padding:14px 18px}
+.titulo-sistema{font-size:34px}
+.usuario-logado{width:100%;min-width:auto}
+.select-monitoramento{width:100%}
+}
