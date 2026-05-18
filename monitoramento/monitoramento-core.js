@@ -307,72 +307,54 @@ app.style.display='block'
 }
 await carregarDashboard()
 }
-/*=========================================================
-002 MONITORAMENTO CORE AUTOLOGIN
-=========================================================*/
+/*=========================================================002 MONITORAMENTO CORE AUTOLOGIN=========================================================*/
 document.addEventListener('DOMContentLoaded',async()=>{
-
 let salvo=localStorage.getItem('user_monitoramento')
-
-if(!salvo){
-
+let login=document.getElementById('loginMonitoramento')
 let app=document.getElementById('appMonitoramento')
-
+if(!salvo){
+if(login){
+login.style.display='flex'
+}
 if(app){
 app.style.display='none'
 }
-
 return
-
 }
-
 try{
-
 window.USER_MONITORAMENTO=JSON.parse(salvo)
-
 }catch(e){
-
 console.log(e)
-
 localStorage.removeItem('user_monitoramento')
-
-return
-
+if(login){
+login.style.display='flex'
 }
-
+if(app){
+app.style.display='none'
+}
+return
+}
 if(!USER_MONITORAMENTO){
-
 localStorage.removeItem('user_monitoramento')
-
+if(login){
+login.style.display='flex'
+}
+if(app){
+app.style.display='none'
+}
 return
-
 }
-
 let boxUsuario=document.getElementById('usuarioLogado')
-
 if(boxUsuario){
-
-boxUsuario.innerHTML=
-USER_MONITORAMENTO.nome_completo||
-USER_MONITORAMENTO.username||
-'USUÁRIO'
-
+boxUsuario.innerHTML=USER_MONITORAMENTO.nome_completo||USER_MONITORAMENTO.username||'USUÁRIO'
 }
-
-let login=document.getElementById('loginMonitoramento')
-
 if(login){
 login.style.display='none'
 }
-
-let app=document.getElementById('appMonitoramento')
-
 if(app){
 app.style.display='block'
 }
-
 await carregarDashboard()
-
 })
 /*=========================================================
 003 MONITORAMENTO CORE LOGOUT
