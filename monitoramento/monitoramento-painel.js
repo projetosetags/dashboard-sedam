@@ -798,19 +798,6 @@ tela.insertAdjacentHTML('beforeend',html)
 }
 
 /*=========================================================
-023 MONITORAMENTO-PAINEL.JS FILTRO GLOBAL
-=========================================================*/
-function aplicarFiltroOrigem(data){
-if(!ORIGEM_ATUAL||ORIGEM_ATUAL==='TODAS'){
-return data||[]
-}
-return(data||[]).filter(i=>
-String(i.origem||'').toUpperCase()===
-String(ORIGEM_ATUAL||'').toUpperCase()
-)
-}
-
-/*=========================================================
 024 MONITORAMENTO-PAINEL.JS ORDENAÇÃO GLOBAL
 =========================================================*/
 function ordenarDataGlobal(data){
