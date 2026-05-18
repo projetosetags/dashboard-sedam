@@ -473,98 +473,6 @@ renderizarMonitoramentos(data||[])
 }
 
 /*=========================================================
-002 MONITORAMENTO-PAINEL.JS RENDERIZAR MONITORAMENTOS INLINE
-=========================================================*/
-function renderizarMonitoramentos(data){
-let html=''
-;(data||[]).forEach(m=>{
-let percentual=Number(m.percentual||0)
-html+=`
-<div class="card-monitoramento" data-monitoramento="${m.id}">
-<div class="card-monitoramento-topo">
-<div>
-<div class="monitoramento-titulo" contenteditable="true" onblur="salvarCampoMonitoramento(${m.id},'titulo',this.innerText)">
-${m.titulo||'-'}
-</div>
-<div class="monitoramento-subtitulo">
-<span contenteditable="true" onblur="salvarCampoMonitoramento(${m.id},'orgao',this.innerText)">
-${m.orgao||'-'}
-</span>
-•
-<span contenteditable="true" onblur="salvarCampoMonitoramento(${m.id},'origem',this.innerText)">
-${m.origem||'-'}
-</span>
-</div>
-</div>
-<div class="badge-status ${getClasseStatus(m.status)}">
-<select class="select-card-monitoramento" onchange="salvarCampoMonitoramento(${m.id},'status',this.value)">
-<option value="EM ANDAMENTO" ${m.status==='EM ANDAMENTO'?'selected':''}>EM ANDAMENTO</option>
-<option value="EXECUTADA" ${m.status==='EXECUTADA'?'selected':''}>EXECUTADA</option>
-<option value="PARCIALMENTE EXECUTADA" ${m.status==='PARCIALMENTE EXECUTADA'?'selected':''}>PARCIALMENTE EXECUTADA</option>
-<option value="NÃO EXECUTADA" ${m.status==='NÃO EXECUTADA'?'selected':''}>NÃO EXECUTADA</option>
-</select>
-</div>
-</div>
-<div class="monitoramento-info-grid">
-<div>
-<b>Processo:</b>
-<div contenteditable="true" onblur="salvarCampoMonitoramento(${m.id},'processo',this.innerText)">
-${m.processo||'-'}
-</div>
-</div>
-<div>
-<b>Relator:</b>
-<div contenteditable="true" onblur="salvarCampoMonitoramento(${m.id},'relator',this.innerText)">
-${m.relator||'-'}
-</div>
-</div>
-<div>
-<b>Auditor:</b>
-<div contenteditable="true" onblur="salvarCampoMonitoramento(${m.id},'auditor_responsavel',this.innerText)">
-${m.auditor_responsavel||'-'}
-</div>
-</div>
-<div>
-<b>Criticidade:</b>
-<select class="select-card-monitoramento" onchange="salvarCampoMonitoramento(${m.id},'criticidade',this.value)">
-<option value="ALTA" ${m.criticidade==='ALTA'?'selected':''}>ALTA</option>
-<option value="MÉDIA" ${m.criticidade==='MÉDIA'?'selected':''}>MÉDIA</option>
-<option value="BAIXA" ${m.criticidade==='BAIXA'?'selected':''}>BAIXA</option>
-</select>
-</div>
-<div>
-<b>Origem:</b>
-<select class="select-card-monitoramento" onchange="salvarCampoMonitoramento(${m.id},'origem',this.value)">
-<option value="SEDAM" ${m.origem==='SEDAM'?'selected':''}>SEDAM</option>
-<option value="SEPAT" ${m.origem==='SEPAT'?'selected':''}>SEPAT</option>
-<option value="QUEIMADAS" ${m.origem==='QUEIMADAS'?'selected':''}>QUEIMADAS</option>
-</select>
-</div>
-<div>
-<b>%:</b>
-<input type="number" class="input-card-monitoramento" value="${percentual}" min="0" max="100" onchange="salvarCampoMonitoramento(${m.id},'percentual',this.value)">
-</div>
-</div>
-<div class="progress-monitoramento">
-<div class="progress-monitoramento-bar" style="width:${percentual}%"></div>
-</div>
-<div class="monitoramento-actions">
-<button class="btn-padrao" onclick="abrirMonitoramento(${m.id})">
-Abrir
-</button>
-<button class="btn-padrao azul" onclick="salvarMonitoramentoCompleto(${m.id})">
-Salvar
-</button>
-<button class="btn-padrao vermelho" onclick="excluirMonitoramento(${m.id})">
-Excluir
-</button>
-</div>
-</div>
-`
-})
-document.getElementById('listaMonitoramentos').innerHTML=html
-}
-/*=========================================================
 006 MONITORAMENTO-PAINEL.JS CONTROLE ALTERAÇÕES INLINE
 =========================================================*/
 window.MONITORAMENTO_EDITANDO={}
@@ -578,26 +486,127 @@ window.MONITORAMENTO_EDITANDO[id]={}
 window.MONITORAMENTO_EDITANDO[id][campo]=valor
 }
 /*=========================================================
-008 MONITORAMENTO-PAINEL.JS SALVAR MONITORAMENTO
+001 MONITORAMENTO-PAINEL.JS REMOVER ALERTAS JSON ERRO
 =========================================================*/
 async function salvarMonitoramento(id){
 let payload=window.MONITORAMENTO_EDITANDO[id]
 if(!payload||Object.keys(payload).length===0){
-alert('Nenhuma alteração encontrada')
 return
 }
+let btn=document.querySelector(`[data-save-monitoramento="${id}"]`)
+if(btn){
+btn.disabled=true
+btn.innerHTML='SALVANDO...'
+}
+try{
 let{error}=await client
 .from('monitoramentos')
 .update(payload)
 .eq('id',id)
 if(error){
 console.log(error)
-alert('Erro ao salvar')
+alert('Erro ao salvar monitoramento')
 return
 }
-alert('Monitoramento salvo com sucesso')
 window.MONITORAMENTO_EDITANDO[id]={}
 await carregarListaMonitoramentos()
+}catch(e){
+console.log(e)
+alert('Falha de conexão com Supabase')
+}
+if(btn){
+btn.disabled=false
+btn.innerHTML='SALVAR'
+}
+}
+
+/*=========================================================
+002 MONITORAMENTO-PAINEL.JS RENDERIZAR MONITORAMENTOS EDITÁVEIS
+=========================================================*/
+function renderizarMonitoramentos(data){
+let html=''
+;(data||[]).forEach(m=>{
+html+=`
+<div class="card-monitoramento" data-monitoramento="${m.id}">
+<div class="card-monitoramento-topo">
+<div style="flex:1;">
+<input class="titulo-inline" value="${m.titulo||''}" oninput="alterarCampoMonitoramento(${m.id},'titulo',this.value)">
+<div class="monitoramento-subtitulo">
+<input class="subtitulo-inline" value="${m.orgao||''}" oninput="alterarCampoMonitoramento(${m.id},'orgao',this.value)">
+•
+<input class="subtitulo-inline" value="${m.origem||''}" oninput="alterarCampoMonitoramento(${m.id},'origem',this.value)">
+</div>
+</div>
+<select class="select-inline-monitoramento" style="max-width:220px;" onchange="alterarCampoMonitoramento(${m.id},'status',this.value)">
+<option value="EM ANDAMENTO" ${m.status==='EM ANDAMENTO'?'selected':''}>EM ANDAMENTO</option>
+<option value="EXECUTADA" ${m.status==='EXECUTADA'?'selected':''}>EXECUTADA</option>
+<option value="PARCIALMENTE EXECUTADA" ${m.status==='PARCIALMENTE EXECUTADA'?'selected':''}>PARCIALMENTE EXECUTADA</option>
+<option value="NÃO EXECUTADA" ${m.status==='NÃO EXECUTADA'?'selected':''}>NÃO EXECUTADA</option>
+</select>
+</div>
+
+<div class="monitoramento-info-grid">
+
+<div>
+<b>Processo</b>
+<input class="input-inline-monitoramento" value="${m.processo||''}" oninput="alterarCampoMonitoramento(${m.id},'processo',this.value)">
+</div>
+
+<div>
+<b>Relator</b>
+<input class="input-inline-monitoramento" value="${m.relator||''}" oninput="alterarCampoMonitoramento(${m.id},'relator',this.value)">
+</div>
+
+<div>
+<b>Auditor</b>
+<input class="input-inline-monitoramento" value="${m.auditor_responsavel||''}" oninput="alterarCampoMonitoramento(${m.id},'auditor_responsavel',this.value)">
+</div>
+
+<div>
+<b>Criticidade</b>
+<select class="select-inline-monitoramento" onchange="alterarCampoMonitoramento(${m.id},'criticidade',this.value)">
+<option value="ALTA" ${m.criticidade==='ALTA'?'selected':''}>ALTA</option>
+<option value="MÉDIA" ${m.criticidade==='MÉDIA'?'selected':''}>MÉDIA</option>
+<option value="BAIXA" ${m.criticidade==='BAIXA'?'selected':''}>BAIXA</option>
+</select>
+</div>
+
+<div>
+<b>Origem</b>
+<select class="select-inline-monitoramento" onchange="alterarCampoMonitoramento(${m.id},'origem',this.value)">
+<option value="SEDAM" ${m.origem==='SEDAM'?'selected':''}>SEDAM</option>
+<option value="SEPAT" ${m.origem==='SEPAT'?'selected':''}>SEPAT</option>
+<option value="QUEIMADAS" ${m.origem==='QUEIMADAS'?'selected':''}>QUEIMADAS</option>
+</select>
+</div>
+
+<div>
+<b>Acórdão</b>
+<input class="input-inline-monitoramento" value="${m.acordao||''}" oninput="alterarCampoMonitoramento(${m.id},'acordao',this.value)">
+</div>
+
+</div>
+
+<div class="monitoramento-actions">
+
+<button class="btn-padrao" onclick="abrirMonitoramento(${m.id})">
+Abrir
+</button>
+
+<button class="btn-padrao verde" data-save-monitoramento="${m.id}" onclick="salvarMonitoramento(${m.id})">
+Salvar
+</button>
+
+<button class="btn-padrao vermelho" onclick="excluirMonitoramento(${m.id})">
+Excluir
+</button>
+
+</div>
+
+</div>
+`
+})
+document.getElementById('listaMonitoramentos').innerHTML=html
 }
 
 
