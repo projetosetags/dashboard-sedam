@@ -17,14 +17,13 @@ let filtro=document.getElementById('filtroOrigem')
 if(filtro){
 origem=filtro.value||''
 }
-let monitoramento=await carregarMonitoramentoAtual()
 let query=client
-.from('vw_monitoramento_integrado')
+.from('monitoramento_itens')
 .select('*')
-if(monitoramento&&monitoramento.origem){
-query=query.eq('origem',monitoramento.origem)
+if(MONITORAMENTO_ATUAL){
+query=query.eq('monitoramento_id',MONITORAMENTO_ATUAL)
 }
-if(origem){
+if(origem&&origem!=='TODAS'){
 query=query.eq('origem',origem)
 }
 let{data,error}=await query
@@ -42,10 +41,8 @@ let andamento=0
 let riscoAlto=0
 let riscoMedio=0
 let riscoBaixo=0
-let beneficios=0
 ;(data||[]).forEach(i=>{
 let percentual=Number(i.percentual||0)
-beneficios+=percentual
 if(i.status==='EXECUTADA'){
 executadas++
 }
@@ -231,15 +228,25 @@ plugins:[ChartDataLabels]
 005 MONITORAMENTO-PAINEL.JS LISTA MONITORAMENTOS
 =========================================================*/
 async function carregarListaMonitoramentos(){
-let{data,error}=await client
+
+let query=client
 .from('monitoramentos')
 .select('*')
 .order('titulo',{ascending:true})
+
+if(ORIGEM_ATUAL&&ORIGEM_ATUAL!=='TODAS'){
+query=query.eq('origem',ORIGEM_ATUAL)
+}
+
+let{data,error}=await query
+
 if(error){
 console.log(error)
 return
 }
+
 renderizarMonitoramentos(data||[])
+
 }
 
 /*=========================================================
@@ -529,12 +536,23 @@ abrirTela('dashboard')
 014 MONITORAMENTO-PAINEL.JS FILTRAR ORIGEM
 =========================================================*/
 function filtrarOrigemMonitoramento(){
+
 let filtro=document.getElementById('filtroOrigem')
-if(filtro){
-ORIGEM_ATUAL=filtro.value||'TODAS'
-}
-carregarListaMonitoramentos()
+
+ORIGEM_ATUAL=filtro?filtro.value:''
+
+if(typeof carregarDashboard==='function'){
 carregarDashboard()
+}
+
+if(typeof carregarListaMonitoramentos==='function'){
+carregarListaMonitoramentos()
+}
+
+if(typeof carregarItensMatriz==='function'){
+carregarItensMatriz()
+}
+
 }
 
 /*=========================================================
