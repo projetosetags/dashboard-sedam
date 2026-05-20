@@ -95,7 +95,6 @@ ACESSAR PAINEL
 
 <!-- 002 DASHBOARD -->
 <div id="dashboard" class="hidden">
-
 <header class="topo-sedam-modern">
 
 <div class="topo-esquerda-sedam">
@@ -108,6 +107,10 @@ Painel de Acompanhamento TAG/Sedam 2026
 <div id="user-info" class="usuario-sedam-modern"></div>
 </div>
 
+</div>
+
+<div class="topo-direita-sedam">
+
 <div class="mini-kpis-sedam">
 
 <div class="mini-kpi-sedam azul">
@@ -119,16 +122,17 @@ Painel de Acompanhamento TAG/Sedam 2026
 <span id="dashboardTotalSubitens">0</span>
 <small>SUBITENS</small>
 </div>
-</div>
 
 </div>
-
-<div class="topo-direita-sedam">
 
 <div class="media-topo-sedam">
 <div>MÉDIA GERAL TAG</div>
 <strong id="total-geral">0%</strong>
 </div>
+
+<button class="btn-topo-sedam" onclick="voltarPainelGeral()">
+Painel Geral
+</button>
 
 <button id="btnBackupSedam" class="btn-topo-sedam hidden" onclick="backupSedam()">
 BACKUP Sedam
@@ -145,7 +149,6 @@ Sair
 </button>
 
 </div>
-
 
 </header>
 
