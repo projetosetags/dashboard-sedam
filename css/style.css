@@ -521,3 +521,11 @@ font-size:18px;
 }
 
 }
+#btn-ocultar{
+display:inline-flex!important;
+align-items:center!important;
+justify-content:center!important;
+visibility:visible!important;
+opacity:1!important;
+white-space:nowrap;
+}
