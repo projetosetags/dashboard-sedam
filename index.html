@@ -96,43 +96,55 @@ ACESSAR PAINEL
 <!-- 002 DASHBOARD -->
 <div id="dashboard" class="hidden">
 
-<header class="flex justify-between items-center mb-4 px-2">
+<header class="topo-sedam-modern">
+
+<div class="topo-esquerda-sedam">
 
 <div>
-<h2 class="text-lg font-black text-blue-400 leading-none tracking-tighter uppercase">
+<h1 class="titulo-sedam-modern">
 Painel de Acompanhamento TAG/Sedam 2026
-</h2>
-<p id="user-info" class="text-[9px] text-slate-500 mt-1 uppercase italic"></p>
+</h1>
+
+<div id="user-info" class="usuario-sedam-modern"></div>
 </div>
 
-<div class="flex items-center gap-4">
-<div id="pdf-container" class="flex items-center gap-2"></div>
-<div id="backup-container" class="flex items-center gap-2 min-w-[140px]"></div>
+<div class="mini-kpis-sedam">
 
-<div class="flex items-center gap-3">
-<div class="text-right border-l border-white/10 pl-4">
-<span class="block text-[7px] text-slate-500 font-bold uppercase">
-Média Geral TAG
-</span>
-<span id="total-geral" class="text-2xl font-black text-emerald-400">
-0%
-</span>
+<div class="mini-kpi-sedam azul">
+<span id="dashboardTotalItens">0</span>
+<small>ITENS</small>
 </div>
 
-<button id="btnBackupSedam" class="hidden text-[11px] bg-blue-700 hover:bg-blue-800 text-white font-black px-4 py-2 rounded-xl shadow-lg transition-all duration-200 hover:scale-105" onclick="backupSedam()">
+<div class="mini-kpi-sedam verde">
+<span id="dashboardTotalSubitens">0</span>
+<small>SUBITENS</small>
+</div>
+
+</div>
+
+</div>
+
+<div class="topo-direita-sedam">
+
+<div class="media-topo-sedam">
+<div>MÉDIA GERAL TAG</div>
+<strong id="total-geral">0%</strong>
+</div>
+
+<button id="btnBackupSedam" class="btn-topo-sedam hidden" onclick="backupSedam()">
 BACKUP Sedam
 </button>
 
 <div id="btn-monitoramento" style="display:none">
-<a href="https://projetosetags.github.io/tags/monitoramento/monitoramento.html" target="_blank" class="text-[11px] bg-indigo-700 hover:bg-indigo-800 text-white font-black px-4 py-2 rounded-xl shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2">
-<span>📊</span>
-<span>MONITORAMENTO</span>
+<a href="https://projetosetags.github.io/tags/monitoramento/monitoramento.html" target="_blank" class="btn-topo-sedam">
+📊 Monitoramento
 </a>
 </div>
 
-<button onclick="logout()" class="text-[11px] bg-red-700 hover:bg-red-800 text-white font-black px-4 py-2 rounded-xl shadow-lg">
-SAIR
+<button onclick="logout()" class="btn-topo-sedam sair">
+Sair
 </button>
+
 </div>
 
 </header>
@@ -196,13 +208,6 @@ SUBITEM
 <div class="flex justify-end items-center gap-2 ml-auto">
 <input id="dataInicio" type="date" onchange="aplicarFiltroData()" class="text-xs bg-white border border-slate-300 text-slate-800 px-3 py-2 rounded-2xl shadow-sm font-bold">
 <input id="dataFim" type="date" onchange="aplicarFiltroData()" class="text-xs bg-white border border-slate-300 text-slate-800 px-3 py-2 rounded-2xl shadow-sm font-bold">
-<button onclick="limparFiltroData()" class="btn-dashboard">
-LIMPAR
-</button>
-
-<button onclick="toggleOcultarConcluidos()" id="btn-ocultar" class="btn-dashboard">
-OCULTAR 100%
-</button>
 </div>
 
 </div>
