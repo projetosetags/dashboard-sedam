@@ -200,20 +200,15 @@ Sair
 
 <!-- 004 FILTROS -->
 <div class="flex flex-wrap gap-2 mb-3 items-center justify-between">
+
 <div id="boxModoResumo" class="flex flex-wrap gap-2 items-center">
+
 <button onclick="modoResumo='item';renderResumo()" id="btnModoItem" class="text-xs bg-amber-500 hover:bg-amber-400 text-white px-4 py-2 rounded-2xl font-black shadow inline-flex items-center">
 ITEM
 </button>
+
 <button onclick="modoResumo='subitem';renderResumo()" id="btnModoSubitem" class="text-xs bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-2xl font-black shadow inline-flex items-center">
 SUBITEM
-</button>
-<button
-type="button"
-onclick="toggleOcultarConcluidos()"
-id="btn-ocultar"
-style="display:inline-flex"
-class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl font-black shadow items-center justify-center">
-OCULTAR 100%
 </button>
 
 </div>
@@ -225,8 +220,10 @@ OCULTAR 100%
 <input id="dataFim" type="date" onchange="aplicarFiltroData()" class="text-xs bg-white border border-slate-300 text-slate-800 px-3 py-2 rounded-2xl shadow-sm font-bold">
 
 <button
+type="button"
 onclick="toggleOcultarConcluidos()"
-class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl font-black shadow">
+id="btn-ocultar"
+class="text-xs bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-2xl font-black shadow inline-flex items-center justify-center">
 OCULTAR 100%
 </button>
 
