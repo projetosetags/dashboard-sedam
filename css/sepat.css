@@ -35,7 +35,16 @@ img{max-width:100%;display:block;}
 .topo-sepat{position:sticky;top:0;z-index:50;min-height:74px;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;color:#ffffff;background:linear-gradient(135deg,#0050aa,#0a67c7);border-bottom:1px solid rgba(255,255,255,.18);box-shadow:0 12px 30px rgba(0,80,170,.22);}
 .titulo-sepat{font-size:21px;font-weight:1000;letter-spacing:1px;}
 .usuario-sepat{font-size:11px;font-weight:800;opacity:.92;margin-top:4px;}
-.topo-acoes-sepat{display:flex;align-items:center;gap:10px;}
+.topo-acoes-sepat{
+display:flex;
+align-items:center;
+justify-content:flex-end;
+gap:10px;
+flex-wrap:nowrap;
+overflow-x:auto;
+margin-left:auto;
+padding-left:10px;
+}
 .btn-topo-sepat{padding:8px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#ffffff;font-size:11px;font-weight:1000;cursor:pointer;transition:.2s ease;}
 .btn-topo-sepat:hover{background:rgba(255,255,255,.24);}
 .btn-topo-sepat.sair{background:rgba(127,29,29,.35);}
