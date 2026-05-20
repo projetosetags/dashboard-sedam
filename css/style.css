@@ -355,70 +355,81 @@ canvas{display:block!important;visibility:visible!important;opacity:1!important;
 /*=========================================================
 SEDAM TOPO MODERNO
 =========================================================*/
+
+./*=========================================================
+SEDAM TOPO PREMIUM PADRAO SEPAT
+=========================================================*/
 .topo-sedam-modern{
 display:flex;
 justify-content:space-between;
-align-items:center;
-gap:20px;
-padding:22px 26px;
-border-radius:30px;
-background:linear-gradient(135deg,#dff7e8,#f4fff8);
-border:1px solid #c7ead5;
-box-shadow:0 10px 30px rgba(0,0,0,.06);
+align-items:flex-start;
+gap:30px;
+padding:26px 34px;
+border-radius:34px;
+background:linear-gradient(135deg,#dff7e8,#eefcf3);
+border:1px solid #bfe7cd;
+box-shadow:0 12px 34px rgba(34,197,94,.08);
 margin-bottom:18px;
 flex-wrap:wrap
 }
 
 .topo-esquerda-sedam{
 display:flex;
-align-items:center;
-gap:30px;
-flex-wrap:wrap
+flex-direction:column;
+justify-content:flex-start;
+gap:18px;
+flex:1;
+min-width:420px
 }
 
 .titulo-sedam-modern{
-font-size:38px;
+font-size:64px;
 font-weight:1000;
-line-height:1;
+line-height:.95;
 color:#14532d;
 margin:0;
-letter-spacing:-1px
+letter-spacing:-2px
 }
 
 .usuario-sedam-modern{
-margin-top:8px;
-font-size:13px;
+font-size:18px;
 font-style:italic;
 font-weight:700;
-color:#365314;
-text-transform:uppercase
+color:#3f6212;
+text-transform:uppercase;
+margin-top:8px
 }
 
 .mini-kpis-sedam{
 display:flex;
-gap:12px;
+gap:18px;
+margin-top:18px;
 flex-wrap:wrap
 }
 
 .mini-kpi-sedam{
-min-width:140px;
-padding:14px 18px;
-border-radius:22px;
-background:#fff;
-border:1px solid #dbe4dc;
-box-shadow:0 3px 10px rgba(0,0,0,.05)
+width:210px;
+height:150px;
+padding:24px;
+border-radius:32px;
+background:#ffffff;
+border:1px solid #d7e6da;
+box-shadow:0 8px 24px rgba(0,0,0,.05);
+display:flex;
+flex-direction:column;
+justify-content:center
 }
 
 .mini-kpi-sedam span{
-display:block;
-font-size:34px;
+font-size:72px;
 font-weight:1000;
 line-height:1
 }
 
 .mini-kpi-sedam small{
-font-size:11px;
-font-weight:900;
+font-size:18px;
+font-weight:1000;
+margin-top:6px;
 opacity:.7
 }
 
@@ -432,45 +443,51 @@ color:#16a34a
 
 .topo-direita-sedam{
 display:flex;
-align-items:center;
-gap:14px;
+align-items:flex-end;
+gap:18px;
+margin-left:auto;
+padding-top:6px;
 flex-wrap:wrap
 }
 
 .media-topo-sedam{
-text-align:center;
-padding-right:14px;
-border-right:1px solid #cbd5e1
+padding-right:20px;
+border-right:1px solid #bfd8c7;
+text-align:center
 }
 
 .media-topo-sedam div{
-font-size:11px;
+font-size:18px;
 font-weight:1000;
-color:#14532d
+color:#14532d;
+line-height:1.2
 }
 
 .media-topo-sedam strong{
 display:block;
-font-size:42px;
+font-size:76px;
 line-height:1;
 font-weight:1000;
-color:#16a34a
+color:#16a34a;
+margin-top:6px
 }
 
 .btn-topo-sedam{
+height:72px;
+padding:0 30px;
+border-radius:24px;
+border:none;
 background:linear-gradient(135deg,#22c55e,#16a34a);
 color:#fff;
-border:none;
-padding:14px 20px;
-border-radius:18px;
-font-size:12px;
+font-size:22px;
 font-weight:1000;
 cursor:pointer;
-text-decoration:none;
 display:flex;
 align-items:center;
-gap:8px;
-box-shadow:0 6px 18px rgba(34,197,94,.25);
+justify-content:center;
+gap:10px;
+text-decoration:none;
+box-shadow:0 10px 28px rgba(34,197,94,.22);
 transition:.2s
 }
 
@@ -479,6 +496,6 @@ transform:translateY(-2px) scale(1.02)
 }
 
 .btn-topo-sedam.sair{
-background:linear-gradient(135deg,#dc2626,#b91c1c);
-box-shadow:0 6px 18px rgba(220,38,38,.22)
+background:linear-gradient(135deg,#ef4444,#b91c1c);
+box-shadow:0 10px 28px rgba(239,68,68,.18)
 }
