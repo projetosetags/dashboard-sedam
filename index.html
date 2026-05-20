@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <link rel="icon" href="data:,">
-<title>Painel de Acompanhamento TAG/Sedam 2026</title>
+<title>Painel de Acompanhamento TAGs/Sedam e Sepat 2026</title>
 <link rel="icon" href="/tags/assets/bg-monitoramento.png">
 <link rel="stylesheet" href="./css/tailwind.min.css">
 <link rel="stylesheet" href="./css/style.css?v=6">
@@ -122,6 +122,10 @@ Média Geral TAG
 <button id="btnBackupSedam" class="hidden text-[11px] bg-blue-700 hover:bg-blue-800 text-white font-black px-4 py-2 rounded-xl shadow-lg transition-all duration-200 hover:scale-105" onclick="backupSedam()">
 BACKUP Sedam
 </button>
+
+<div id="btn-monitoramento" style="display:none">
+<a href="https://projetosetags.github.io/tags/monitoramento/monitoramento.html" target="_blank" style="font-size:9px;color:#94a3b8;text-decoration:none;opacity:.5">📊</a>
+</div>
 
 <button onclick="logout()" class="text-[11px] bg-red-700 hover:bg-red-800 text-white font-black px-4 py-2 rounded-xl shadow-lg">
 SAIR
@@ -454,6 +458,19 @@ FECHAR
 function voltarPainelGeral(){
 window.location.href='index.html'
 }
+
+function aplicarAcessoMonitoramento(){
+let btn=document.getElementById('btn-monitoramento')
+if(!btn)return
+let nome=(userP?.nome_completo||'').toLowerCase()
+if(nome.includes('manoel')||nome.includes('jane')){
+btn.style.display='block'
+}else{
+btn.style.display='none'
+}
+}
+
+
 </script>
 </body>
 </html>
