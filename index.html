@@ -467,42 +467,32 @@ FECHAR
 
 <script>
 function voltarPainelGeral(){
-window.location.href='index.html'
+window.location.href='https://projetosetags.github.io/tags/index.html'
 }
 
 function aplicarAcessoMonitoramento(){
-
 let btn=document.getElementById('btn-monitoramento')
-
 if(!btn)return
-
 let username=(userP?.username||'').toLowerCase().trim()
 let nome=(userP?.nome_completo||'').toLowerCase().trim()
-
 const usuariosPermitidos=[
 'manoel',
 'jane'
 ]
-
 const liberado=
 usuariosPermitidos.includes(username)||
 nome.includes('manoel')||
 nome.includes('jane')
-
 if(liberado){
-
 btn.style.display='flex'
 btn.style.alignItems='center'
-
 }else{
-
 btn.style.display='none'
-
+}
 }
 
-}
+
 </script>
-
-  
+ 
 </body>
 </html>
