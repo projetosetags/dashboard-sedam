@@ -270,11 +270,15 @@ switchTab('dashboard')
 setTimeout(async ()=>{
 try{
 await carregarDados()
+
+aplicarAcessoMonitoramento()
+
 if(typeof renderDashboard==='function')renderDashboard()
 if(typeof renderResumo==='function')renderResumo()
 if(typeof renderTable==='function')renderTable()
 if(typeof renderConcluidos==='function')renderConcluidos()
 if(typeof initPainelGrafico==='function')initPainelGrafico()
+
 }catch(e){
 console.log(e)
 }
