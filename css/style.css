@@ -398,8 +398,11 @@ font-style:normal;
 .topo-direita-sedam{
 display:flex;
 align-items:center;
-gap:10px;
-flex-wrap:wrap;
+justify-content:flex-end;
+gap:12px;
+flex-wrap:nowrap;
+margin-left:auto;
+}wrap:wrap;
 }
 
 .mini-kpis-sedam{
