@@ -63,7 +63,7 @@ info.innerHTML=
 aplicarPermissoesAbas()
 
 await carregarDados()
-
+aplicarAcessoMonitoramento()
 let abaSalva=localStorage.getItem('activeTab')||'dashboard'
 
 switchTab(abaSalva)
