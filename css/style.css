@@ -352,3 +352,133 @@ canvas{display:block!important;visibility:visible!important;opacity:1!important;
 
 /*=========================================================017 FINAL=========================================================*/
 /*ARQUIVO FINAL CONSOLIDADO SEDAM + PAINEL GERAL ESTRUTURA COMPLETA 001 AO 017*/
+/*=========================================================
+SEDAM TOPO MODERNO
+=========================================================*/
+.topo-sedam-modern{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+padding:22px 26px;
+border-radius:30px;
+background:linear-gradient(135deg,#dff7e8,#f4fff8);
+border:1px solid #c7ead5;
+box-shadow:0 10px 30px rgba(0,0,0,.06);
+margin-bottom:18px;
+flex-wrap:wrap
+}
+
+.topo-esquerda-sedam{
+display:flex;
+align-items:center;
+gap:30px;
+flex-wrap:wrap
+}
+
+.titulo-sedam-modern{
+font-size:38px;
+font-weight:1000;
+line-height:1;
+color:#14532d;
+margin:0;
+letter-spacing:-1px
+}
+
+.usuario-sedam-modern{
+margin-top:8px;
+font-size:13px;
+font-style:italic;
+font-weight:700;
+color:#365314;
+text-transform:uppercase
+}
+
+.mini-kpis-sedam{
+display:flex;
+gap:12px;
+flex-wrap:wrap
+}
+
+.mini-kpi-sedam{
+min-width:140px;
+padding:14px 18px;
+border-radius:22px;
+background:#fff;
+border:1px solid #dbe4dc;
+box-shadow:0 3px 10px rgba(0,0,0,.05)
+}
+
+.mini-kpi-sedam span{
+display:block;
+font-size:34px;
+font-weight:1000;
+line-height:1
+}
+
+.mini-kpi-sedam small{
+font-size:11px;
+font-weight:900;
+opacity:.7
+}
+
+.mini-kpi-sedam.azul span{
+color:#2563eb
+}
+
+.mini-kpi-sedam.verde span{
+color:#16a34a
+}
+
+.topo-direita-sedam{
+display:flex;
+align-items:center;
+gap:14px;
+flex-wrap:wrap
+}
+
+.media-topo-sedam{
+text-align:center;
+padding-right:14px;
+border-right:1px solid #cbd5e1
+}
+
+.media-topo-sedam div{
+font-size:11px;
+font-weight:1000;
+color:#14532d
+}
+
+.media-topo-sedam strong{
+display:block;
+font-size:42px;
+line-height:1;
+font-weight:1000;
+color:#16a34a
+}
+
+.btn-topo-sedam{
+background:linear-gradient(135deg,#22c55e,#16a34a);
+color:#fff;
+border:none;
+padding:14px 20px;
+border-radius:18px;
+font-size:12px;
+font-weight:1000;
+cursor:pointer;
+text-decoration:none;
+display:flex;
+align-items:center;
+gap:8px;
+box-shadow:0 6px 18px rgba(34,197,94,.25);
+transition:.2s
+}
+
+.btn-topo-sedam:hover{
+transform:translateY(-2px) scale(1.02)
+}
+
+.btn-topo-sedam.sair{
+background:linear-gradient(135deg,#dc2626,#b91c1c);
+box-shadow:0 6px 18px rgba(220,38,38,.22)
+}
